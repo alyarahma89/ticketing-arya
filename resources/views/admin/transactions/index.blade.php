@@ -73,12 +73,16 @@
                 <a href="{{ route('admin.transactions.index') }}" class="flex items-center gap-3 px-4 py-3 bg-white/10 text-white rounded-xl text-[14px] font-medium shadow-sm transition-all hover:bg-white/15">
                     <span class="text-lg">💳</span> Data Transaksi
                 </a>
+
+                <!-- PEMBATASAN MENU: Hanya Admin yang bisa melihat menu Kelola Pengguna -->
+                @if(Auth::user()->role === 'admin')
                 <a href="{{ route('admin.users.index') }}" class="flex items-center gap-3 px-4 py-3 text-white/60 hover:text-white hover:bg-white/5 rounded-xl text-[14px] font-medium transition-all">
                     <span class="text-lg">👥</span> Kelola Pengguna
                 </a>
                 <a href="{{ route('admin.sponsorships.create') }}" class="flex items-center gap-3 px-4 py-3 text-white/60 hover:text-white hover:bg-white/5 rounded-xl text-[14px] font-medium transition-all">
                     <span class="text-lg">🤝</span> Kelola Sponsorship
                 </a>
+                @endif
             </nav>
         </div>
 
@@ -89,7 +93,7 @@
                 </div>
                 <div class="overflow-hidden">
                     <p class="text-[14px] text-white font-medium truncate">{{ Auth::user()->name ?? 'Administrator' }}</p>
-                    <p class="text-[11px] text-primary-subdued truncate">Platform Admin</p>
+                    <p class="text-[11px] text-primary-subdued truncate uppercase">{{ Auth::user()->role ?? 'Admin' }}</p>
                 </div>
             </div>
 
@@ -118,7 +122,14 @@
         <div class="px-10 mb-8 relative z-10 flex flex-col sm:flex-row sm:items-end justify-between gap-4">
             <div>
                 <h1 class="text-[32px] font-light tracking-[-0.64px] text-ink mb-1">Data Transaksi</h1>
-                <p class="text-[15px] text-ink-mute font-light">Pantau seluruh riwayat pembelian dan status pembayaran tiket.</p>
+                <p class="text-[15px] text-ink-mute font-light">
+                    <!-- PEMBATASAN TEKS: Pesan berbeda untuk Admin dan EO -->
+                    @if(Auth::user()->role === 'eo')
+                        Pantau riwayat pembelian dan status pembayaran tiket untuk seluruh event Anda.
+                    @else
+                        Pantau seluruh riwayat pembelian dan status pembayaran tiket di platform.
+                    @endif
+                </p>
             </div>
 
             <button class="bg-white border border-hairline text-ink hover:text-primary hover:border-primary px-5 py-2.5 rounded-full text-[13px] font-medium transition-colors shadow-sm">
@@ -202,7 +213,14 @@
                                         <span class="text-2xl opacity-50">📭</span>
                                     </div>
                                     <h5 class="text-[16px] font-medium text-ink mb-1">Belum Ada Transaksi</h5>
-                                    <p class="text-[14px] text-ink-mute mb-4">Belum ada pengguna yang melakukan pembelian tiket.</p>
+                                    <p class="text-[14px] text-ink-mute mb-4">
+                                        <!-- PEMBATASAN TEKS STATE KOSONG -->
+                                        @if(Auth::user()->role === 'eo')
+                                            Belum ada pengguna yang melakukan pembelian tiket pada event Anda.
+                                        @else
+                                            Belum ada pengguna yang melakukan pembelian tiket.
+                                        @endif
+                                    </p>
                                 </td>
                             </tr>
                             @endforelse

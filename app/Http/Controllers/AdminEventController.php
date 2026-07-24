@@ -114,10 +114,21 @@ class AdminEventController extends Controller
         ));
     }
 
+    
     // HANYA UNTUK MANAJEMEN EVENT (Tabel)
     public function index()
     {
-        $events = Event::with('category')->get(); // Diperbarui untuk memuat data relasi kategori
+        $user = Auth::user();
+
+        // Cek jika yang login adalah EO
+        if ($user->role === 'eo') {
+            // EO hanya mengambil event miliknya sendiri beserta relasi kategorinya
+            $events = Event::with('category')->where('user_id', $user->id)->get();
+        } else {
+            // Admin mengambil semua event beserta relasi kategorinya
+            $events = Event::with('category')->get();
+        }
+
         $sponsorships = Sponsorship::all();
 
         return view('admin.events.index', compact('events', 'sponsorships'));

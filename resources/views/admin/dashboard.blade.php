@@ -53,6 +53,8 @@
                 <a href="{{ route('admin.transactions.index') }}" class="flex items-center gap-3 px-4 py-3 text-white/60 hover:text-white hover:bg-white/5 rounded-xl text-[14px] font-medium transition-all">
                     <span class="text-lg">💳</span> Data Transaksi
                 </a>
+                <a href="{{ route('admin.reports.index') }}" class="flex items-center gap-3 px-4 py-3 text-white/60 hover:text-white hover:bg-white/5 rounded-xl text-[14px] font-medium transition-all">
+                    <span class="text-lg">📈</span> Laporan Keuangan
 
                 <!-- MENU KHUSUS: HANYA MUNCUL JIKA ROLE = ADMIN -->
                 @if(Auth::user()->role === 'admin')

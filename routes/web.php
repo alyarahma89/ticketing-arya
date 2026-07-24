@@ -17,6 +17,7 @@ use Illuminate\Http\Request;
 use App\Http\Controllers\AdminCategoryController;
 use App\Http\Controllers\PanitiaController;
 use App\Http\Controllers\EOEventController;
+use App\Http\Controllers\AdminReportController;
 
 // =========================================================
 // RUTE PUBLIK (TIDAK PERLU LOGIN)
@@ -112,6 +113,9 @@ Route::middleware(['auth', 'role:admin,eo'])->prefix('admin')->name('admin.')->g
     Route::post('/categories', [AdminCategoryController::class, 'store'])->name('categories.store');
     Route::put('/categories/{id}', [AdminCategoryController::class, 'update'])->name('categories.update');
     Route::delete('/categories/{id}', [AdminCategoryController::class, 'destroy'])->name('categories.destroy');
+
+    // Rute untuk laporan keuangan
+    Route::get('/laporan', [AdminReportController::class, 'index'])->name('reports.index');
 });
 
 // =========================================================
