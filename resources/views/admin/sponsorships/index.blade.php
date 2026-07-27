@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Kelola Sponsorship - TICKS ID</title>
+    <title>Kelola Sponsorship - ARTIX ID</title>
 
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -29,24 +29,72 @@
             }
         }
     </script>
+    <!-- 3. CSS Kustom & Scrollbar (KHUSUS CSS) -->
+    <style>
+        body {
+            font-feature-settings: "ss01" 1;
+            -webkit-font-smoothing: antialiased;
+        }
+        .tabular-numeric {
+            font-feature-settings: "tnum" 1;
+        }
+
+        /* Custom scrollbar untuk sidebar */
+        .sidebar-scroll::-webkit-scrollbar { width: 4px; }
+        .sidebar-scroll::-webkit-scrollbar-track { background: transparent; }
+        .sidebar-scroll::-webkit-scrollbar-thumb { background: rgba(255, 255, 255, 0.2); border-radius: 10px; }
+        .sidebar-scroll::-webkit-scrollbar-thumb:hover { background: rgba(255, 255, 255, 0.3); }
+
+        /* Aturan untuk cetak PDF */
+        @media print {
+            .no-print { display: none !important; }
+            body { background: white !important; }
+            main { padding: 0 !important; overflow: visible !important; }
+            .shadow-sm { box-shadow: none !important; border: 1px solid #ccc !important; }
+        }
+    </style>
 </head>
 <body class="bg-canvas-soft text-ink flex h-screen overflow-hidden">
 
     <!-- SIDEBAR -->
-    <aside class="w-64 bg-brand-dark flex flex-col justify-between hidden lg:flex relative z-20 shadow-level-2">
-        <div>
-            <div class="h-24 flex items-center px-8 border-b border-white/5">
-                <span class="text-white font-light text-[24px] tracking-[-0.22px]">
-                    TICKS <span class="font-medium text-primary-subdued">ID</span>
-                </span>
-            </div>
+    <!-- SIDEBAR DINAMIS -->
+    <aside class="w-64 bg-brand-dark flex flex-col hidden lg:flex relative z-20 shrink-0 h-screen">
 
-            <nav class="p-5 space-y-2 mt-2">
+        <!-- 1. BAGIAN ATAS: LOGO (Ukurannya Tetap) -->
+        <div class="h-20 shrink-0 flex items-center px-8 border-b border-white/5 pt-4">
+            <span class="text-white font-light text-[24px] tracking-tight">
+                ARTIX <span class="font-bold text-primary-subdued">ID</span>
+            </span>
+        </div>
+
+        <!-- 2. BAGIAN TENGAH: MENU (Bisa di-scroll) -->
+        <nav class="p-5 space-y-2 flex-1 overflow-y-auto sidebar-scroll">
+            <!-- MENU EO -->
+            @if(Auth::user()->role == 'eo')
+                <a href="{{ route('admin.dashboard') }}" class="flex items-center gap-3 px-4 py-3 text-white/60 hover:text-white hover:bg-white/5 rounded-xl text-[14px] font-medium transition-all">
+                    <span class="text-lg">📊</span> Dasbor Saya
+                </a>
+                <a href="{{ route('admin.events.index') }}" class="flex items-center gap-3 px-4 py-3 text-white/60 hover:text-white hover:bg-white/5 rounded-xl text-[14px] font-medium transition-all">
+                    <span class="text-lg">🎟️</span> Event Saya
+                </a>
+                <a href="{{ route('admin.transactions.index') }}" class="flex items-center gap-3 px-4 py-3 text-white/60 hover:text-white hover:bg-white/5 rounded-xl text-[14px] font-medium transition-all">
+                    <span class="text-lg">💳</span> Penjualan Tiket
+                </a>
+                <!-- Menu ini AKTIF untuk EO -->
+                <a href="{{ route('admin.sponsorships.index') }}" class="flex items-center gap-3 px-4 py-3 bg-white/10 text-white rounded-xl text-[14px] font-medium transition-all shadow-sm">
+                    <span class="text-lg">🤝</span> Kerjasama Sponsor
+                </a>
+
+            <!-- MENU ADMIN UTAMA -->
+            @elseif(Auth::user()->role == 'admin')
                 <a href="{{ route('admin.dashboard') }}" class="flex items-center gap-3 px-4 py-3 text-white/60 hover:text-white hover:bg-white/5 rounded-xl text-[14px] font-medium transition-all">
                     <span class="text-lg">📊</span> Ikhtisar Platform
                 </a>
                 <a href="{{ route('admin.events.index') }}" class="flex items-center gap-3 px-4 py-3 text-white/60 hover:text-white hover:bg-white/5 rounded-xl text-[14px] font-medium transition-all">
                     <span class="text-lg">🎟️</span> Manajemen Event
+                </a>
+                <a href="{{ route('admin.categories.index') }}" class="flex items-center gap-3 px-4 py-3 text-white/60 hover:text-white hover:bg-white/5 rounded-xl text-[14px] font-medium transition-all">
+                    <span class="text-lg">🏷️</span> Kelola Kategori
                 </a>
                 <a href="{{ route('admin.transactions.index') }}" class="flex items-center gap-3 px-4 py-3 text-white/60 hover:text-white hover:bg-white/5 rounded-xl text-[14px] font-medium transition-all">
                     <span class="text-lg">💳</span> Data Transaksi
@@ -54,20 +102,27 @@
                 <a href="{{ route('admin.users.index') }}" class="flex items-center gap-3 px-4 py-3 text-white/60 hover:text-white hover:bg-white/5 rounded-xl text-[14px] font-medium transition-all">
                     <span class="text-lg">👥</span> Kelola Pengguna
                 </a>
-                <a href="{{ route('admin.sponsorships.index') }}" class="flex items-center gap-3 px-4 py-3 bg-white/10 text-white rounded-xl text-[14px] font-medium shadow-sm transition-all hover:bg-white/15">
+                <!-- Menu ini AKTIF untuk Admin -->
+                <a href="{{ route('admin.sponsorships.index') }}" class="flex items-center gap-3 px-4 py-3 bg-white/10 text-white rounded-xl text-[14px] font-medium transition-all shadow-sm">
                     <span class="text-lg">🤝</span> Kelola Sponsorship
                 </a>
-            </nav>
-        </div>
+                <a href="{{ route('admin.reports.index') }}" class="flex items-center gap-3 px-4 py-3 text-white/60 hover:text-white hover:bg-white/5 rounded-xl text-[14px] font-medium transition-all">
+                    <span class="text-lg">📊</span> Laporan Keseluruhan
+                </a>
+            @endif
+        </nav>
 
-        <div class="p-5 border-t border-white/5">
-            <form action="{{ route('logout') }}" method="POST">
+        <!-- 3. BAGIAN BAWAH: PROFIL & LOGOUT (Selalu terlihat di bawah) -->
+        <div class="p-5 border-t border-white/5 shrink-0 bg-brand-dark">
+
+            <form action="{{ route('logout') }}" method="POST" class="mt-3">
                 @csrf
-                <button type="submit" class="w-full text-left text-[13px] text-primary-soft hover:text-white px-3 py-2 rounded-lg transition-colors flex items-center gap-2">
-                    🚪 Keluar dari Sistem
+                <button type="submit" class="w-full text-left text-[13px] font-medium text-red-300 bg-red-500/10 hover:bg-red-500/25 border border-red-500/20 px-4 py-2.5 rounded-xl transition-all flex items-center gap-3 shadow-sm">
+                    <span class="text-lg">🚪</span> Keluar dari Sistem
                 </button>
             </form>
         </div>
+
     </aside>
 
     <!-- MAIN CONTENT -->
@@ -75,12 +130,7 @@
         <div class="absolute top-0 left-0 w-full h-[300px] bg-gradient-to-tr from-canvas-soft via-primary-soft/10 to-primary-subdued/20 blur-[90px] opacity-80 z-0 pointer-events-none"></div>
 
         <div class="h-20 px-10 flex items-center justify-end relative z-10 shrink-0">
-            <div class="flex items-center gap-3 bg-white/40 px-4 py-2 rounded-full border border-hairline backdrop-blur-sm">
-                <div class="w-7 h-7 rounded-full bg-primary flex items-center justify-center text-white text-xs font-semibold uppercase">
-                    {{ substr(Auth::user()->name ?? 'A', 0, 1) }}
-                </div>
-                <span class="text-[13px] font-medium text-ink">{{ Auth::user()->name ?? 'Administrator' }}</span>
-            </div>
+
         </div>
 
         <div class="px-10 mb-8 relative z-10 flex flex-col sm:flex-row sm:items-end justify-between gap-4">

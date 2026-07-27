@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Edit Paket Sponsor - TICKS ID</title>
+    <title>Edit Paket Sponsor - ARTIX ID</title>
 
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -58,9 +58,9 @@
                 <span class="transform group-hover:-translate-x-1 transition-transform">&larr;</span> Kembali
             </a>
         </div>
-        
+
         <div class="flex items-center justify-center gap-1.5 w-2/4">
-            <span class="font-syne font-extrabold text-[22px] tracking-tight text-white block">TICKS</span>
+            <span class="font-syne font-extrabold text-[22px] tracking-tight text-white block">ARTIX</span>
             <span class="font-syne font-extrabold text-[22px] tracking-tight text-primary-subdued block">ID</span>
         </div>
 
@@ -88,7 +88,7 @@
     </div>
 
     <main class="flex-1 max-w-6xl w-full mx-auto py-10 px-6 -mt-8">
-        
+
         <form action="{{ route('admin.sponsorships.update', $sponsor->id) }}" method="POST" enctype="multipart/form-data">
             @csrf
             @method('PUT')
@@ -108,7 +108,7 @@
             @endif
 
             <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
-                
+
                 <div class="lg:col-span-2 space-y-6">
                     <div class="bg-white border border-hairline rounded-[24px] shadow-level-1 p-8 space-y-6 relative overflow-hidden">
                         <div class="absolute top-0 inset-x-0 h-1.5 bg-gradient-to-r from-primary to-primary-soft"></div>
@@ -155,7 +155,7 @@
                 </div>
 
                 <div class="space-y-6">
-                    
+
                     <div class="bg-white border border-hairline rounded-[24px] shadow-level-1 p-6 space-y-5 relative overflow-hidden">
                         <div class="absolute top-0 inset-x-0 h-1.5 bg-gradient-to-r from-primary-soft to-primary-subdued"></div>
 
@@ -187,7 +187,7 @@
                         <h2 class="text-[16px] font-bold text-brand-dark flex items-center gap-2">
                             <i class="bi bi-image text-primary"></i> Ilustrasi / Badge <span class="text-[11px] font-normal text-ink-mute">(Opsional)</span>
                         </h2>
-                        
+
                         <div class="relative group aspect-square w-full max-w-[220px] mx-auto rounded-2xl bg-canvas-soft border-2 border-dashed border-primary/20 overflow-hidden flex items-center justify-center shadow-inner">
                             @if($sponsor->image)
                                 <img id="badge-preview" src="{{ asset('storage/' . $sponsor->image) }}" alt="Preview" class="w-full h-full object-cover">

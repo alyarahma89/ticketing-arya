@@ -114,7 +114,8 @@ class AdminEventController extends Controller
         ));
     }
 
-    
+
+    // HANYA UNTUK MANAJEMEN EVENT (Tabel)
     // HANYA UNTUK MANAJEMEN EVENT (Tabel)
     public function index()
     {
@@ -246,14 +247,17 @@ class AdminEventController extends Controller
     }
 
     public function byCategory($id)
-    {
-        // Mengambil data kategori untuk judul halaman
-        $category = \App\Models\Category::findOrFail($id);
+{
+    // Mengambil data kategori
+    $category = Category::findOrFail($id);
 
-        // Mengambil semua event yang memiliki category_id tersebut
-        $events = \App\Models\Event::where('category_id', $id)->get();
+    // Mengambil event berdasarkan kategori
+    $events = Event::where('category_id', $id)->get();
 
-        // Mengirim ke view (kamu bisa buat view baru atau pakai index.blade.php)
-        return view('events.index', compact('events', 'category'));
-    }
+    // TAMBAHKAN BARIS INI: Ambil juga data sponsorship
+    $sponsorships = \App\Models\Sponsorship::all();
+
+    // Pastikan $sponsorships ikut dikirim ke dalam fungsi compact() atau murni array
+    return view('events.index', compact('events', 'category', 'sponsorships'));
+}
 }

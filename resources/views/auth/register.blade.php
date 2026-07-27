@@ -3,236 +3,236 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Daftar Akun | TICKS ID</title>
+    <title>Daftar Akun | ARTIX ID</title>
 
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Syne:wght@700;800&display=swap" rel="stylesheet">
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
 
     <style>
-        :root {
-            --primary: #696FC7;
-            --primary-deep: #3D365C;
-            --primary-press: #7C4585;
-            --primary-soft: #C95792;
-            --brand-dark-900: #1c1e54;
-            --ink: #0d253d;
-            --ink-secondary: #273951;
-            --ink-mute: #64748d;
-            --on-primary: #ffffff;
-            --canvas: #ffffff;
-            --hairline: #e3e8ee;
-            --hairline-input: #a8c3de;
-            --rounded-xl: 16px;
-            --rounded-pill: 9999px;
-            --shadow-level-2: 0 8px 24px rgba(0, 55, 112, 0.08), 0 2px 6px rgba(0, 55, 112, 0.04);
-            --font-sans: 'Inter', 'SF Pro Display', system-ui, -apple-system, sans-serif;
+        body { font-family: 'Inter', sans-serif; }
+
+        /* Pola grid halus untuk latar belakang gelap */
+        .bg-grid-dark {
+            background-size: 24px 24px;
+            background-image:
+                linear-gradient(to right, rgba(255, 255, 255, 0.05) 1px, transparent 1px),
+                linear-gradient(to bottom, rgba(255, 255, 255, 0.05) 1px, transparent 1px);
         }
 
-        body { font-family: var(--font-sans); }
-
-        .gradient-mesh {
-            background: radial-gradient(ellipse at 20% 30%, rgba(253, 244, 227, 0.8) 0%, rgba(255, 209, 165, 0.6) 25%, rgba(197, 163, 255, 0.5) 55%, rgba(105, 111, 199, 0.55) 75%, rgba(234, 34, 97, 0.35) 100%);
-        }
-
-        .card-stripi {
-            background: var(--canvas);
-            border-radius: var(--rounded-xl);
-            border: 1px solid var(--hairline);
-            box-shadow: var(--shadow-level-2);
-        }
-
-        .btn-primary-pill {
-            background: var(--primary);
-            color: var(--on-primary);
-            padding: 12px 24px;
-            border-radius: var(--rounded-pill);
-            font-weight: 600;
-            transition: all 0.2s;
-            border: none;
-        }
-
-        .btn-primary-pill:hover {
-            background: var(--primary-press);
-            transform: translateY(-2px);
-            color: white;
-        }
-
-        .form-control {
-            border: 1px solid var(--hairline-input) !important;
-            border-radius: 8px !important;
-            padding: 12px 16px !important;
-        }
-
-        .form-control:focus {
-            border-color: var(--primary) !important;
-            box-shadow: 0 0 0 3px rgba(105, 111, 199, 0.1) !important;
-        }
-
-        /* Styling Khusus Tombol Pilih Akun */
-        .btn-check:checked + .btn-outline-secondary {
-            background-color: var(--primary);
-            color: white;
-            border-color: var(--primary);
-        }
-        .btn-outline-secondary {
-            border-color: var(--hairline-input);
-            color: var(--ink-secondary);
-        }
-
-        /* Animasi Transisi Halus */
+        /* Animasi transisi form panitia */
         #staff_section {
-            transition: all 0.3s ease-in-out;
+            transition: max-height 0.3s ease-in-out, opacity 0.3s ease-in-out;
+            max-height: 0;
+            opacity: 0;
+            overflow: hidden;
+        }
+        #staff_section.show {
+            max-height: 150px; /* Cukup untuk menampung form kode */
+            opacity: 1;
+            margin-bottom: 1.25rem; /* setara mb-5 */
         }
     </style>
 </head>
-<body>
+<body class="bg-gradient-to-br from-[#0B1A30] via-[#102A4C] to-[#0084FF] flex flex-col min-h-screen relative overflow-x-hidden">
 
-<div class="gradient-mesh min-vh-100 d-flex align-items-center justify-content-center p-3">
-    <div class="card-stripi p-4 p-md-5" style="max-width: 450px; width: 100%;">
+    <!-- Grid Pattern -->
+    <div class="absolute inset-0 bg-grid-dark opacity-40 z-0"></div>
 
-        <div class="text-center mb-4">
-            <span class="fs-1 d-block mb-2">✨</span>
-            <h3 class="fw-bold m-0" style="color: var(--brand-dark-900); font-size: 24px;">Buat Akun Baru</h3>
-            <p class="text-muted small mt-2">Daftar sekarang untuk mulai berburu tiket event seru di Medan.</p>
-        </div>
+    <!-- Ambient Glow Sorotan di Belakang Card -->
+    <div class="absolute top-10 left-10 w-96 h-96 bg-[#0084FF] rounded-full blur-[100px] opacity-30 z-0 pointer-events-none"></div>
+    <div class="absolute bottom-10 right-10 w-96 h-96 bg-[#00D2FF] rounded-full blur-[100px] opacity-20 z-0 pointer-events-none"></div>
 
-        <form method="POST" action="{{ route('register') }}">
-            @csrf
+    <div class="flex-1 flex items-center justify-center p-4 relative z-10 py-10">
 
-            <!-- AWAL BAGIAN PILIH JENIS AKUN -->
-            <div class="mb-4">
-                <label class="form-label small fw-bold" style="color: var(--ink-secondary);">Pilih Jenis Akun</label>
-                <div class="d-flex gap-2">
-                    <!-- Tombol Pelanggan -->
-                    <input type="radio" class="btn-check" name="account_type" id="type_user" autocomplete="off" checked onchange="toggleRole()">
-                    <label class="btn btn-outline-secondary flex-fill fw-bold rounded-3 py-2" for="type_user">
-                        🎟️ Pelanggan
-                    </label>
+        <!-- Frame Gradient Border untuk Card -->
+        <div class="w-full max-w-lg p-[2px] rounded-3xl bg-gradient-to-b from-white/40 via-white/10 to-transparent shadow-[0_20px_50px_rgba(0,0,0,0.3)] transition-all">
 
-                    <!-- Tombol Panitia / EO -->
-                    <input type="radio" class="btn-check" name="account_type" id="type_staff" autocomplete="off" onchange="toggleRole()">
-                    <label class="btn btn-outline-secondary flex-fill fw-bold rounded-3 py-2" for="type_staff">
-                        💼 Panitia / EO
-                    </label>
-                </div>
-            </div>
-            <!-- AKHIR BAGIAN PILIH JENIS AKUN -->
+            <!-- Card Register (Glassmorphism) -->
+            <div class="bg-white/95 backdrop-blur-xl rounded-[22px] p-8 sm:p-10 relative overflow-hidden shadow-inner">
 
-            <div class="mb-3">
-                <label for="name" class="form-label small fw-bold" style="color: var(--ink-secondary);">Nama Lengkap</label>
-                <input id="name" type="text" name="name" class="form-control shadow-sm @error('name') is-invalid @enderror"
-                       value="{{ old('name') }}" required autofocus placeholder="Masukkan nama lengkap Anda">
-                @error('name')
-                    <div class="invalid-feedback small fw-semibold">{{ $message }}</div>
-                @enderror
-            </div>
+                <!-- Hiasan Sinar Atas Card -->
+                <div class="absolute top-0 left-0 right-0 h-1.5 bg-gradient-to-r from-[#0084FF] via-[#00D2FF] to-[#0084FF]"></div>
 
-            <div class="mb-3">
-                <label for="email" class="form-label small fw-bold" style="color: var(--ink-secondary);">Alamat Email</label>
-                <input id="email" type="email" name="email" class="form-control shadow-sm @error('email') is-invalid @enderror"
-                       value="{{ old('email') }}" required placeholder="contoh: anakmedan@gmail.com">
-                @error('email')
-                    <div class="invalid-feedback small fw-semibold">{{ $message }}</div>
-                @enderror
-            </div>
-
-            <div class="mb-3">
-                <label for="password" class="form-label small fw-bold" style="color: var(--ink-secondary);">Kata Sandi</label>
-                <div class="input-group">
-                    <input id="password" type="password" name="password" class="form-control shadow-sm @error('password') is-invalid @enderror"
-                           required placeholder="Minimal 8 karakter">
-                    <button class="btn btn-outline-secondary" type="button" onclick="togglePassword('password', 'icon1')" style="border-color: var(--hairline-input);">
-                        <i id="icon1" class="bi bi-eye"></i>
-                    </button>
-                </div>
-                @error('password')
-                    <div class="invalid-feedback d-block small fw-semibold mt-1">{{ $message }}</div>
-                @enderror
-            </div>
-
-            <div class="mb-3">
-                <label for="password_confirmation" class="form-label small fw-bold" style="color: var(--ink-secondary);">Konfirmasi Kata Sandi</label>
-                <div class="input-group">
-                    <input id="password_confirmation" type="password" name="password_confirmation" class="form-control shadow-sm"
-                           required placeholder="Ulangi kata sandi Anda">
-                    <button class="btn btn-outline-secondary" type="button" onclick="togglePassword('password_confirmation', 'icon2')" style="border-color: var(--hairline-input);">
-                        <i id="icon2" class="bi bi-eye"></i>
-                    </button>
-                </div>
-            </div>
-
-            <!-- AWAL BAGIAN KODE RAHASIA (DISEMBUNYIKAN SECARA DEFAULT) -->
-            <div id="staff_section" style="display: none;">
-                <div class="mb-4 p-3 rounded" style="background-color: rgba(105, 111, 199, 0.05); border: 1px dashed var(--primary-soft);">
-                    <label for="secret_code" class="form-label small fw-bold" style="color: var(--ink-secondary);">
-                        <i class="bi bi-key-fill text-warning me-1"></i> Kode Pendaftaran Khusus
-                    </label>
-                    <input id="secret_code" type="text" name="secret_code" class="form-control shadow-sm @error('secret_code') is-invalid @enderror"
-                           value="{{ old('secret_code') }}" placeholder="Masukkan kode yang diberikan Admin">
-                    <div class="form-text mt-1" style="font-size: 11px; color: var(--ink-mute);">
-                        *Wajib diisi agar akun Anda diverifikasi sebagai Panitia atau EO.
+                <!-- Header Logo & Teks -->
+                <div class="text-center mb-8">
+                    <!-- Logo Box -->
+                    <div class="w-14 h-14 bg-gradient-to-br from-[#0084FF] to-[#0055FF] text-white rounded-2xl flex items-center justify-center mx-auto mb-4 text-3xl font-extrabold shadow-lg shadow-blue-500/40">
+                        T
                     </div>
-                    @error('secret_code')
-                        <div class="invalid-feedback small fw-semibold">{{ $message }}</div>
-                    @enderror
+                    <h3 class="text-2xl font-extrabold text-[#0B1A30] tracking-tight mb-2">Buat Akun Baru</h3>
+                    <p class="text-sm text-gray-500">Daftar sekarang untuk mulai berburu tiket event seru.</p>
                 </div>
+
+                <!-- Form Register -->
+                <form method="POST" action="{{ route('register') }}">
+                    @csrf
+
+                    <!-- PILIH JENIS AKUN (Styled Radio Buttons) -->
+                    <div class="mb-5">
+                        <label class="block text-sm font-bold text-[#0B1A30] mb-3">Pilih Jenis Akun</label>
+                        <div class="flex gap-3">
+                            <!-- Tombol Pelanggan -->
+                            <div class="flex-1">
+                                <input type="radio" name="account_type" id="type_user" class="peer hidden" checked onchange="toggleRole()">
+                                <label for="type_user" class="block w-full text-center py-2.5 px-3 rounded-xl border border-gray-200 bg-gray-50 text-gray-500 font-bold text-sm cursor-pointer transition-all peer-checked:bg-[#0084FF] peer-checked:text-white peer-checked:border-[#0084FF] peer-checked:shadow-md hover:bg-gray-100">
+                                    🎟️ Pelanggan
+                                </label>
+                            </div>
+
+                            <!-- Tombol Panitia / EO -->
+                            <div class="flex-1">
+                                <input type="radio" name="account_type" id="type_staff" class="peer hidden" onchange="toggleRole()">
+                                <label for="type_staff" class="block w-full text-center py-2.5 px-3 rounded-xl border border-gray-200 bg-gray-50 text-gray-500 font-bold text-sm cursor-pointer transition-all peer-checked:bg-[#0084FF] peer-checked:text-white peer-checked:border-[#0084FF] peer-checked:shadow-md hover:bg-gray-100">
+                                    💼 Panitia / EO
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Input Nama -->
+                    <div class="mb-5">
+                        <label for="name" class="block text-sm font-bold text-[#0B1A30] mb-2">Nama Lengkap</label>
+                        <input id="name" type="text" name="name" value="{{ old('name') }}" required autofocus
+                               placeholder="Masukkan nama lengkap Anda"
+                               class="w-full px-4 py-3 rounded-xl border border-gray-200 bg-gray-50 text-gray-800 text-sm focus:bg-white focus:border-[#0084FF] focus:ring-4 focus:ring-[#0084FF]/10 transition-all outline-none @error('name') border-red-500 focus:border-red-500 focus:ring-red-100 @enderror">
+                        @error('name')
+                            <p class="text-red-500 text-xs font-semibold mt-2">{{ $message }}</p>
+                        @enderror
+                    </div>
+
+                    <!-- Input Email -->
+                    <div class="mb-5">
+                        <label for="email" class="block text-sm font-bold text-[#0B1A30] mb-2">Alamat Email</label>
+                        <input id="email" type="email" name="email" value="{{ old('email') }}" required
+                               placeholder="contoh: user@gmail.com"
+                               class="w-full px-4 py-3 rounded-xl border border-gray-200 bg-gray-50 text-gray-800 text-sm focus:bg-white focus:border-[#0084FF] focus:ring-4 focus:ring-[#0084FF]/10 transition-all outline-none @error('email') border-red-500 focus:border-red-500 focus:ring-red-100 @enderror">
+                        @error('email')
+                            <p class="text-red-500 text-xs font-semibold mt-2">{{ $message }}</p>
+                        @enderror
+                    </div>
+
+                    <!-- Input Password -->
+                    <div class="mb-5">
+                        <label for="password" class="block text-sm font-bold text-[#0B1A30] mb-2">Kata Sandi</label>
+                        <div class="relative">
+                            <input id="password" type="password" name="password" required
+                                   placeholder="Minimal 8 karakter"
+                                   class="w-full pl-4 pr-12 py-3 rounded-xl border border-gray-200 bg-gray-50 text-gray-800 text-sm focus:bg-white focus:border-[#0084FF] focus:ring-4 focus:ring-[#0084FF]/10 transition-all outline-none @error('password') border-red-500 focus:border-red-500 focus:ring-red-100 @enderror">
+
+                            <!-- Toggle Button (Menggunakan SVG langsung) -->
+                            <button type="button" onclick="togglePassword('password', 'icon-pwd')" class="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 focus:outline-none p-1">
+                                <svg id="icon-pwd" class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <!-- Eye Icon Default -->
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path>
+                                </svg>
+                            </button>
+                        </div>
+                        @error('password')
+                            <p class="text-red-500 text-xs font-semibold mt-2">{{ $message }}</p>
+                        @enderror
+                    </div>
+
+                    <!-- Input Konfirmasi Password -->
+                    <div class="mb-5">
+                        <label for="password_confirmation" class="block text-sm font-bold text-[#0B1A30] mb-2">Konfirmasi Kata Sandi</label>
+                        <div class="relative">
+                            <input id="password_confirmation" type="password" name="password_confirmation" required
+                                   placeholder="Ulangi kata sandi Anda"
+                                   class="w-full pl-4 pr-12 py-3 rounded-xl border border-gray-200 bg-gray-50 text-gray-800 text-sm focus:bg-white focus:border-[#0084FF] focus:ring-4 focus:ring-[#0084FF]/10 transition-all outline-none">
+
+                            <button type="button" onclick="togglePassword('password_confirmation', 'icon-pwd-confirm')" class="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 focus:outline-none p-1">
+                                <svg id="icon-pwd-confirm" class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path>
+                                </svg>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- BAGIAN KODE RAHASIA PANITIA -->
+                    <div id="staff_section">
+                        <div class="p-4 rounded-xl border border-dashed border-[#0084FF]/40 bg-[#0084FF]/5">
+                            <label for="secret_code" class="flex items-center gap-2 text-sm font-bold text-[#0B1A30] mb-2">
+                                <svg class="w-4 h-4 text-amber-500" fill="currentColor" viewBox="0 0 20 20">
+                                    <path fill-rule="evenodd" d="M18 8a6 6 0 01-7.743 5.743L10 14l-1 1-1 1H6v2H2v-4l4.257-4.257A6 6 0 1118 8zm-6-4a1 1 0 100 2 2 2 0 012 2 1 1 0 102 0 4 4 0 00-4-4z" clip-rule="evenodd"></path>
+                                </svg>
+                                Kode Pendaftaran Khusus
+                            </label>
+                            <input id="secret_code" type="text" name="secret_code" value="{{ old('secret_code') }}"
+                                   placeholder="Masukkan kode dari Admin"
+                                   class="w-full px-4 py-2.5 rounded-lg border border-[#0084FF]/30 bg-white text-gray-800 text-sm focus:border-[#0084FF] focus:ring-4 focus:ring-[#0084FF]/10 transition-all outline-none @error('secret_code') border-red-500 focus:border-red-500 focus:ring-red-100 @enderror">
+                            <p class="text-[11px] text-gray-500 mt-2 leading-tight">
+                                *Wajib diisi agar akun Anda diverifikasi sebagai Panitia atau EO untuk mengakses Dashboard Scanner.
+                            </p>
+                            @error('secret_code')
+                                <p class="text-red-500 text-xs font-semibold mt-1">{{ $message }}</p>
+                            @enderror
+                        </div>
+                    </div>
+                    <!-- AKHIR BAGIAN KODE RAHASIA -->
+
+                    <!-- Tombol Submit -->
+                    <button type="submit" class="w-full flex justify-center items-center gap-2 bg-gradient-to-r from-[#0084FF] to-[#0055FF] hover:from-[#0070E0] hover:to-[#0040DD] text-white font-bold text-base py-3.5 rounded-xl shadow-[0_10px_25px_rgba(0,132,255,0.3)] hover:shadow-[0_15px_30px_rgba(0,132,255,0.4)] hover:-translate-y-0.5 transition-all duration-200 mt-2 mb-6">
+                        Daftar Akun Baru
+                    </button>
+
+                    <!-- Link Login -->
+                    <div class="text-center">
+                        <span class="text-sm text-gray-500">Sudah punya akun? </span>
+                        <a href="{{ route('login') }}" class="text-sm font-bold text-[#0084FF] hover:text-[#0055FF] transition-colors">
+                            Masuk di Sini
+                        </a>
+                    </div>
+                </form>
+
             </div>
-            <!-- AKHIR BAGIAN KODE RAHASIA -->
-
-            <button type="submit" class="btn-primary-pill w-100 mb-3 shadow-sm mt-2">
-                Daftar Akun Baru
-            </button>
-
-            <div class="text-center mt-4">
-                <span class="text-secondary small">Sudah punya akun? </span>
-                <a href="{{ route('login') }}" class="small fw-bold text-decoration-none" style="color: var(--primary-soft);">
-                    Masuk di Sini
-                </a>
-            </div>
-        </form>
-
+        </div>
     </div>
-</div>
 
-<script>
-    // Fungsi untuk menampilkan/menyembunyikan password
-    function togglePassword(inputId, iconId) {
-        const input = document.getElementById(inputId);
-        const icon = document.getElementById(iconId);
-        if (input.type === "password") {
-            input.type = "text";
-            icon.classList.remove("bi-eye");
-            icon.classList.add("bi-eye-slash");
-        } else {
-            input.type = "password";
-            icon.classList.remove("bi-eye-slash");
-            icon.classList.add("bi-eye");
+    <!-- Script Fungsionalitas -->
+    <script>
+        // Fungsi Toggle Visibility Password dengan perubahan ikon SVG
+        function togglePassword(inputId, iconId) {
+            const input = document.getElementById(inputId);
+            const icon = document.getElementById(iconId);
+
+            // SVG Path Mata Terbuka
+            const eyeOpen = `<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path>`;
+
+            // SVG Path Mata Tertutup (Eye Slash)
+            const eyeClosed = `<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.88 9.88l-3.29-3.29m7.532 7.532l3.29 3.29M3 3l3.59 3.59m0 0A9.953 9.953 0 0112 5c4.478 0 8.268 2.943 9.543 7a10.025 10.025 0 01-4.132 5.411m0 0L21 21"></path>`;
+
+            if (input.type === "password") {
+                input.type = "text";
+                icon.innerHTML = eyeClosed;
+            } else {
+                input.type = "password";
+                icon.innerHTML = eyeOpen;
+            }
         }
-    }
 
-    // Fungsi cerdas untuk menampilkan form Panitia
-    function toggleRole() {
-        const isStaff = document.getElementById('type_staff').checked;
-        const staffSection = document.getElementById('staff_section');
-        const secretCodeInput = document.getElementById('secret_code');
+        // Fungsi Animasi Menampilkan/Menyembunyikan Form Panitia
+        function toggleRole() {
+            const isStaff = document.getElementById('type_staff').checked;
+            const staffSection = document.getElementById('staff_section');
+            const secretCodeInput = document.getElementById('secret_code');
 
-        if (isStaff) {
-            // Tampilkan kotak kode khusus dan buat wajib diisi
-            staffSection.style.display = 'block';
-            secretCodeInput.setAttribute('required', 'required');
-        } else {
-            // Sembunyikan, hapus wajib isi, dan bersihkan teksnya agar tidak error
-            staffSection.style.display = 'none';
-            secretCodeInput.removeAttribute('required');
-            secretCodeInput.value = '';
+            if (isStaff) {
+                staffSection.classList.add('show');
+                secretCodeInput.setAttribute('required', 'required');
+            } else {
+                staffSection.classList.remove('show');
+                secretCodeInput.removeAttribute('required');
+                secretCodeInput.value = '';
+            }
         }
-    }
 
-    // Jalankan fungsi saat halaman pertama kali dimuat (jaga-jaga jika ada error validasi)
-    window.onload = function() {
-        toggleRole();
-    };
-</script>
+        // Inisialisasi saat pertama kali dimuat
+        window.onload = function() {
+            toggleRole();
+        };
+    </script>
 </body>
 </html>

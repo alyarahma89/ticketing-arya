@@ -3,103 +3,313 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Tambah Event Baru (Mode Back-End)</title>
-</head>
-<body>
+    <title>Tambah Event Baru - ARTIX ID</title>
 
-    <h1>Tambah Event Baru</h1>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700&family=Syne:wght@700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
 
-    <!-- Link Kembali -->
-    <a href="{{ route('admin.events.index') }}">⬅ Kembali ke Daftar Event</a>
-    <hr><br>
-
-    <!-- Menampilkan Pesan Error Jika Ada -->
-    @if ($errors->any())
-        <div style="color: red; border: 1px solid red; padding: 10px; margin-bottom: 20px;">
-            <strong>Gagal menerbitkan event:</strong>
-            <ul>
-                @foreach ($errors->all() as $error)
-                    <li>{{ $error }}</li>
-                @endforeach
-            </ul>
-        </div>
-    @endif
-
-    <!-- FORM TAMBAH EVENT -->
-    <form action="{{ route('admin.events.store') }}" method="POST" enctype="multipart/form-data">
-        @csrf
-
-        <div style="margin-bottom: 15px;">
-            <label for="name"><strong>Nama Resmi Event:</strong></label><br>
-            <input type="text" name="name" id="name" value="{{ old('name') }}" required style="width: 100%; max-width: 400px;">
-        </div>
-
-        <div style="margin-bottom: 15px;">
-            <label for="category-select"><strong>Kategori / Klaster:</strong></label><br>
-            <select name="category_id" id="category-select" required style="width: 100%; max-width: 400px;">
-                <option value="" disabled selected>Pilih Klaster Kategori</option>
-                <!-- Menampilkan Kategori dari Database -->
-                @foreach($categories as $category)
-                    <option value="{{ $category->id }}" {{ old('category_id') == $category->id ? 'selected' : '' }}>
-                        {{ $category->name }}
-                    </option>
-                @endforeach
-            </select>
-        </div>
-
-        <div style="margin-bottom: 15px;">
-            <label for="location"><strong>Lokasi / Venue:</strong></label><br>
-            <input type="text" name="location" id="location" value="{{ old('location') }}" required style="width: 100%; max-width: 400px;">
-        </div>
-
-        <div style="margin-bottom: 15px;">
-            <label for="event_date"><strong>Waktu Pelaksanaan (Tanggal & Jam):</strong></label><br>
-            <!-- Input datetime-local akan memunculkan kalender saat diklik -->
-            <input type="datetime-local" name="event_date" id="event_date" value="{{ old('event_date') }}" required>
-        </div>
-
-        <div style="margin-bottom: 15px;">
-            <label for="price"><strong>Harga Tiket Offline (Rp):</strong></label><br>
-            <input type="number" name="price" id="price" value="{{ old('price', 0) }}" required min="0">
-        </div>
-
-        <!-- Disembunyikan secara default, hanya muncul untuk Kategori Hybrid -->
-        <div id="online-price-wrapper" style="margin-bottom: 15px; display: none;">
-            <label for="online_price" style="color: blue;"><strong>Harga Tiket Online / Live (Rp):</strong></label><br>
-            <input type="number" name="online_price" id="online_price" value="{{ old('online_price', 0) }}" min="0">
-        </div>
-
-        <div style="margin-bottom: 15px;">
-            <label for="quota"><strong>Kuota Maksimal Tiket:</strong></label><br>
-            <input type="number" name="quota" id="quota" value="{{ old('quota') }}" required min="1">
-        </div>
-
-        <!-- Disembunyikan secara default, hanya muncul untuk Kategori Hybrid -->
-        <div id="online-options" style="margin-bottom: 15px; display: none;">
-            <label for="youtube_link" style="color: red;"><strong>Link Livestream YouTube:</strong></label><br>
-            <input type="url" name="youtube_link" id="youtube_link" value="{{ old('youtube_link') }}" style="width: 100%; max-width: 400px;">
-        </div>
-
-        <div style="margin-bottom: 15px;">
-            <label for="description"><strong>Deskripsi Lengkap Acara:</strong></label><br>
-            <textarea name="description" id="description" rows="5" required style="width: 100%; max-width: 400px;">{{ old('description') }}</textarea>
-        </div>
-
-        <div style="margin-bottom: 25px;">
-            <label for="image"><strong>Poster Promosi (Opsional):</strong></label><br>
-            <input type="file" name="image" id="image" accept="image/*">
-        </div>
-
-        <button type="submit" style="padding: 10px 20px; cursor: pointer;">Publikasikan Event</button>
-    </form>
+    <script src="https://cdn.tailwindcss.com"></script>
 
     <script>
-        // Logika Javascript untuk memunculkan kolom harga online & Youtube
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Plus Jakarta Sans', 'system-ui', 'sans-serif'],
+                        syne: ['Syne', 'sans-serif'],
+                    },
+                    colors: {
+                        primary: '#696FC7',
+                        'primary-deep': '#3D365C',
+                        'primary-press': '#7C4585',
+                        'primary-soft': '#C95792',
+                        'primary-subdued': '#F8B55F',
+                        'brand-dark': '#1c1e54',
+                        ink: '#0d253d',
+                        'ink-secondary': '#273951',
+                        'ink-mute': '#64748d',
+                        canvas: '#ffffff',
+                        'canvas-soft': '#f0f4f8',
+                        hairline: '#e3e8ee',
+                        ruby: '#ea2261',
+                    },
+                    boxShadow: {
+                        'level-1': '0 4px 20px rgba(28, 30, 84, 0.04), 0 1px 3px rgba(28, 30, 84, 0.02)',
+                        'level-2': '0 20px 40px rgba(28, 30, 84, 0.08), 0 1px 10px rgba(28, 30, 84, 0.03)',
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        textarea::-webkit-scrollbar { width: 6px; }
+        textarea::-webkit-scrollbar-track { background: transparent; }
+        textarea::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
+        textarea::-webkit-scrollbar-thumb:hover { background: #696FC7; }
+        /* Memperbaiki tampilan icon kalender bawaan browser pada input datetime */
+        input[type="datetime-local"]::-webkit-calendar-picker-indicator {
+            cursor: pointer;
+            opacity: 0.6;
+            transition: 0.2s;
+        }
+        input[type="datetime-local"]::-webkit-calendar-picker-indicator:hover {
+            opacity: 1;
+        }
+    </style>
+</head>
+<body class="bg-canvas-soft text-ink font-sans antialiased min-h-screen flex flex-col">
+
+    <!-- HEADER -->
+    <header class="h-20 bg-brand-dark border-b border-white/10 flex items-center justify-between px-8 sticky top-0 z-50 shadow-md">
+        <div class="flex items-center w-1/4">
+            <a href="{{ route('admin.events.index') }}" class="text-white/70 hover:text-white flex items-center gap-2 text-[14px] font-semibold transition-all duration-200 group">
+                <span class="transform group-hover:-translate-x-1 transition-transform">&larr;</span> Kembali
+            </a>
+        </div>
+
+        <div class="flex items-center justify-center gap-1.5 w-2/4">
+            <span class="font-syne font-extrabold text-[22px] tracking-tight text-white block">ARTIX</span>
+            <span class="font-syne font-extrabold text-[22px] tracking-tight text-primary-subdued block">ID</span>
+        </div>
+
+        <div class="flex items-center justify-end w-1/4">
+            <div class="flex items-center gap-2 bg-white/10 px-4 py-2 rounded-full border border-white/10">
+                <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+                <span class="text-[11px] font-bold text-white tracking-wide uppercase">Event Creator</span>
+            </div>
+        </div>
+    </header>
+
+    <!-- HERO SECTION -->
+    <div class="bg-gradient-to-r from-brand-dark via-primary-deep to-primary text-white py-12 px-8 shadow-inner">
+        <div class="max-w-6xl w-full mx-auto flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+            <div>
+                <span class="text-primary-subdued font-bold text-xs uppercase tracking-widest bg-white/10 px-3 py-1 rounded-full border border-white/10">Manajemen Acara</span>
+                <h1 class="text-[36px] font-bold tracking-tight font-syne mt-2">Tambah Event Baru</h1>
+                <p class="text-[14px] text-white/70 font-light mt-1">Publikasikan informasi event, atur ketersediaan tiket, dan kelola rincian acara secara real-time.</p>
+            </div>
+            <div class="text-right hidden md:block">
+                <span class="text-[28px] opacity-20 font-syne font-black tracking-wider">ARTIX ID EVENTS</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- MAIN FORM AREA -->
+    <main class="flex-1 max-w-6xl w-full mx-auto py-10 px-6 -mt-8">
+
+        <form action="{{ route('admin.events.store') }}" method="POST" enctype="multipart/form-data">
+            @csrf
+
+            <!-- ALERT ERROR -->
+            @if ($errors->any())
+                <div class="bg-ruby/10 border border-ruby/20 text-ruby p-4 rounded-xl mb-6 text-[14px] flex gap-3 items-start shadow-sm">
+                    <i class="bi bi-exclamation-triangle-fill text-[18px] mt-0.5"></i>
+                    <div>
+                        <span class="font-bold block mb-1">Gagal menerbitkan event:</span>
+                        <ul class="list-disc list-inside space-y-0.5 opacity-90">
+                            @foreach ($errors->all() as $error)
+                                <li>{{ $error }}</li>
+                            @endforeach
+                        </ul>
+                    </div>
+                </div>
+            @endif
+
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+
+                <!-- KOLOM KIRI (Detail Utama Event) -->
+                <div class="lg:col-span-2 space-y-6">
+                    <div class="bg-white border border-hairline rounded-[24px] shadow-level-1 p-8 space-y-6 relative overflow-hidden">
+                        <div class="absolute top-0 inset-x-0 h-1.5 bg-gradient-to-r from-primary to-primary-soft"></div>
+
+                        <h2 class="text-[18px] font-bold text-brand-dark border-b border-hairline pb-3 flex items-center gap-2">
+                            <i class="bi bi-card-text text-primary"></i> Informasi Dasar Event
+                        </h2>
+
+                        <div>
+                            <label class="block text-[11px] font-bold text-ink-secondary mb-2 uppercase tracking-wider">Nama Resmi Event</label>
+                            <div class="relative">
+                                <span class="absolute inset-y-0 left-0 flex items-center pl-4 text-primary/60"><i class="bi bi-type"></i></span>
+                                <input type="text" name="name" id="name" value="{{ old('name') }}" required placeholder="Contoh: Artix Music Festival 2024"
+                                    class="w-full bg-canvas-soft focus:bg-white border border-hairline text-ink text-[15px] font-semibold rounded-xl pl-11 pr-4 py-3.5 focus:outline-none focus:border-primary focus:ring-4 focus:ring-primary/10 transition-all duration-200">
+                            </div>
+                        </div>
+
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <div>
+                                <label class="block text-[11px] font-bold text-ink-secondary mb-2 uppercase tracking-wider">Kategori / Klaster</label>
+                                <div class="relative">
+                                    <span class="absolute inset-y-0 left-0 flex items-center pl-4 text-primary/60"><i class="bi bi-grid-fill"></i></span>
+                                    <select name="category_id" id="category-select" required class="w-full bg-canvas-soft focus:bg-white border border-hairline text-ink text-[15px] font-semibold rounded-xl pl-11 pr-4 py-3.5 focus:outline-none focus:border-primary focus:ring-4 focus:ring-primary/10 transition-all duration-200 appearance-none cursor-pointer">
+                                        <option value="" disabled {{ old('category_id') ? '' : 'selected' }}>-- Pilih Kategori --</option>
+                                        @foreach($categories as $category)
+                                            <option value="{{ $category->id }}" {{ old('category_id') == $category->id ? 'selected' : '' }}>
+                                                {{ $category->name }}
+                                            </option>
+                                        @endforeach
+                                    </select>
+                                    <span class="absolute inset-y-0 right-0 flex items-center pr-4 pointer-events-none text-ink-mute/50"><i class="bi bi-chevron-down text-xs"></i></span>
+                                </div>
+                            </div>
+
+                            <div>
+                                <label class="block text-[11px] font-bold text-ink-secondary mb-2 uppercase tracking-wider">Waktu Pelaksanaan</label>
+                                <div class="relative">
+                                    <span class="absolute inset-y-0 left-0 flex items-center pl-4 text-primary/60 pointer-events-none"><i class="bi bi-clock-fill"></i></span>
+                                    <input type="datetime-local" name="event_date" id="event_date" value="{{ old('event_date') }}" required
+                                        class="w-full bg-canvas-soft focus:bg-white border border-hairline text-ink text-[15px] font-semibold rounded-xl pl-11 pr-4 py-3.5 focus:outline-none focus:border-primary focus:ring-4 focus:ring-primary/10 transition-all duration-200 cursor-text">
+                                </div>
+                            </div>
+                        </div>
+
+                        <div>
+                            <label class="block text-[11px] font-bold text-ink-secondary mb-2 uppercase tracking-wider">Lokasi / Venue</label>
+                            <div class="relative">
+                                <span class="absolute inset-y-0 left-0 flex items-center pl-4 text-primary/60"><i class="bi bi-geo-alt-fill"></i></span>
+                                <input type="text" name="location" id="location" value="{{ old('location') }}" required placeholder="Contoh: Gelora Bung Karno, Jakarta"
+                                    class="w-full bg-canvas-soft focus:bg-white border border-hairline text-ink text-[15px] font-semibold rounded-xl pl-11 pr-4 py-3.5 focus:outline-none focus:border-primary focus:ring-4 focus:ring-primary/10 transition-all duration-200">
+                            </div>
+                        </div>
+
+                        <div>
+                            <label class="block text-[11px] font-bold text-ink-secondary mb-2 uppercase tracking-wider">Deskripsi Lengkap Acara</label>
+                            <textarea name="description" id="description" rows="5" required placeholder="Jelaskan detail acara, rundown, syarat dan ketentuan tiket..."
+                                class="w-full bg-canvas-soft focus:bg-white border border-hairline text-ink text-[15px] rounded-xl px-4 py-3.5 focus:outline-none focus:border-primary focus:ring-4 focus:ring-primary/10 transition-all duration-200 shadow-inner">{{ old('description') }}</textarea>
+                        </div>
+
+                        <!-- HIDDEN YOUTUBE FIELD -->
+                        <div id="online-options" class="hidden animate-[fadeIn_0.3s_ease-in-out]">
+                            <label class="block text-[11px] font-bold text-ruby mb-2 uppercase tracking-wider flex items-center gap-1.5"><i class="bi bi-youtube"></i> Link Livestream YouTube</label>
+                            <div class="relative">
+                                <span class="absolute inset-y-0 left-0 flex items-center pl-4 text-ruby/60"><i class="bi bi-link-45deg"></i></span>
+                                <input type="url" name="youtube_link" id="youtube_link" value="{{ old('youtube_link') }}" placeholder="https://youtube.com/live/..."
+                                    class="w-full bg-ruby/5 focus:bg-white border border-ruby/20 focus:border-ruby text-ink text-[15px] font-semibold rounded-xl pl-11 pr-4 py-3.5 focus:outline-none focus:ring-4 focus:ring-ruby/10 transition-all duration-200">
+                            </div>
+                            <span class="text-[10px] text-ink-mute mt-1.5 block">Kolom ini muncul khusus untuk kategori hybrid/online (Live Concert, Workshop, dll).</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- KOLOM KANAN (Harga, Kuota & Poster) -->
+                <div class="space-y-6">
+
+                    <div class="bg-white border border-hairline rounded-[24px] shadow-level-1 p-6 space-y-5 relative overflow-hidden">
+                        <div class="absolute top-0 inset-x-0 h-1.5 bg-gradient-to-r from-primary-soft to-primary-subdued"></div>
+
+                        <h2 class="text-[18px] font-bold text-brand-dark border-b border-hairline pb-3 flex items-center gap-2">
+                            <i class="bi bi-ticket-perforated text-primary"></i> Tiket & Kapasitas
+                        </h2>
+
+                        <div>
+                            <label class="block text-[11px] font-bold text-ink-secondary mb-2 uppercase tracking-wider">Harga Tiket Offline</label>
+                            <div class="relative">
+                                <span class="absolute inset-y-0 left-0 flex items-center pl-4 text-emerald-600 font-bold text-[14px]">Rp</span>
+                                <input type="number" name="price" id="price" value="{{ old('price', 0) }}" required min="0" placeholder="0"
+                                    class="w-full bg-emerald-500/5 focus:bg-white border border-emerald-500/20 focus:border-emerald-500 text-emerald-700 text-[16px] font-bold rounded-xl pl-12 pr-4 py-3 focus:outline-none focus:ring-4 focus:ring-emerald-500/10 transition-all duration-200">
+                            </div>
+                        </div>
+
+                        <!-- HIDDEN ONLINE PRICE FIELD -->
+                        <div id="online-price-wrapper" class="hidden animate-[fadeIn_0.3s_ease-in-out]">
+                            <label class="block text-[11px] font-bold text-blue-600 mb-2 uppercase tracking-wider">Harga Tiket Online / Live</label>
+                            <div class="relative">
+                                <span class="absolute inset-y-0 left-0 flex items-center pl-4 text-blue-600 font-bold text-[14px]">Rp</span>
+                                <input type="number" name="online_price" id="online_price" value="{{ old('online_price', 0) }}" min="0" placeholder="0"
+                                    class="w-full bg-blue-500/5 focus:bg-white border border-blue-500/20 focus:border-blue-500 text-blue-700 text-[16px] font-bold rounded-xl pl-12 pr-4 py-3 focus:outline-none focus:ring-4 focus:ring-blue-500/10 transition-all duration-200">
+                            </div>
+                        </div>
+
+                        <div>
+                            <label class="block text-[11px] font-bold text-ink-secondary mb-2 uppercase tracking-wider">Kuota Maksimal (Tiket)</label>
+                            <div class="relative">
+                                <span class="absolute inset-y-0 left-0 flex items-center pl-4 text-indigo-600/70"><i class="bi bi-people-fill"></i></span>
+                                <input type="number" name="quota" id="quota" value="{{ old('quota') }}" required min="1" placeholder="Contoh: 500"
+                                    class="w-full bg-indigo-500/5 focus:bg-white border border-indigo-500/20 focus:border-indigo-500 text-indigo-700 text-[16px] font-bold rounded-xl pl-11 pr-4 py-3 focus:outline-none focus:ring-4 focus:ring-indigo-500/10 transition-all duration-200">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="bg-gradient-to-b from-white to-primary/5 border border-hairline rounded-[24px] shadow-level-1 p-6 space-y-4">
+                        <h2 class="text-[16px] font-bold text-brand-dark flex items-center gap-2">
+                            <i class="bi bi-image text-primary"></i> Poster Promosi <span class="text-[11px] font-normal text-ink-mute">(Opsional)</span>
+                        </h2>
+
+                        <div class="relative group aspect-[4/5] w-full max-w-[220px] mx-auto rounded-2xl bg-canvas-soft border-2 border-dashed border-primary/20 overflow-hidden flex items-center justify-center shadow-inner">
+                            <div class="text-center p-4 transition-opacity duration-200" id="placeholder-box">
+                                <i class="bi bi-cloud-arrow-up text-[36px] text-primary block mb-1 animate-pulse"></i>
+                                <span class="text-primary text-[12px] font-bold block">Unggah Poster</span>
+                                <span class="text-ink-mute text-[10px] block mt-0.5">Rasio Potret (4:5)</span>
+                            </div>
+                            <img id="badge-preview" class="w-full h-full object-cover hidden transition-transform duration-300 group-hover:scale-105">
+                            <div id="hover-overlay" class="absolute inset-0 bg-brand-dark/60 opacity-0 group-hover:opacity-100 transition-opacity hidden items-center justify-center">
+                                <span class="text-white text-[11px] font-semibold bg-primary px-3 py-1.5 rounded-full shadow-md"><i class="bi bi-arrow-repeat mr-1"></i> Ganti Poster</span>
+                            </div>
+                        </div>
+
+                        <div>
+                            <input type="file" name="image" id="badge-input" accept="image/*"
+                                class="w-full text-xs text-ink-mute file:mr-3 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-[11px] file:font-bold file:bg-primary file:text-white hover:file:bg-primary-press transition-all cursor-pointer border border-hairline rounded-lg p-1.5 bg-white">
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ACTION BAR BAWAH -->
+            <div class="mt-8 bg-brand-dark border border-white/10 rounded-[24px] p-6 shadow-level-2 flex flex-col sm:flex-row items-center justify-between gap-4">
+                <span class="text-[13px] text-white/70 font-medium flex items-center gap-1.5">
+                    <i class="bi bi-info-circle-fill text-primary-subdued"></i> Pastikan semua informasi acara sudah valid sebelum diterbitkan.
+                </span>
+                <div class="flex items-center gap-4 w-full sm:w-auto shrink-0">
+                    <a href="{{ route('admin.events.index') }}" class="text-[14px] text-white/70 hover:text-white font-bold px-5 py-3 transition-colors rounded-full hover:bg-white/5 text-center w-full sm:w-auto">Batal</a>
+                    <button type="submit" class="bg-primary hover:bg-primary-press text-white px-8 py-3.5 rounded-full text-[14px] font-bold transition-all shadow-md hover:shadow-xl hover:-translate-y-0.5 active:translate-y-0 w-full sm:w-auto text-center flex items-center justify-center gap-2">
+                        <i class="bi bi-rocket-takeoff-fill"></i> Publikasikan Event
+                    </button>
+                </div>
+            </div>
+        </form>
+    </main>
+
+    <script>
+        // --- SCRIPT 1: Preview Poster/Image ---
+        const badgeInput = document.getElementById('badge-input');
+        const badgePreview = document.getElementById('badge-preview');
+        const placeholderBox = document.getElementById('placeholder-box');
+        const hoverOverlay = document.getElementById('hover-overlay');
+
+        if(badgeInput) {
+            badgeInput.addEventListener('change', function() {
+                const file = this.files[0];
+                if(file) {
+                    const reader = new FileReader();
+                    reader.addEventListener('load', function() {
+                        if(placeholderBox) placeholderBox.classList.add('hidden');
+                        if(hoverOverlay) {
+                            hoverOverlay.classList.remove('hidden');
+                            hoverOverlay.classList.add('flex');
+                        }
+                        badgePreview.classList.remove('hidden');
+                        badgePreview.setAttribute('src', this.result);
+                    });
+                    reader.readAsDataURL(file);
+                } else {
+                    badgePreview.classList.add('hidden');
+                    if(placeholderBox) placeholderBox.classList.remove('hidden');
+                    if(hoverOverlay) {
+                        hoverOverlay.classList.add('hidden');
+                        hoverOverlay.classList.remove('flex');
+                    }
+                    badgePreview.removeAttribute('src');
+                }
+            });
+        }
+
+        // --- SCRIPT 2: Logika Form Hybrid (YouTube & Harga Online) ---
         const categorySelect = document.getElementById('category-select');
         const onlineOptions = document.getElementById('online-options');
         const onlinePriceWrapper = document.getElementById('online-price-wrapper');
 
-        // Daftar nama kategori yang memunculkan opsi Livestream
         const hybridCategories = ['LIVE CONCERT', 'WORKSHOP', 'STAND UP COMEDY'];
 
         function toggleOnlineFields() {
@@ -108,13 +318,14 @@
                 const selectedText = categorySelect.options[categorySelect.selectedIndex].text.trim().toUpperCase();
 
                 if (hybridCategories.includes(selectedText)) {
-                    // Tampilkan kolom
-                    onlineOptions.style.display = 'block';
-                    onlinePriceWrapper.style.display = 'block';
+                    // Tampilkan kolom (menggunakan class bawaan Tailwind 'hidden')
+                    onlineOptions.classList.remove('hidden');
+                    onlinePriceWrapper.classList.remove('hidden');
                 } else {
                     // Sembunyikan kolom
-                    onlineOptions.style.display = 'none';
-                    onlinePriceWrapper.style.display = 'none';
+                    onlineOptions.classList.add('hidden');
+                    onlinePriceWrapper.classList.add('hidden');
+
                     // Reset nilai inputan ke default
                     document.getElementById('youtube_link').value = '';
                     document.getElementById('online_price').value = 0;
@@ -122,7 +333,7 @@
             }
         }
 
-        // Jalankan pengecekan saat pertama kali halaman dimuat (berguna jika ada old() data)
+        // Jalankan pengecekan saat pertama kali halaman dimuat (berguna jika ada old() data saat validasi gagal)
         toggleOnlineFields();
 
         // Jalankan pengecekan setiap kali pilihan dropdown berubah

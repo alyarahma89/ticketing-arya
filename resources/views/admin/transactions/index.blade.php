@@ -3,46 +3,37 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Data Transaksi - TICKS ID</title>
+    <title>Data Transaksi - ARTIX ID</title>
 
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
 
+    <!-- 1. Panggil Script Eksternal -->
     <script src="https://cdn.tailwindcss.com"></script>
 
+    <!-- 2. Konfigurasi Tailwind (KHUSUS JAVASCRIPT) -->
     <script>
         tailwind.config = {
             theme: {
                 extend: {
-                    fontFamily: {
-                        sans: ['Inter', 'system-ui', 'sans-serif'],
-                    },
+                    fontFamily: { sans: ['Inter', 'system-ui', 'sans-serif'], },
                     colors: {
                         primary: '#696FC7',
                         'primary-deep': '#3D365C',
-                        'primary-press': '#7C4585',
                         'primary-soft': '#C95792',
                         'primary-subdued': '#F8B55F',
                         'brand-dark': '#1c1e54',
                         ink: '#0d253d',
-                        'ink-secondary': '#273951',
                         'ink-mute': '#64748d',
-                        canvas: '#ffffff',
-                        'canvas-soft': '#f6f9fc',
-                        'canvas-cream': '#f5e9d4',
-                        hairline: '#e3e8ee',
-                        ruby: '#ea2261',
-                    },
-                    boxShadow: {
-                        'level-1': '0 1px 3px rgba(0,55,112,0.08)',
-                        'level-2': '0 8px 24px rgba(0,55,112,0.08), 0 2px 6px rgba(0,55,112,0.04)',
+                        'canvas-soft': '#f8fafc',
                     }
                 }
             }
         }
     </script>
 
+    <!-- 3. CSS Kustom & Scrollbar (KHUSUS CSS) -->
     <style>
         body {
             font-feature-settings: "ss01" 1;
@@ -51,56 +42,86 @@
         .tabular-numeric {
             font-feature-settings: "tnum" 1;
         }
+
+        /* Custom scrollbar untuk sidebar */
+        .sidebar-scroll::-webkit-scrollbar { width: 4px; }
+        .sidebar-scroll::-webkit-scrollbar-track { background: transparent; }
+        .sidebar-scroll::-webkit-scrollbar-thumb { background: rgba(255, 255, 255, 0.2); border-radius: 10px; }
+        .sidebar-scroll::-webkit-scrollbar-thumb:hover { background: rgba(255, 255, 255, 0.3); }
+
+        /* Aturan untuk cetak PDF */
+        @media print {
+            .no-print { display: none !important; }
+            body { background: white !important; }
+            main { padding: 0 !important; overflow: visible !important; }
+            .shadow-sm { box-shadow: none !important; border: 1px solid #ccc !important; }
+        }
     </style>
 </head>
-<body class="bg-canvas-soft text-ink flex h-screen overflow-hidden">
+<body class="bg-canvas-soft text-ink flex h-screen overflow-hidden font-sans">
 
-    <aside class="w-64 bg-brand-dark flex flex-col justify-between hidden lg:flex relative z-20 shadow-level-2">
-        <div>
-            <div class="h-24 flex items-center px-8 border-b border-white/5">
-                <span class="text-white font-light text-[24px] tracking-[-0.22px]">
-                    TICKS <span class="font-medium text-primary-subdued">ID</span>
-                </span>
-            </div>
+    <!-- SIDEBAR DINAMIS -->
+    <aside class="w-64 bg-brand-dark flex flex-col hidden lg:flex relative z-20 shrink-0 h-screen">
 
-            <nav class="p-5 space-y-2 mt-2">
+        <!-- 1. BAGIAN ATAS: LOGO (Ukurannya Tetap) -->
+        <div class="h-20 shrink-0 flex items-center px-8 border-b border-white/5 pt-4">
+            <span class="text-white font-light text-[24px] tracking-tight">
+                ARTIX <span class="font-bold text-primary-subdued">ID</span>
+            </span>
+        </div>
+
+        <!-- 2. BAGIAN TENGAH: MENU (Bisa di-scroll) -->
+        <nav class="p-5 space-y-2 flex-1 overflow-y-auto sidebar-scroll">
+            <!-- PENGECEKAN SESUAI DATABASE: Jika role adalah 'eo' -->
+            @if(Auth::user()->role == 'eo')
+                <a href="{{ route('admin.dashboard') }}" class="flex items-center gap-3 px-4 py-3 text-white/60 hover:text-white hover:bg-white/5 rounded-xl text-[14px] font-medium transition-all">
+                    <span class="text-lg">📊</span> Dasbor Saya
+                </a>
+                <a href="{{ route('admin.events.index') }}" class="flex items-center gap-3 px-4 py-3 text-white/60 hover:text-white hover:bg-white/5 rounded-xl text-[14px] font-medium transition-all">
+                    <span class="text-lg">🎟️</span> Event Saya
+                </a>
+                <!-- Menu ini AKTIF karena kita sedang di halaman Transaksi -->
+                <a href="{{ route('admin.transactions.index') }}" class="flex items-center gap-3 px-4 py-3 bg-white/10 text-white rounded-xl text-[14px] font-medium transition-all shadow-sm">
+                    <span class="text-lg">💳</span> Penjualan Tiket
+                </a>
+                <a href="{{ route('admin.sponsorships.index') }}" class="flex items-center gap-3 px-4 py-3 text-white/60 hover:text-white hover:bg-white/5 rounded-xl text-[14px] font-medium transition-all">
+                    <span class="text-lg">🤝</span> Kerjasama Sponsor
+                </a>
+
+            <!-- PENGECEKAN SESUAI DATABASE: Jika role adalah 'admin' -->
+            @elseif(Auth::user()->role == 'admin')
                 <a href="{{ route('admin.dashboard') }}" class="flex items-center gap-3 px-4 py-3 text-white/60 hover:text-white hover:bg-white/5 rounded-xl text-[14px] font-medium transition-all">
                     <span class="text-lg">📊</span> Ikhtisar Platform
                 </a>
                 <a href="{{ route('admin.events.index') }}" class="flex items-center gap-3 px-4 py-3 text-white/60 hover:text-white hover:bg-white/5 rounded-xl text-[14px] font-medium transition-all">
                     <span class="text-lg">🎟️</span> Manajemen Event
                 </a>
-                <a href="{{ route('admin.transactions.index') }}" class="flex items-center gap-3 px-4 py-3 bg-white/10 text-white rounded-xl text-[14px] font-medium shadow-sm transition-all hover:bg-white/15">
+                <a href="{{ route('admin.categories.index') }}" class="flex items-center gap-3 px-4 py-3 text-white/60 hover:text-white hover:bg-white/5 rounded-xl text-[14px] font-medium transition-all">
+                    <span class="text-lg">🏷️</span> Kelola Kategori
+                </a>
+                <!-- Menu ini AKTIF karena kita sedang di halaman Transaksi -->
+                <a href="{{ route('admin.transactions.index') }}" class="flex items-center gap-3 px-4 py-3 bg-white/10 text-white rounded-xl text-[14px] font-medium transition-all shadow-sm">
                     <span class="text-lg">💳</span> Data Transaksi
                 </a>
-
-                <!-- PEMBATASAN MENU: Hanya Admin yang bisa melihat menu Kelola Pengguna -->
-                @if(Auth::user()->role === 'admin')
                 <a href="{{ route('admin.users.index') }}" class="flex items-center gap-3 px-4 py-3 text-white/60 hover:text-white hover:bg-white/5 rounded-xl text-[14px] font-medium transition-all">
                     <span class="text-lg">👥</span> Kelola Pengguna
                 </a>
-                <a href="{{ route('admin.sponsorships.create') }}" class="flex items-center gap-3 px-4 py-3 text-white/60 hover:text-white hover:bg-white/5 rounded-xl text-[14px] font-medium transition-all">
+                <a href="{{ route('admin.sponsorships.index') }}" class="flex items-center gap-3 px-4 py-3 text-white/60 hover:text-white hover:bg-white/5 rounded-xl text-[14px] font-medium transition-all">
                     <span class="text-lg">🤝</span> Kelola Sponsorship
                 </a>
-                @endif
-            </nav>
-        </div>
+                <a href="{{ route('admin.reports.index') }}" class="flex items-center gap-3 px-4 py-3 text-white/60 hover:text-white hover:bg-white/5 rounded-xl text-[14px] font-medium transition-all">
+                    <span class="text-lg">📊</span> Laporan Keseluruhan
+                </a>
+            @endif
+        </nav>
 
-        <div class="p-5 border-t border-white/5">
-            <div class="flex items-center gap-3 p-3 bg-white/5 rounded-xl border border-white/10">
-                <div class="w-10 h-10 rounded-full bg-primary flex items-center justify-center text-white text-sm font-semibold uppercase shadow-inner">
-                    {{ substr(Auth::user()->name ?? 'A', 0, 1) }}
-                </div>
-                <div class="overflow-hidden">
-                    <p class="text-[14px] text-white font-medium truncate">{{ Auth::user()->name ?? 'Administrator' }}</p>
-                    <p class="text-[11px] text-primary-subdued truncate uppercase">{{ Auth::user()->role ?? 'Admin' }}</p>
-                </div>
-            </div>
+        <!-- 3. BAGIAN BAWAH: PROFIL & LOGOUT (Selalu terlihat di bawah) -->
+        <div class="p-5 border-t border-white/5 shrink-0 bg-brand-dark">
 
             <form action="{{ route('logout') }}" method="POST" class="mt-3">
                 @csrf
-                <button type="submit" class="w-full text-left text-[13px] text-primary-soft hover:text-white px-3 py-2 rounded-lg transition-colors flex items-center gap-2">
-                    🚪 Keluar dari Sistem
+                <button type="submit" class="w-full text-left text-[13px] font-medium text-red-300 bg-red-500/10 hover:bg-red-500/25 border border-red-500/20 px-4 py-2.5 rounded-xl transition-all flex items-center gap-3 shadow-sm">
+                    <span class="text-lg">🚪</span> Keluar dari Sistem
                 </button>
             </form>
         </div>
@@ -108,38 +129,27 @@
 
     <main class="flex-1 flex flex-col h-full overflow-y-auto relative z-10">
 
-        <div class="absolute top-0 left-0 w-full h-[300px] bg-gradient-to-tr from-canvas-cream via-primary-soft/20 to-primary-subdued/30 blur-[90px] opacity-80 z-0 pointer-events-none"></div>
+        <!-- Latar belakang gradient -->
+        <div class="absolute top-0 left-0 w-full h-[300px] bg-gradient-to-tr from-white via-primary-soft/10 to-primary-subdued/20 blur-[90px] opacity-80 z-0 pointer-events-none"></div>
 
         <div class="h-20 px-10 flex items-center justify-end relative z-10 shrink-0">
-            <div class="flex items-center gap-3 bg-white/40 px-4 py-2 rounded-full border border-hairline backdrop-blur-sm">
-                <div class="w-7 h-7 rounded-full bg-primary flex items-center justify-center text-white text-xs font-semibold uppercase">
-                    {{ substr(Auth::user()->name ?? 'A', 0, 1) }}
-                </div>
-                <span class="text-[13px] font-medium text-ink">{{ Auth::user()->name ?? 'Administrator' }}</span>
-            </div>
+
         </div>
 
         <div class="px-10 mb-8 relative z-10 flex flex-col sm:flex-row sm:items-end justify-between gap-4">
             <div>
                 <h1 class="text-[32px] font-light tracking-[-0.64px] text-ink mb-1">Data Transaksi</h1>
-                <p class="text-[15px] text-ink-mute font-light">
-                    <!-- PEMBATASAN TEKS: Pesan berbeda untuk Admin dan EO -->
-                    @if(Auth::user()->role === 'eo')
-                        Pantau riwayat pembelian dan status pembayaran tiket untuk seluruh event Anda.
-                    @else
-                        Pantau seluruh riwayat pembelian dan status pembayaran tiket di platform.
-                    @endif
-                </p>
+                <p class="text-[15px] text-ink-mute font-light">Pantau seluruh riwayat pembelian dan status pembayaran tiket.</p>
             </div>
 
-            <button class="bg-white border border-hairline text-ink hover:text-primary hover:border-primary px-5 py-2.5 rounded-full text-[13px] font-medium transition-colors shadow-sm">
-                &darr; Export Data
+            <button class="bg-white border border-hairline text-ink hover:text-primary hover:border-primary px-5 py-2.5 rounded-full text-[13px] font-medium transition-colors shadow-sm flex items-center gap-2">
+                <span class="text-lg">📥</span> Export Data
             </button>
         </div>
 
         <div class="px-10 pb-12 relative z-10 flex-1">
 
-            <div class="bg-canvas border border-hairline rounded-[16px] shadow-level-1 overflow-hidden">
+            <div class="bg-white border border-hairline rounded-[16px] shadow-sm overflow-hidden">
                 <div class="overflow-x-auto">
                     <table class="w-full text-left">
                         <thead>
@@ -213,14 +223,7 @@
                                         <span class="text-2xl opacity-50">📭</span>
                                     </div>
                                     <h5 class="text-[16px] font-medium text-ink mb-1">Belum Ada Transaksi</h5>
-                                    <p class="text-[14px] text-ink-mute mb-4">
-                                        <!-- PEMBATASAN TEKS STATE KOSONG -->
-                                        @if(Auth::user()->role === 'eo')
-                                            Belum ada pengguna yang melakukan pembelian tiket pada event Anda.
-                                        @else
-                                            Belum ada pengguna yang melakukan pembelian tiket.
-                                        @endif
-                                    </p>
+                                    <p class="text-[14px] text-ink-mute mb-4">Belum ada pengguna yang melakukan pembelian tiket.</p>
                                 </td>
                             </tr>
                             @endforelse
