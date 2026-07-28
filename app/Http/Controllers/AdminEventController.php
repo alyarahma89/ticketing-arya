@@ -260,4 +260,15 @@ class AdminEventController extends Controller
     // Pastikan $sponsorships ikut dikirim ke dalam fungsi compact() atau murni array
     return view('events.index', compact('events', 'category', 'sponsorships'));
 }
+
+// Fungsi untuk menampilkan halaman katalog sponsor berdasarkan ID event
+    public function sponsorship($id)
+    {
+        // Mencari event berdasarkan ID, sekaligus menarik relasi 'sponsorships'
+        $event = \App\Models\Event::with('sponsorships')->findOrFail($id);
+
+        // Mengarahkan ke file view baru bernama 'sponsorship.blade.php'
+        // dan mengirimkan variabel $event ke sana
+        return view('sponsorship', compact('event'));
+    }
 }

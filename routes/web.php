@@ -19,6 +19,7 @@ use App\Http\Controllers\PanitiaController;
 use App\Http\Controllers\EOEventController;
 use App\Http\Controllers\AdminReportController;
 
+
 // =========================================================
 // RUTE PUBLIK (TIDAK PERLU LOGIN)
 // =========================================================
@@ -55,6 +56,8 @@ Route::get('/tes-langsung', function () { return view('emails.ticket'); });
 
 // Route untuk menampilkan event berdasarkan kategori
 Route::get('/events/category/{id}', [App\Http\Controllers\AdminEventController::class, 'byCategory'])->name('events.byCategory');
+// Tambahkan rute ini untuk halaman detail sponsorship sebuah event
+Route::get('/event/{id}/sponsorship', [App\Http\Controllers\AdminEventController::class, 'sponsorship'])->name('event.sponsorship');
 
 // =========================================================
 // RUTE PEMESANAN & PROFIL (SEMUA AKUN YANG LOGIN: USER, EO, ADMIN)
