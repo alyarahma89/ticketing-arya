@@ -5,8 +5,8 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Models\Transaction;
 use Illuminate\Support\Facades\Auth;
-use Carbon\Carbon; // Tambahkan ini untuk memanipulasi tanggal
-use Barryvdh\DomPDF\Facade\Pdf; // Tambahkan baris ini di atas
+use Carbon\Carbon;
+use Barryvdh\DomPDF\Facade\Pdf;
 
 class AdminReportController extends Controller
 {
@@ -18,6 +18,7 @@ class AdminReportController extends Controller
         $query = Transaction::with(['user', 'event'])->whereIn('payment_status', ['paid', 'success', 'settlement']);
 
         // 2. Filter Role (Admin vs EO)
+        // Logika ini sudah sangat benar! Admin akan melewatkan filter ini.
         if ($user->role === 'eo') {
             $query->whereHas('event', function ($q) use ($user) {
                 $q->where('user_id', $user->id);
@@ -67,27 +68,24 @@ class AdminReportController extends Controller
                 return response()->stream($callback, 200, $headers);
             }
 
-            // 2. Logika Jika Export PDF (BARU)
+            // 2. Logika Jika Export PDF
             if ($request->export === 'pdf') {
-                // Memanggil tampilan khusus PDF yang kita buat di langkah 3
                 $pdf = Pdf::loadView('admin.reports.pdf', compact('reports'));
 
-                // Mengunduh file PDF dengan nama otomatis
-                return $pdf->download('Laporan_Pendapatan_TICKS_ID_' . date('Y-m-d') . '.pdf');
+                // Mengubah nama file menjadi ARTIX_ID
+                return $pdf->download('Laporan_Pendapatan_ARTIX_ID_' . date('Y-m-d') . '.pdf');
             }
         }
 
         // ==========================================
         // PERSIAPAN DATA GRAFIK (CHART.JS)
         // ==========================================
-        // Kita kelompokkan pendapatan berdasarkan tanggal
         $chartDataRaw = $reports->groupBy(function($item) {
             return Carbon::parse($item->created_at)->format('d M Y');
         })->map(function($row) {
-            return $row->sum('total_amount'); // Jumlahkan uang per tanggal
+            return $row->sum('total_amount');
         });
 
-        // Pisahkan Label (Tanggal) dan Value (Uang)
         $chartLabels = $chartDataRaw->keys()->toArray();
         $chartValues = $chartDataRaw->values()->toArray();
 

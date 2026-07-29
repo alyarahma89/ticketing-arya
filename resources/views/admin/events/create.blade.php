@@ -3,341 +3,406 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Tambah Event Baru - ARTIX ID</title>
+    <title>Laporan Keuangan - ARTIX ID</title>
 
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700&family=Syne:wght@700;800&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
 
+    <!-- Menggunakan Font Sesuai Brand Guidelines -->
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700;800;900&family=Exo+2:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+    <!-- Panggil Script Eksternal -->
     <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
 
+    <!-- Konfigurasi Tailwind Sesuai Brand Guidelines -->
     <script>
         tailwind.config = {
             theme: {
                 extend: {
                     fontFamily: {
-                        sans: ['Plus Jakarta Sans', 'system-ui', 'sans-serif'],
-                        syne: ['Syne', 'sans-serif'],
+                        'montserrat': ['Montserrat', 'sans-serif'],
+                        'exo': ['"Exo 2"', 'sans-serif'],
                     },
                     colors: {
-                        primary: '#696FC7',
-                        'primary-deep': '#3D365C',
-                        'primary-press': '#7C4585',
-                        'primary-soft': '#C95792',
-                        'primary-subdued': '#F8B55F',
-                        'brand-dark': '#1c1e54',
-                        ink: '#0d253d',
-                        'ink-secondary': '#273951',
-                        'ink-mute': '#64748d',
-                        canvas: '#ffffff',
-                        'canvas-soft': '#f0f4f8',
-                        hairline: '#e3e8ee',
-                        ruby: '#ea2261',
-                    },
-                    boxShadow: {
-                        'level-1': '0 4px 20px rgba(28, 30, 84, 0.04), 0 1px 3px rgba(28, 30, 84, 0.02)',
-                        'level-2': '0 20px 40px rgba(28, 30, 84, 0.08), 0 1px 10px rgba(28, 30, 84, 0.03)',
+                        'artix-blue': '#0066FF',
+                        'artix-navy': '#041B4A',
+                        'artix-orange': '#FF7A00',
+                        'artix-red': '#FF3B30',
+                        'artix-purple': '#A100FF',
+                        'artix-cyan': '#00C2FF',
+                        'canvas-soft': '#F8FAFC',
                     }
                 }
             }
         }
     </script>
+
+    <!-- CSS Kustom & Scrollbar -->
     <style>
-        textarea::-webkit-scrollbar { width: 6px; }
-        textarea::-webkit-scrollbar-track { background: transparent; }
-        textarea::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
-        textarea::-webkit-scrollbar-thumb:hover { background: #696FC7; }
-        /* Memperbaiki tampilan icon kalender bawaan browser pada input datetime */
-        input[type="datetime-local"]::-webkit-calendar-picker-indicator {
-            cursor: pointer;
-            opacity: 0.6;
-            transition: 0.2s;
+        body { font-family: 'Exo 2', sans-serif; }
+
+        /* Custom scrollbar untuk sidebar */
+        .sidebar-scroll::-webkit-scrollbar { width: 4px; }
+        .sidebar-scroll::-webkit-scrollbar-track { background: transparent; }
+        .sidebar-scroll::-webkit-scrollbar-thumb { background: rgba(255, 255, 255, 0.15); border-radius: 10px; }
+        .sidebar-scroll::-webkit-scrollbar-thumb:hover { background: rgba(255, 255, 255, 0.3); }
+
+        /* Utility Class untuk Teks Bergradien */
+        .text-gradient-orange {
+            background: linear-gradient(135deg, #FF7A00, #FF3B30);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
         }
-        input[type="datetime-local"]::-webkit-calendar-picker-indicator:hover {
-            opacity: 1;
+
+        /* Aturan untuk cetak PDF */
+        @media print {
+            .no-print { display: none !important; }
+            body { background: white !important; }
+            main { padding: 0 !important; overflow: visible !important; }
+            .shadow-sm { box-shadow: none !important; border: 1px solid #e2e8f0 !important; }
+            canvas { max-width: 100% !important; }
         }
     </style>
 </head>
-<body class="bg-canvas-soft text-ink font-sans antialiased min-h-screen flex flex-col">
+<body class="bg-canvas-soft text-slate-800 flex h-screen overflow-hidden">
 
-    <!-- HEADER -->
-    <header class="h-20 bg-brand-dark border-b border-white/10 flex items-center justify-between px-8 sticky top-0 z-50 shadow-md">
-        <div class="flex items-center w-1/4">
-            <a href="{{ route('admin.events.index') }}" class="text-white/70 hover:text-white flex items-center gap-2 text-[14px] font-semibold transition-all duration-200 group">
-                <span class="transform group-hover:-translate-x-1 transition-transform">&larr;</span> Kembali
+    <!-- ── SIDEBAR KIRI (Deep Navy) ── -->
+    <aside class="w-64 bg-artix-navy flex flex-col hidden lg:flex relative z-20 shrink-0 h-screen shadow-xl border-r border-white/5 no-print">
+
+        <!-- LOGO MAIN & TEKS -->
+        <div class="h-20 shrink-0 flex items-center px-8 border-b border-white/10">
+            <a href="{{ url('/') }}" class="flex items-center gap-3 group">
+                <img src="{{ asset('main_logo.png') }}" alt="ARTIX ID Logo" class="h-10 w-auto object-contain group-hover:scale-105 transition-transform duration-300" style="filter: drop-shadow(0px 0px 8px rgba(0, 102, 255, 0.4)); clip-path: inset(2px);">
+                <span class="text-white font-black text-xl tracking-tight font-montserrat group-hover:opacity-90 transition-opacity">
+                    ARTIX <span class="text-gradient-orange">ID</span>
+                </span>
             </a>
         </div>
 
-        <div class="flex items-center justify-center gap-1.5 w-2/4">
-            <span class="font-syne font-extrabold text-[22px] tracking-tight text-white block">ARTIX</span>
-            <span class="font-syne font-extrabold text-[22px] tracking-tight text-primary-subdued block">ID</span>
-        </div>
+        <!-- MENU NAVIGASI -->
+        <nav class="p-5 space-y-1.5 flex-1 overflow-y-auto sidebar-scroll">
 
-        <div class="flex items-center justify-end w-1/4">
-            <div class="flex items-center gap-2 bg-white/10 px-4 py-2 rounded-full border border-white/10">
-                <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
-                <span class="text-[11px] font-bold text-white tracking-wide uppercase">Event Creator</span>
-            </div>
-        </div>
-    </header>
+            <!-- MENU EO -->
+            @if(Auth::user()->role == 'eo')
+                <div class="text-[10px] font-bold text-white/40 uppercase tracking-widest px-4 mb-2 mt-2">Menu Utama</div>
 
-    <!-- HERO SECTION -->
-    <div class="bg-gradient-to-r from-brand-dark via-primary-deep to-primary text-white py-12 px-8 shadow-inner">
-        <div class="max-w-6xl w-full mx-auto flex flex-col md:flex-row md:items-center md:justify-between gap-4">
-            <div>
-                <span class="text-primary-subdued font-bold text-xs uppercase tracking-widest bg-white/10 px-3 py-1 rounded-full border border-white/10">Manajemen Acara</span>
-                <h1 class="text-[36px] font-bold tracking-tight font-syne mt-2">Tambah Event Baru</h1>
-                <p class="text-[14px] text-white/70 font-light mt-1">Publikasikan informasi event, atur ketersediaan tiket, dan kelola rincian acara secara real-time.</p>
-            </div>
-            <div class="text-right hidden md:block">
-                <span class="text-[28px] opacity-20 font-syne font-black tracking-wider">ARTIX ID EVENTS</span>
-            </div>
-        </div>
-    </div>
+                <a href="{{ route('admin.dashboard') }}" class="flex items-center gap-3 px-4 py-3 text-white/60 hover:text-white hover:bg-white/5 rounded-xl text-[14px] font-medium transition-all">
+                    <i data-lucide="layout-dashboard" class="w-5 h-5"></i> Dasbor Saya
+                </a>
+                <a href="{{ route('admin.events.index') }}" class="flex items-center gap-3 px-4 py-3 text-white/60 hover:text-white hover:bg-white/5 rounded-xl text-[14px] font-medium transition-all">
+                    <i data-lucide="ticket" class="w-5 h-5"></i> Event Saya
+                </a>
+                <a href="{{ route('admin.transactions.index') }}" class="flex items-center gap-3 px-4 py-3 text-white/60 hover:text-white hover:bg-white/5 rounded-xl text-[14px] font-medium transition-all">
+                    <i data-lucide="credit-card" class="w-5 h-5"></i> Penjualan Tiket
+                </a>
+                <a href="{{ route('admin.sponsorships.index') }}" class="flex items-center gap-3 px-4 py-3 text-white/60 hover:text-white hover:bg-white/5 rounded-xl text-[14px] font-medium transition-all">
+                    <i data-lucide="handshake" class="w-5 h-5"></i> Kerjasama Sponsor
+                </a>
 
-    <!-- MAIN FORM AREA -->
-    <main class="flex-1 max-w-6xl w-full mx-auto py-10 px-6 -mt-8">
+                <!-- Disorot karena ini halaman Laporan Event (EO) -->
+                <a href="{{ route('admin.reports.index') }}" class="flex items-center gap-3 px-4 py-3 bg-[#0066FF] text-white rounded-xl text-[14px] font-bold transition-all shadow-md shadow-blue-500/20">
+                    <i data-lucide="file-bar-chart-2" class="w-5 h-5"></i> Laporan Event
+                </a>
 
-        <form action="{{ route('admin.events.store') }}" method="POST" enctype="multipart/form-data">
-            @csrf
+            <!-- MENU ADMIN UTAMA -->
+            @elseif(Auth::user()->role == 'admin')
+                <div class="text-[10px] font-bold text-white/40 uppercase tracking-widest px-4 mb-2 mt-2">Sistem Admin</div>
 
-            <!-- ALERT ERROR -->
-            @if ($errors->any())
-                <div class="bg-ruby/10 border border-ruby/20 text-ruby p-4 rounded-xl mb-6 text-[14px] flex gap-3 items-start shadow-sm">
-                    <i class="bi bi-exclamation-triangle-fill text-[18px] mt-0.5"></i>
-                    <div>
-                        <span class="font-bold block mb-1">Gagal menerbitkan event:</span>
-                        <ul class="list-disc list-inside space-y-0.5 opacity-90">
-                            @foreach ($errors->all() as $error)
-                                <li>{{ $error }}</li>
-                            @endforeach
-                        </ul>
-                    </div>
-                </div>
+                <a href="{{ route('admin.dashboard') }}" class="flex items-center gap-3 px-4 py-3 text-white/60 hover:text-white hover:bg-white/5 rounded-xl text-[14px] font-medium transition-all">
+                    <i data-lucide="layout-dashboard" class="w-5 h-5"></i> Ikhtisar Platform
+                </a>
+                <a href="{{ route('admin.events.index') }}" class="flex items-center gap-3 px-4 py-3 text-white/60 hover:text-white hover:bg-white/5 rounded-xl text-[14px] font-medium transition-all">
+                    <i data-lucide="ticket" class="w-5 h-5"></i> Manajemen Event
+                </a>
+                <a href="{{ route('admin.categories.index') }}" class="flex items-center gap-3 px-4 py-3 text-white/60 hover:text-white hover:bg-white/5 rounded-xl text-[14px] font-medium transition-all">
+                    <i data-lucide="tags" class="w-5 h-5"></i> Kelola Kategori
+                </a>
+                <a href="{{ route('admin.transactions.index') }}" class="flex items-center gap-3 px-4 py-3 text-white/60 hover:text-white hover:bg-white/5 rounded-xl text-[14px] font-medium transition-all">
+                    <i data-lucide="credit-card" class="w-5 h-5"></i> Data Transaksi
+                </a>
+                <a href="{{ route('admin.users.index') }}" class="flex items-center gap-3 px-4 py-3 text-white/60 hover:text-white hover:bg-white/5 rounded-xl text-[14px] font-medium transition-all">
+                    <i data-lucide="users" class="w-5 h-5"></i> Kelola Pengguna
+                </a>
+                <a href="{{ route('admin.sponsorships.index') }}" class="flex items-center gap-3 px-4 py-3 text-white/60 hover:text-white hover:bg-white/5 rounded-xl text-[14px] font-medium transition-all">
+                    <i data-lucide="handshake" class="w-5 h-5"></i> Kelola Sponsorship
+                </a>
+
+                <!-- Disorot karena ini halaman Laporan Keseluruhan (Admin) -->
+                <a href="{{ route('admin.reports.index') }}" class="flex items-center gap-3 px-4 py-3 bg-[#0066FF] text-white rounded-xl text-[14px] font-bold transition-all shadow-md shadow-blue-500/20">
+                    <i data-lucide="file-bar-chart-2" class="w-5 h-5"></i> Laporan Keseluruhan
+                </a>
             @endif
+        </nav>
 
-            <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+        <!-- BAGIAN BAWAH: LOGOUT -->
+        <div class="p-5 border-t border-white/10 shrink-0 bg-artix-navy">
+            <form action="{{ route('logout') }}" method="POST" class="mt-1">
+                @csrf
+                <button type="submit" class="w-full text-left text-[13px] font-bold text-red-400 bg-red-500/10 hover:bg-red-500/20 hover:text-red-300 border border-red-500/20 px-4 py-3 rounded-xl transition-all flex items-center gap-3 shadow-sm group">
+                    <i data-lucide="log-out" class="w-4 h-4 group-hover:-translate-x-1 transition-transform"></i> Keluar Sistem
+                </button>
+            </form>
+        </div>
+    </aside>
 
-                <!-- KOLOM KIRI (Detail Utama Event) -->
-                <div class="lg:col-span-2 space-y-6">
-                    <div class="bg-white border border-hairline rounded-[24px] shadow-level-1 p-8 space-y-6 relative overflow-hidden">
-                        <div class="absolute top-0 inset-x-0 h-1.5 bg-gradient-to-r from-primary to-primary-soft"></div>
+    <!-- ── AREA KONTEN UTAMA ── -->
+    <main class="flex-1 flex flex-col h-full overflow-y-auto relative z-10 w-full bg-[#F8FAFC]">
 
-                        <h2 class="text-[18px] font-bold text-brand-dark border-b border-hairline pb-3 flex items-center gap-2">
-                            <i class="bi bi-card-text text-primary"></i> Informasi Dasar Event
-                        </h2>
-
-                        <div>
-                            <label class="block text-[11px] font-bold text-ink-secondary mb-2 uppercase tracking-wider">Nama Resmi Event</label>
-                            <div class="relative">
-                                <span class="absolute inset-y-0 left-0 flex items-center pl-4 text-primary/60"><i class="bi bi-type"></i></span>
-                                <input type="text" name="name" id="name" value="{{ old('name') }}" required placeholder="Contoh: Artix Music Festival 2024"
-                                    class="w-full bg-canvas-soft focus:bg-white border border-hairline text-ink text-[15px] font-semibold rounded-xl pl-11 pr-4 py-3.5 focus:outline-none focus:border-primary focus:ring-4 focus:ring-primary/10 transition-all duration-200">
-                            </div>
-                        </div>
-
-                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                            <div>
-                                <label class="block text-[11px] font-bold text-ink-secondary mb-2 uppercase tracking-wider">Kategori / Klaster</label>
-                                <div class="relative">
-                                    <span class="absolute inset-y-0 left-0 flex items-center pl-4 text-primary/60"><i class="bi bi-grid-fill"></i></span>
-                                    <select name="category_id" id="category-select" required class="w-full bg-canvas-soft focus:bg-white border border-hairline text-ink text-[15px] font-semibold rounded-xl pl-11 pr-4 py-3.5 focus:outline-none focus:border-primary focus:ring-4 focus:ring-primary/10 transition-all duration-200 appearance-none cursor-pointer">
-                                        <option value="" disabled {{ old('category_id') ? '' : 'selected' }}>-- Pilih Kategori --</option>
-                                        @foreach($categories as $category)
-                                            <option value="{{ $category->id }}" {{ old('category_id') == $category->id ? 'selected' : '' }}>
-                                                {{ $category->name }}
-                                            </option>
-                                        @endforeach
-                                    </select>
-                                    <span class="absolute inset-y-0 right-0 flex items-center pr-4 pointer-events-none text-ink-mute/50"><i class="bi bi-chevron-down text-xs"></i></span>
-                                </div>
-                            </div>
-
-                            <div>
-                                <label class="block text-[11px] font-bold text-ink-secondary mb-2 uppercase tracking-wider">Waktu Pelaksanaan</label>
-                                <div class="relative">
-                                    <span class="absolute inset-y-0 left-0 flex items-center pl-4 text-primary/60 pointer-events-none"><i class="bi bi-clock-fill"></i></span>
-                                    <input type="datetime-local" name="event_date" id="event_date" value="{{ old('event_date') }}" required
-                                        class="w-full bg-canvas-soft focus:bg-white border border-hairline text-ink text-[15px] font-semibold rounded-xl pl-11 pr-4 py-3.5 focus:outline-none focus:border-primary focus:ring-4 focus:ring-primary/10 transition-all duration-200 cursor-text">
-                                </div>
-                            </div>
-                        </div>
-
-                        <div>
-                            <label class="block text-[11px] font-bold text-ink-secondary mb-2 uppercase tracking-wider">Lokasi / Venue</label>
-                            <div class="relative">
-                                <span class="absolute inset-y-0 left-0 flex items-center pl-4 text-primary/60"><i class="bi bi-geo-alt-fill"></i></span>
-                                <input type="text" name="location" id="location" value="{{ old('location') }}" required placeholder="Contoh: Gelora Bung Karno, Jakarta"
-                                    class="w-full bg-canvas-soft focus:bg-white border border-hairline text-ink text-[15px] font-semibold rounded-xl pl-11 pr-4 py-3.5 focus:outline-none focus:border-primary focus:ring-4 focus:ring-primary/10 transition-all duration-200">
-                            </div>
-                        </div>
-
-                        <div>
-                            <label class="block text-[11px] font-bold text-ink-secondary mb-2 uppercase tracking-wider">Deskripsi Lengkap Acara</label>
-                            <textarea name="description" id="description" rows="5" required placeholder="Jelaskan detail acara, rundown, syarat dan ketentuan tiket..."
-                                class="w-full bg-canvas-soft focus:bg-white border border-hairline text-ink text-[15px] rounded-xl px-4 py-3.5 focus:outline-none focus:border-primary focus:ring-4 focus:ring-primary/10 transition-all duration-200 shadow-inner">{{ old('description') }}</textarea>
-                        </div>
-
-                        <!-- HIDDEN YOUTUBE FIELD -->
-                        <div id="online-options" class="hidden animate-[fadeIn_0.3s_ease-in-out]">
-                            <label class="block text-[11px] font-bold text-ruby mb-2 uppercase tracking-wider flex items-center gap-1.5"><i class="bi bi-youtube"></i> Link Livestream YouTube</label>
-                            <div class="relative">
-                                <span class="absolute inset-y-0 left-0 flex items-center pl-4 text-ruby/60"><i class="bi bi-link-45deg"></i></span>
-                                <input type="url" name="youtube_link" id="youtube_link" value="{{ old('youtube_link') }}" placeholder="https://youtube.com/live/..."
-                                    class="w-full bg-ruby/5 focus:bg-white border border-ruby/20 focus:border-ruby text-ink text-[15px] font-semibold rounded-xl pl-11 pr-4 py-3.5 focus:outline-none focus:ring-4 focus:ring-ruby/10 transition-all duration-200">
-                            </div>
-                            <span class="text-[10px] text-ink-mute mt-1.5 block">Kolom ini muncul khusus untuk kategori hybrid/online (Live Concert, Workshop, dll).</span>
-                        </div>
-                    </div>
+        <!-- HEADER KANAN ATAS -->
+        <header class="h-20 px-8 flex items-center justify-end gap-3 shrink-0 bg-white/50 backdrop-blur-md border-b border-slate-200/50 sticky top-0 z-50 no-print">
+            <div class="flex items-center gap-3 bg-white px-4 py-2 rounded-full border border-slate-200 shadow-sm">
+                <div class="w-8 h-8 rounded-full bg-artix-blue flex items-center justify-center text-white text-xs font-bold uppercase shadow-inner">
+                    {{ substr(Auth::user()->name ?? 'A', 0, 1) }}
                 </div>
-
-                <!-- KOLOM KANAN (Harga, Kuota & Poster) -->
-                <div class="space-y-6">
-
-                    <div class="bg-white border border-hairline rounded-[24px] shadow-level-1 p-6 space-y-5 relative overflow-hidden">
-                        <div class="absolute top-0 inset-x-0 h-1.5 bg-gradient-to-r from-primary-soft to-primary-subdued"></div>
-
-                        <h2 class="text-[18px] font-bold text-brand-dark border-b border-hairline pb-3 flex items-center gap-2">
-                            <i class="bi bi-ticket-perforated text-primary"></i> Tiket & Kapasitas
-                        </h2>
-
-                        <div>
-                            <label class="block text-[11px] font-bold text-ink-secondary mb-2 uppercase tracking-wider">Harga Tiket Offline</label>
-                            <div class="relative">
-                                <span class="absolute inset-y-0 left-0 flex items-center pl-4 text-emerald-600 font-bold text-[14px]">Rp</span>
-                                <input type="number" name="price" id="price" value="{{ old('price', 0) }}" required min="0" placeholder="0"
-                                    class="w-full bg-emerald-500/5 focus:bg-white border border-emerald-500/20 focus:border-emerald-500 text-emerald-700 text-[16px] font-bold rounded-xl pl-12 pr-4 py-3 focus:outline-none focus:ring-4 focus:ring-emerald-500/10 transition-all duration-200">
-                            </div>
-                        </div>
-
-                        <!-- HIDDEN ONLINE PRICE FIELD -->
-                        <div id="online-price-wrapper" class="hidden animate-[fadeIn_0.3s_ease-in-out]">
-                            <label class="block text-[11px] font-bold text-blue-600 mb-2 uppercase tracking-wider">Harga Tiket Online / Live</label>
-                            <div class="relative">
-                                <span class="absolute inset-y-0 left-0 flex items-center pl-4 text-blue-600 font-bold text-[14px]">Rp</span>
-                                <input type="number" name="online_price" id="online_price" value="{{ old('online_price', 0) }}" min="0" placeholder="0"
-                                    class="w-full bg-blue-500/5 focus:bg-white border border-blue-500/20 focus:border-blue-500 text-blue-700 text-[16px] font-bold rounded-xl pl-12 pr-4 py-3 focus:outline-none focus:ring-4 focus:ring-blue-500/10 transition-all duration-200">
-                            </div>
-                        </div>
-
-                        <div>
-                            <label class="block text-[11px] font-bold text-ink-secondary mb-2 uppercase tracking-wider">Kuota Maksimal (Tiket)</label>
-                            <div class="relative">
-                                <span class="absolute inset-y-0 left-0 flex items-center pl-4 text-indigo-600/70"><i class="bi bi-people-fill"></i></span>
-                                <input type="number" name="quota" id="quota" value="{{ old('quota') }}" required min="1" placeholder="Contoh: 500"
-                                    class="w-full bg-indigo-500/5 focus:bg-white border border-indigo-500/20 focus:border-indigo-500 text-indigo-700 text-[16px] font-bold rounded-xl pl-11 pr-4 py-3 focus:outline-none focus:ring-4 focus:ring-indigo-500/10 transition-all duration-200">
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="bg-gradient-to-b from-white to-primary/5 border border-hairline rounded-[24px] shadow-level-1 p-6 space-y-4">
-                        <h2 class="text-[16px] font-bold text-brand-dark flex items-center gap-2">
-                            <i class="bi bi-image text-primary"></i> Poster Promosi <span class="text-[11px] font-normal text-ink-mute">(Opsional)</span>
-                        </h2>
-
-                        <div class="relative group aspect-[4/5] w-full max-w-[220px] mx-auto rounded-2xl bg-canvas-soft border-2 border-dashed border-primary/20 overflow-hidden flex items-center justify-center shadow-inner">
-                            <div class="text-center p-4 transition-opacity duration-200" id="placeholder-box">
-                                <i class="bi bi-cloud-arrow-up text-[36px] text-primary block mb-1 animate-pulse"></i>
-                                <span class="text-primary text-[12px] font-bold block">Unggah Poster</span>
-                                <span class="text-ink-mute text-[10px] block mt-0.5">Rasio Potret (4:5)</span>
-                            </div>
-                            <img id="badge-preview" class="w-full h-full object-cover hidden transition-transform duration-300 group-hover:scale-105">
-                            <div id="hover-overlay" class="absolute inset-0 bg-brand-dark/60 opacity-0 group-hover:opacity-100 transition-opacity hidden items-center justify-center">
-                                <span class="text-white text-[11px] font-semibold bg-primary px-3 py-1.5 rounded-full shadow-md"><i class="bi bi-arrow-repeat mr-1"></i> Ganti Poster</span>
-                            </div>
-                        </div>
-
-                        <div>
-                            <input type="file" name="image" id="badge-input" accept="image/*"
-                                class="w-full text-xs text-ink-mute file:mr-3 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-[11px] file:font-bold file:bg-primary file:text-white hover:file:bg-primary-press transition-all cursor-pointer border border-hairline rounded-lg p-1.5 bg-white">
-                        </div>
-                    </div>
+                <div class="flex flex-col text-left">
+                    <span class="text-[13px] font-bold text-slate-800 leading-tight">{{ Auth::user()->name ?? 'Administrator' }}</span>
+                    <span class="text-[10px] text-artix-blue font-bold uppercase tracking-wider">{{ Auth::user()->role == 'eo' ? 'Event Organizer' : 'Platform Admin' }}</span>
                 </div>
             </div>
+        </header>
 
-            <!-- ACTION BAR BAWAH -->
-            <div class="mt-8 bg-brand-dark border border-white/10 rounded-[24px] p-6 shadow-level-2 flex flex-col sm:flex-row items-center justify-between gap-4">
-                <span class="text-[13px] text-white/70 font-medium flex items-center gap-1.5">
-                    <i class="bi bi-info-circle-fill text-primary-subdued"></i> Pastikan semua informasi acara sudah valid sebelum diterbitkan.
-                </span>
-                <div class="flex items-center gap-4 w-full sm:w-auto shrink-0">
-                    <a href="{{ route('admin.events.index') }}" class="text-[14px] text-white/70 hover:text-white font-bold px-5 py-3 transition-colors rounded-full hover:bg-white/5 text-center w-full sm:w-auto">Batal</a>
-                    <button type="submit" class="bg-primary hover:bg-primary-press text-white px-8 py-3.5 rounded-full text-[14px] font-bold transition-all shadow-md hover:shadow-xl hover:-translate-y-0.5 active:translate-y-0 w-full sm:w-auto text-center flex items-center justify-center gap-2">
-                        <i class="bi bi-rocket-takeoff-fill"></i> Publikasikan Event
+        <!-- ── KONTEN UTAMA LAPORAN ── -->
+        <div class="px-8 pt-10 pb-12">
+
+            <!-- Judul Halaman & Tombol Export -->
+            <div class="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-8">
+                <div>
+                    <h1 class="text-3xl font-black text-slate-900 mb-1 font-montserrat tracking-tight">Laporan Keuangan</h1>
+                    <p class="text-[14px] text-slate-500 font-medium">
+                        @if(Auth::user()->role === 'eo') Ringkasan pendapatan event Anda. @else Ringkasan pendapatan seluruh event di platform. @endif
+                    </p>
+                </div>
+
+                <!-- TOMBOL EXPORT (Sembunyikan saat cetak PDF) -->
+                <div class="flex flex-wrap gap-3 no-print">
+                    <!-- Download PDF -->
+                    <button type="submit" form="filterForm" name="export" value="pdf" class="bg-gradient-to-r from-red-500 to-[#FF3B30] text-white px-6 py-2.5 rounded-[12px] text-sm font-bold hover:shadow-lg hover:shadow-red-500/30 transition-all flex items-center gap-2 hover:-translate-y-0.5">
+                        <i data-lucide="file-text" class="w-4 h-4"></i> Download PDF
+                    </button>
+                    <!-- Download Excel -->
+                    <button type="submit" form="filterForm" name="export" value="excel" class="bg-gradient-to-r from-emerald-500 to-emerald-600 text-white px-6 py-2.5 rounded-[12px] text-sm font-bold hover:shadow-lg hover:shadow-emerald-500/30 transition-all flex items-center gap-2 hover:-translate-y-0.5">
+                        <i data-lucide="file-spreadsheet" class="w-4 h-4"></i> Download Excel
                     </button>
                 </div>
             </div>
-        </form>
+
+            <!-- ── FORM FILTER TANGGAL ── -->
+            <div class="bg-white p-6 rounded-[24px] border border-slate-200 shadow-sm mb-8 no-print">
+                <form id="filterForm" action="{{ route('admin.reports.index') }}" method="GET" class="flex flex-wrap items-end gap-5">
+                    <div>
+                        <label class="block text-[11px] font-bold text-slate-500 mb-2 uppercase tracking-widest">Dari Tanggal</label>
+                        <div class="relative">
+                            <span class="absolute inset-y-0 left-0 flex items-center pl-4 text-slate-400 pointer-events-none"><i data-lucide="calendar" class="w-4 h-4"></i></span>
+                            <input type="date" name="start_date" value="{{ request('start_date') }}" class="pl-10 pr-4 py-3 bg-slate-50 border border-slate-200 rounded-[12px] text-[14px] font-bold text-slate-700 outline-none focus:bg-white focus:border-[#0066FF] focus:ring-4 focus:ring-[#0066FF]/10 transition-all cursor-pointer">
+                        </div>
+                    </div>
+                    <div>
+                        <label class="block text-[11px] font-bold text-slate-500 mb-2 uppercase tracking-widest">Sampai Tanggal</label>
+                        <div class="relative">
+                            <span class="absolute inset-y-0 left-0 flex items-center pl-4 text-slate-400 pointer-events-none"><i data-lucide="calendar" class="w-4 h-4"></i></span>
+                            <input type="date" name="end_date" value="{{ request('end_date') }}" class="pl-10 pr-4 py-3 bg-slate-50 border border-slate-200 rounded-[12px] text-[14px] font-bold text-slate-700 outline-none focus:bg-white focus:border-[#0066FF] focus:ring-4 focus:ring-[#0066FF]/10 transition-all cursor-pointer">
+                        </div>
+                    </div>
+
+                    <div class="flex gap-3">
+                        <button type="submit" class="bg-[#041B4A] hover:bg-slate-800 text-white px-6 py-3 rounded-[12px] text-sm font-bold transition-all shadow-md flex items-center gap-2">
+                            <i data-lucide="search" class="w-4 h-4"></i> Filter Data
+                        </button>
+                        <a href="{{ route('admin.reports.index') }}" class="bg-slate-100 text-slate-600 hover:text-slate-900 border border-slate-200 hover:border-slate-300 px-6 py-3 rounded-[12px] text-sm font-bold transition-all flex items-center gap-2">
+                            <i data-lucide="refresh-ccw" class="w-4 h-4"></i> Reset
+                        </a>
+                    </div>
+                </form>
+            </div>
+
+            <!-- ── KARTU RINGKASAN (SUMMARY) ── -->
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+                <!-- Total Pendapatan -->
+                <div class="bg-white p-6 rounded-[20px] border border-slate-200 shadow-sm flex items-center justify-between relative overflow-hidden group hover:shadow-md transition-all">
+                    <div class="absolute top-0 left-0 w-1.5 h-full bg-[#0066FF]"></div>
+                    <div class="pl-2">
+                        <p class="text-[11px] font-bold text-slate-400 tracking-widest uppercase mb-1">Total Pendapatan Tiket</p>
+                        <h3 class="text-3xl font-black text-slate-800 font-montserrat">Rp {{ number_format($totalPendapatan, 0, ',', '.') }}</h3>
+                    </div>
+                    <div class="w-14 h-14 rounded-2xl bg-blue-50 flex items-center justify-center text-[#0066FF] shadow-inner border border-blue-100">
+                        <i data-lucide="banknote" class="w-7 h-7"></i>
+                    </div>
+                </div>
+                <!-- Total Tiket Terjual -->
+                <div class="bg-white p-6 rounded-[20px] border border-slate-200 shadow-sm flex items-center justify-between relative overflow-hidden group hover:shadow-md transition-all">
+                    <div class="absolute top-0 left-0 w-1.5 h-full bg-[#FF7A00]"></div>
+                    <div class="pl-2">
+                        <p class="text-[11px] font-bold text-slate-400 tracking-widest uppercase mb-1">Total Tiket Terjual</p>
+                        <h3 class="text-3xl font-black text-slate-800 font-montserrat">{{ number_format($totalTiket, 0, ',', '.') }} <span class="text-sm font-bold text-slate-400 font-exo">Tiket</span></h3>
+                    </div>
+                    <div class="w-14 h-14 rounded-2xl bg-orange-50 flex items-center justify-center text-[#FF7A00] shadow-inner border border-orange-100">
+                        <i data-lucide="ticket" class="w-7 h-7"></i>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ── GRAFIK PENDAPATAN HARIAN ── -->
+            <div class="bg-white p-8 rounded-[24px] border border-slate-200 shadow-sm mb-8">
+                <div class="flex items-center justify-between mb-6">
+                    <h2 class="text-lg font-black text-slate-800 font-montserrat flex items-center gap-2">
+                        <i data-lucide="trending-up" class="w-5 h-5 text-[#0066FF]"></i> Grafik Pendapatan Harian
+                    </h2>
+                    <span class="text-xs font-bold bg-slate-100 text-slate-500 px-3 py-1 rounded-lg">Rupiah (Rp)</span>
+                </div>
+                <div class="relative h-[320px] w-full">
+                    <canvas id="revenueChart"></canvas>
+                </div>
+            </div>
+
+            <!-- ── TABEL RINCIAN TRANSAKSI ── -->
+            <div class="bg-white border border-slate-200 rounded-[24px] overflow-hidden shadow-sm">
+                <div class="p-6 border-b border-slate-100 bg-slate-50/50">
+                    <h3 class="text-base font-black text-slate-800 font-montserrat">Rincian Transaksi Event</h3>
+                </div>
+                <div class="overflow-x-auto">
+                    <table class="w-full text-left border-collapse">
+                        <thead class="bg-white border-b border-slate-200 text-xs font-bold text-slate-500 uppercase tracking-widest font-montserrat">
+                            <tr>
+                                <th class="py-5 px-6">Tanggal Transaksi</th>
+                                <th class="py-5 px-6">Nama Event</th>
+                                <th class="py-5 px-6 text-center">Jml Tiket</th>
+                                <th class="py-5 px-6 text-right">Total Pendapatan</th>
+                            </tr>
+                        </thead>
+                        <tbody class="text-[14px] text-slate-700 divide-y divide-slate-100">
+                            @forelse($reports as $report)
+                            <tr class="hover:bg-slate-50/70 transition-colors">
+                                <td class="py-4 px-6 text-slate-500 font-medium">
+                                    <div class="flex items-center gap-2">
+                                        <i data-lucide="clock" class="w-4 h-4 text-slate-400"></i>
+                                        {{ $report->created_at->format('d M Y, H:i') }}
+                                    </div>
+                                </td>
+                                <td class="py-4 px-6 font-bold text-slate-800">{{ $report->event->name ?? 'Event Terhapus' }}</td>
+                                <td class="py-4 px-6 text-center">
+                                    <span class="bg-slate-100 border border-slate-200 text-slate-700 font-bold px-3 py-1 rounded-lg text-xs">
+                                        {{ $report->quantity }}
+                                    </span>
+                                </td>
+                                <td class="py-4 px-6 text-right font-black text-slate-800 font-montserrat">Rp {{ number_format($report->total_amount, 0, ',', '.') }}</td>
+                            </tr>
+                            @empty
+                            <tr>
+                                <td colspan="4" class="px-6 py-20 text-center">
+                                    <div class="flex flex-col items-center justify-center">
+                                        <div class="w-16 h-16 bg-slate-50 text-slate-300 rounded-full flex items-center justify-center mb-4">
+                                            <i data-lucide="inbox" class="w-8 h-8"></i>
+                                        </div>
+                                        <h3 class="text-lg font-black text-slate-800 mb-1 font-montserrat">Tidak Ada Data</h3>
+                                        <p class="text-slate-500 text-[14px] font-medium">Belum ada transaksi pendapatan pada rentang waktu ini.</p>
+                                    </div>
+                                </td>
+                            </tr>
+                            @endforelse
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+        </div>
     </main>
 
+    <!-- ── SCRIPT GRAFIK CHART.JS ── -->
     <script>
-        // --- SCRIPT 1: Preview Poster/Image ---
-        const badgeInput = document.getElementById('badge-input');
-        const badgePreview = document.getElementById('badge-preview');
-        const placeholderBox = document.getElementById('placeholder-box');
-        const hoverOverlay = document.getElementById('hover-overlay');
+        // Inisialisasi ikon Lucide
+        lucide.createIcons();
 
-        if(badgeInput) {
-            badgeInput.addEventListener('change', function() {
-                const file = this.files[0];
-                if(file) {
-                    const reader = new FileReader();
-                    reader.addEventListener('load', function() {
-                        if(placeholderBox) placeholderBox.classList.add('hidden');
-                        if(hoverOverlay) {
-                            hoverOverlay.classList.remove('hidden');
-                            hoverOverlay.classList.add('flex');
+        document.addEventListener('DOMContentLoaded', function() {
+            // Ambil data yang dikirim dari Controller
+            const labels = @json($chartLabels);
+            const dataValues = @json($chartValues);
+
+            const ctx = document.getElementById('revenueChart').getContext('2d');
+
+            // Membuat efek gradasi warna di bawah garis grafik
+            let gradient = ctx.createLinearGradient(0, 0, 0, 400);
+            gradient.addColorStop(0, 'rgba(0, 102, 255, 0.4)'); // Artix Blue transparan
+            gradient.addColorStop(1, 'rgba(0, 102, 255, 0.0)'); // Memudar ke transparan penuh
+
+            new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        label: 'Pendapatan',
+                        data: dataValues,
+                        borderColor: '#0066FF', // Artix Blue
+                        backgroundColor: gradient, // Menggunakan gradasi yang dibuat di atas
+                        borderWidth: 3,
+                        pointBackgroundColor: '#ffffff',
+                        pointBorderColor: '#0066FF',
+                        pointBorderWidth: 2,
+                        pointRadius: 4,
+                        pointHoverRadius: 6,
+                        pointHoverBackgroundColor: '#0066FF',
+                        pointHoverBorderColor: '#ffffff',
+                        fill: true, // Mengaktifkan warna area di bawah garis
+                        tension: 0.4 // Membuat garis melengkung (smooth)
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { display: false },
+                        tooltip: {
+                            backgroundColor: '#041B4A', // Deep Navy background
+                            titleFont: { family: 'Montserrat', size: 13, weight: 'bold' },
+                            bodyFont: { family: 'Exo 2', size: 14, weight: '600' },
+                            padding: 12,
+                            cornerRadius: 12,
+                            displayColors: false,
+                            callbacks: {
+                                label: function(context) {
+                                    let value = context.parsed.y;
+                                    return 'Rp ' + new Intl.NumberFormat('id-ID').format(value);
+                                }
+                            }
                         }
-                        badgePreview.classList.remove('hidden');
-                        badgePreview.setAttribute('src', this.result);
-                    });
-                    reader.readAsDataURL(file);
-                } else {
-                    badgePreview.classList.add('hidden');
-                    if(placeholderBox) placeholderBox.classList.remove('hidden');
-                    if(hoverOverlay) {
-                        hoverOverlay.classList.add('hidden');
-                        hoverOverlay.classList.remove('flex');
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            border: { display: false },
+                            grid: {
+                                color: '#f1f5f9',
+                                drawBorder: false,
+                            },
+                            ticks: {
+                                color: '#64748b',
+                                font: { family: 'Exo 2', weight: '600' },
+                                padding: 10,
+                                callback: function(value) {
+                                    if (value >= 1000000) {
+                                        return 'Rp ' + (value / 1000000) + ' Jt';
+                                    } else if (value >= 1000) {
+                                        return 'Rp ' + (value / 1000) + ' Rb';
+                                    }
+                                    return 'Rp ' + value;
+                                }
+                            }
+                        },
+                        x: {
+                            border: { display: false },
+                            grid: { display: false },
+                            ticks: {
+                                color: '#64748b',
+                                font: { family: 'Exo 2', weight: '600' },
+                                padding: 10
+                            }
+                        }
                     }
-                    badgePreview.removeAttribute('src');
                 }
             });
-        }
-
-        // --- SCRIPT 2: Logika Form Hybrid (YouTube & Harga Online) ---
-        const categorySelect = document.getElementById('category-select');
-        const onlineOptions = document.getElementById('online-options');
-        const onlinePriceWrapper = document.getElementById('online-price-wrapper');
-
-        const hybridCategories = ['LIVE CONCERT', 'WORKSHOP', 'STAND UP COMEDY'];
-
-        function toggleOnlineFields() {
-            if(categorySelect.selectedIndex >= 0) {
-                // Ambil teks dari opsi yang dipilih
-                const selectedText = categorySelect.options[categorySelect.selectedIndex].text.trim().toUpperCase();
-
-                if (hybridCategories.includes(selectedText)) {
-                    // Tampilkan kolom (menggunakan class bawaan Tailwind 'hidden')
-                    onlineOptions.classList.remove('hidden');
-                    onlinePriceWrapper.classList.remove('hidden');
-                } else {
-                    // Sembunyikan kolom
-                    onlineOptions.classList.add('hidden');
-                    onlinePriceWrapper.classList.add('hidden');
-
-                    // Reset nilai inputan ke default
-                    document.getElementById('youtube_link').value = '';
-                    document.getElementById('online_price').value = 0;
-                }
-            }
-        }
-
-        // Jalankan pengecekan saat pertama kali halaman dimuat (berguna jika ada old() data saat validasi gagal)
-        toggleOnlineFields();
-
-        // Jalankan pengecekan setiap kali pilihan dropdown berubah
-        categorySelect.addEventListener('change', toggleOnlineFields);
+        });
     </script>
 </body>
 </html>

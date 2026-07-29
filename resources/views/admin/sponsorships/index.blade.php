@@ -7,228 +7,271 @@
 
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
-    <script src="https://cdn.tailwindcss.com"></script>
 
+    <!-- Menggunakan Font Sesuai Brand Guidelines -->
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700;800;900&family=Exo+2:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+    <!-- Panggil Script Eksternal -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+
+    <!-- Konfigurasi Tailwind Sesuai Brand Guidelines -->
     <script>
         tailwind.config = {
             theme: {
                 extend: {
-                    fontFamily: { sans: ['Inter', 'system-ui', 'sans-serif'] },
-                    colors: {
-                        primary: '#696FC7', 'primary-deep': '#3D365C', 'primary-press': '#7C4585',
-                        'primary-subdued': '#F8B55F', 'brand-dark': '#1c1e54', ink: '#0d253d',
-                        'ink-secondary': '#273951', 'ink-mute': '#64748d', canvas: '#ffffff',
-                        'canvas-soft': '#f6f9fc', hairline: '#e3e8ee', ruby: '#ea2261',
+                    fontFamily: {
+                        'montserrat': ['Montserrat', 'sans-serif'],
+                        'exo': ['"Exo 2"', 'sans-serif'],
                     },
-                    boxShadow: {
-                        'level-1': '0 1px 3px rgba(0,55,112,0.08)',
-                        'level-2': '0 8px 24px rgba(0,55,112,0.08), 0 2px 6px rgba(0,55,112,0.04)',
+                    colors: {
+                        'artix-blue': '#0066FF',
+                        'artix-navy': '#041B4A',
+                        'artix-orange': '#FF7A00',
+                        'artix-red': '#FF3B30',
+                        'artix-purple': '#A100FF',
+                        'artix-cyan': '#00C2FF',
+                        'canvas-soft': '#F8FAFC',
                     }
                 }
             }
         }
     </script>
-    <!-- 3. CSS Kustom & Scrollbar (KHUSUS CSS) -->
+
+    <!-- CSS Kustom & Scrollbar -->
     <style>
-        body {
-            font-feature-settings: "ss01" 1;
-            -webkit-font-smoothing: antialiased;
-        }
-        .tabular-numeric {
-            font-feature-settings: "tnum" 1;
-        }
+        body { font-family: 'Exo 2', sans-serif; }
 
         /* Custom scrollbar untuk sidebar */
         .sidebar-scroll::-webkit-scrollbar { width: 4px; }
         .sidebar-scroll::-webkit-scrollbar-track { background: transparent; }
-        .sidebar-scroll::-webkit-scrollbar-thumb { background: rgba(255, 255, 255, 0.2); border-radius: 10px; }
+        .sidebar-scroll::-webkit-scrollbar-thumb { background: rgba(255, 255, 255, 0.15); border-radius: 10px; }
         .sidebar-scroll::-webkit-scrollbar-thumb:hover { background: rgba(255, 255, 255, 0.3); }
 
-        /* Aturan untuk cetak PDF */
-        @media print {
-            .no-print { display: none !important; }
-            body { background: white !important; }
-            main { padding: 0 !important; overflow: visible !important; }
-            .shadow-sm { box-shadow: none !important; border: 1px solid #ccc !important; }
+        /* Utility Class untuk Teks Bergradien */
+        .text-gradient-orange {
+            background: linear-gradient(135deg, #FF7A00, #FF3B30);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
         }
     </style>
 </head>
-<body class="bg-canvas-soft text-ink flex h-screen overflow-hidden">
+<body class="bg-canvas-soft text-slate-800 flex h-screen overflow-hidden">
 
-    <!-- SIDEBAR -->
-    <!-- SIDEBAR DINAMIS -->
-    <aside class="w-64 bg-brand-dark flex flex-col hidden lg:flex relative z-20 shrink-0 h-screen">
+    <!-- ── SIDEBAR KIRI (Deep Navy) ── -->
+    <aside class="w-64 bg-artix-navy flex flex-col hidden lg:flex relative z-20 shrink-0 h-screen shadow-xl border-r border-white/5">
 
-        <!-- 1. BAGIAN ATAS: LOGO (Ukurannya Tetap) -->
-        <div class="h-20 shrink-0 flex items-center px-8 border-b border-white/5 pt-4">
-            <span class="text-white font-light text-[24px] tracking-tight">
-                ARTIX <span class="font-bold text-primary-subdued">ID</span>
-            </span>
+        <!-- LOGO MAIN & TEKS -->
+        <div class="h-20 shrink-0 flex items-center px-8 border-b border-white/10">
+            <a href="{{ url('/') }}" class="flex items-center gap-3 group">
+                <img src="{{ asset('main_logo.png') }}" alt="ARTIX ID Logo" class="h-10 w-auto object-contain group-hover:scale-105 transition-transform duration-300" style="filter: drop-shadow(0px 0px 8px rgba(0, 102, 255, 0.4)); clip-path: inset(2px);">
+                <span class="text-white font-black text-xl tracking-tight font-montserrat group-hover:opacity-90 transition-opacity">
+                    ARTIX <span class="text-gradient-orange">ID</span>
+                </span>
+            </a>
         </div>
 
-        <!-- 2. BAGIAN TENGAH: MENU (Bisa di-scroll) -->
-        <nav class="p-5 space-y-2 flex-1 overflow-y-auto sidebar-scroll">
+        <!-- MENU NAVIGASI -->
+        <nav class="p-5 space-y-1.5 flex-1 overflow-y-auto sidebar-scroll">
+
             <!-- MENU EO -->
             @if(Auth::user()->role == 'eo')
+                <div class="text-[10px] font-bold text-white/40 uppercase tracking-widest px-4 mb-2 mt-2">Menu Utama</div>
+
                 <a href="{{ route('admin.dashboard') }}" class="flex items-center gap-3 px-4 py-3 text-white/60 hover:text-white hover:bg-white/5 rounded-xl text-[14px] font-medium transition-all">
-                    <span class="text-lg">📊</span> Dasbor Saya
+                    <i data-lucide="layout-dashboard" class="w-5 h-5"></i> Dasbor Saya
                 </a>
                 <a href="{{ route('admin.events.index') }}" class="flex items-center gap-3 px-4 py-3 text-white/60 hover:text-white hover:bg-white/5 rounded-xl text-[14px] font-medium transition-all">
-                    <span class="text-lg">🎟️</span> Event Saya
+                    <i data-lucide="ticket" class="w-5 h-5"></i> Event Saya
                 </a>
                 <a href="{{ route('admin.transactions.index') }}" class="flex items-center gap-3 px-4 py-3 text-white/60 hover:text-white hover:bg-white/5 rounded-xl text-[14px] font-medium transition-all">
-                    <span class="text-lg">💳</span> Penjualan Tiket
+                    <i data-lucide="credit-card" class="w-5 h-5"></i> Penjualan Tiket
                 </a>
-                <!-- Menu ini AKTIF untuk EO -->
-                <a href="{{ route('admin.sponsorships.index') }}" class="flex items-center gap-3 px-4 py-3 bg-white/10 text-white rounded-xl text-[14px] font-medium transition-all shadow-sm">
-                    <span class="text-lg">🤝</span> Kerjasama Sponsor
+
+                <!-- Disorot karena ini halaman Sponsorship (EO) -->
+                <a href="{{ route('admin.sponsorships.index') }}" class="flex items-center gap-3 px-4 py-3 bg-[#0066FF] text-white rounded-xl text-[14px] font-bold transition-all shadow-md shadow-blue-500/20">
+                    <i data-lucide="handshake" class="w-5 h-5"></i> Kerjasama Sponsor
                 </a>
 
             <!-- MENU ADMIN UTAMA -->
             @elseif(Auth::user()->role == 'admin')
+                <div class="text-[10px] font-bold text-white/40 uppercase tracking-widest px-4 mb-2 mt-2">Sistem Admin</div>
+
                 <a href="{{ route('admin.dashboard') }}" class="flex items-center gap-3 px-4 py-3 text-white/60 hover:text-white hover:bg-white/5 rounded-xl text-[14px] font-medium transition-all">
-                    <span class="text-lg">📊</span> Ikhtisar Platform
+                    <i data-lucide="layout-dashboard" class="w-5 h-5"></i> Ikhtisar Platform
                 </a>
                 <a href="{{ route('admin.events.index') }}" class="flex items-center gap-3 px-4 py-3 text-white/60 hover:text-white hover:bg-white/5 rounded-xl text-[14px] font-medium transition-all">
-                    <span class="text-lg">🎟️</span> Manajemen Event
+                    <i data-lucide="ticket" class="w-5 h-5"></i> Manajemen Event
                 </a>
                 <a href="{{ route('admin.categories.index') }}" class="flex items-center gap-3 px-4 py-3 text-white/60 hover:text-white hover:bg-white/5 rounded-xl text-[14px] font-medium transition-all">
-                    <span class="text-lg">🏷️</span> Kelola Kategori
+                    <i data-lucide="tags" class="w-5 h-5"></i> Kelola Kategori
                 </a>
                 <a href="{{ route('admin.transactions.index') }}" class="flex items-center gap-3 px-4 py-3 text-white/60 hover:text-white hover:bg-white/5 rounded-xl text-[14px] font-medium transition-all">
-                    <span class="text-lg">💳</span> Data Transaksi
+                    <i data-lucide="credit-card" class="w-5 h-5"></i> Data Transaksi
                 </a>
                 <a href="{{ route('admin.users.index') }}" class="flex items-center gap-3 px-4 py-3 text-white/60 hover:text-white hover:bg-white/5 rounded-xl text-[14px] font-medium transition-all">
-                    <span class="text-lg">👥</span> Kelola Pengguna
+                    <i data-lucide="users" class="w-5 h-5"></i> Kelola Pengguna
                 </a>
-                <!-- Menu ini AKTIF untuk Admin -->
-                <a href="{{ route('admin.sponsorships.index') }}" class="flex items-center gap-3 px-4 py-3 bg-white/10 text-white rounded-xl text-[14px] font-medium transition-all shadow-sm">
-                    <span class="text-lg">🤝</span> Kelola Sponsorship
+
+                <!-- Disorot karena ini halaman Sponsorship (Admin) -->
+                <a href="{{ route('admin.sponsorships.index') }}" class="flex items-center gap-3 px-4 py-3 bg-[#0066FF] text-white rounded-xl text-[14px] font-bold transition-all shadow-md shadow-blue-500/20">
+                    <i data-lucide="handshake" class="w-5 h-5"></i> Kelola Sponsorship
                 </a>
+
                 <a href="{{ route('admin.reports.index') }}" class="flex items-center gap-3 px-4 py-3 text-white/60 hover:text-white hover:bg-white/5 rounded-xl text-[14px] font-medium transition-all">
-                    <span class="text-lg">📊</span> Laporan Keseluruhan
+                    <i data-lucide="file-bar-chart-2" class="w-5 h-5"></i> Laporan Keseluruhan
                 </a>
             @endif
         </nav>
 
-        <!-- 3. BAGIAN BAWAH: PROFIL & LOGOUT (Selalu terlihat di bawah) -->
-        <div class="p-5 border-t border-white/5 shrink-0 bg-brand-dark">
-
-            <form action="{{ route('logout') }}" method="POST" class="mt-3">
+        <!-- BAGIAN BAWAH: LOGOUT -->
+        <div class="p-5 border-t border-white/10 shrink-0 bg-artix-navy">
+            <form action="{{ route('logout') }}" method="POST" class="mt-1">
                 @csrf
-                <button type="submit" class="w-full text-left text-[13px] font-medium text-red-300 bg-red-500/10 hover:bg-red-500/25 border border-red-500/20 px-4 py-2.5 rounded-xl transition-all flex items-center gap-3 shadow-sm">
-                    <span class="text-lg">🚪</span> Keluar dari Sistem
+                <button type="submit" class="w-full text-left text-[13px] font-bold text-red-400 bg-red-500/10 hover:bg-red-500/20 hover:text-red-300 border border-red-500/20 px-4 py-3 rounded-xl transition-all flex items-center gap-3 shadow-sm group">
+                    <i data-lucide="log-out" class="w-4 h-4 group-hover:-translate-x-1 transition-transform"></i> Keluar Sistem
                 </button>
             </form>
         </div>
-
     </aside>
 
-    <!-- MAIN CONTENT -->
-    <main class="flex-1 flex flex-col h-full overflow-y-auto relative z-10">
-        <div class="absolute top-0 left-0 w-full h-[300px] bg-gradient-to-tr from-canvas-soft via-primary-soft/10 to-primary-subdued/20 blur-[90px] opacity-80 z-0 pointer-events-none"></div>
+    <!-- ── AREA KONTEN UTAMA ── -->
+    <main class="flex-1 flex flex-col h-full overflow-y-auto relative z-10 w-full bg-[#F8FAFC]">
 
-        <div class="h-20 px-10 flex items-center justify-end relative z-10 shrink-0">
-
-        </div>
-
-        <div class="px-10 mb-8 relative z-10 flex flex-col sm:flex-row sm:items-end justify-between gap-4">
-            <div>
-                <h1 class="text-[32px] font-light tracking-[-0.64px] text-ink mb-1">Marketplace Sponsorship</h1>
-                <p class="text-[15px] text-ink-mute font-light">Kelola penawaran paket sponsor untuk seluruh event Anda.</p>
+        <!-- HEADER KANAN ATAS -->
+        <header class="h-20 px-8 flex items-center justify-end gap-3 shrink-0 bg-white/50 backdrop-blur-md border-b border-slate-200/50 sticky top-0 z-10">
+            <div class="flex items-center gap-3 bg-white px-4 py-2 rounded-full border border-slate-200 shadow-sm">
+                <div class="w-8 h-8 rounded-full bg-artix-blue flex items-center justify-center text-white text-xs font-bold uppercase shadow-inner">
+                    {{ substr(Auth::user()->name ?? 'A', 0, 1) }}
+                </div>
+                <div class="flex flex-col text-left">
+                    <span class="text-[13px] font-bold text-slate-800 leading-tight">{{ Auth::user()->name ?? 'Administrator' }}</span>
+                    <span class="text-[10px] text-artix-blue font-bold uppercase tracking-wider">{{ Auth::user()->role == 'eo' ? 'Event Organizer' : 'Platform Admin' }}</span>
+                </div>
             </div>
+        </header>
 
-            <a href="{{ route('admin.sponsorships.create') }}" class="bg-primary hover:bg-primary-press text-white px-6 py-2.5 rounded-full text-[14px] font-medium transition-all shadow-level-1 inline-flex items-center gap-2">
-                <span>+</span> Tambah Paket Baru
-            </a>
+        <!-- Header Halaman -->
+        <div class="px-8 pt-10 pb-6 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+            <div>
+                <h1 class="text-3xl font-black text-slate-900 mb-1 font-montserrat tracking-tight">Marketplace Sponsorship</h1>
+                <p class="text-[14px] text-slate-500 font-medium">Kelola penawaran paket sponsor untuk seluruh event Anda.</p>
+            </div>
+            <div class="flex items-center gap-4">
+                <a href="{{ route('admin.sponsorships.create') }}" class="bg-gradient-to-r from-[#0066FF] to-[#00C2FF] hover:opacity-90 text-white px-6 py-2.5 rounded-xl text-[14px] font-bold transition-all shadow-lg shadow-blue-500/30 flex items-center gap-2">
+                    <i data-lucide="plus-circle" class="w-4 h-4"></i> Tambah Paket Baru
+                </a>
+            </div>
         </div>
 
-        <div class="px-10 pb-12 relative z-10 flex-1">
+        <div class="px-8 pb-12">
+
+            <!-- Notifikasi Pesan -->
             @if(session('success'))
-                <div class="bg-green-50 border border-green-100 text-green-700 px-6 py-4 rounded-[12px] mb-6 flex items-center gap-3 shadow-sm">
-                    <span class="text-[14px] font-medium">✅ {{ session('success') }}</span>
+                <div class="bg-emerald-50 border border-emerald-200 text-emerald-700 px-5 py-4 rounded-xl mb-6 flex items-center gap-3 shadow-sm font-medium">
+                    <i data-lucide="check-circle" class="w-5 h-5 text-emerald-500"></i>
+                    <span class="text-[14px]">{{ session('success') }}</span>
                 </div>
             @endif
 
-            <div class="bg-canvas border border-hairline rounded-[16px] shadow-level-1 overflow-hidden">
+            <!-- ── TABEL DAFTAR SPONSORSHIP ── -->
+            <div class="bg-white rounded-[24px] shadow-sm border border-slate-200 overflow-hidden">
+                <div class="p-6 border-b border-slate-100 flex justify-between items-center bg-slate-50/50">
+                    <h3 class="text-lg font-black text-slate-800 font-montserrat">Katalog Paket Sponsor</h3>
+                    <span class="text-xs font-bold bg-blue-50 text-[#0066FF] border border-blue-200 px-3 py-1.5 rounded-lg">{{ count($sponsorships) }} Paket Aktif</span>
+                </div>
+
                 <div class="overflow-x-auto">
-                    <table class="w-full text-left min-w-[950px]">
+                    <table class="w-full text-left border-collapse min-w-[950px]">
                         <thead>
-                            <tr class="bg-canvas-soft border-b border-hairline text-[12px] font-semibold text-ink-mute uppercase tracking-wider">
-                                <th class="py-4 px-6 w-[5%]">No</th>
-                                <th class="py-4 px-6 w-[30%]">Nama Paket & Event</th>
-                                <th class="py-4 px-6 w-[25%]">Benefit / Keuntungan</th>
-                                <th class="py-4 px-6 w-[15%] text-right">Harga (Rp)</th>
-                                <th class="py-4 px-6 w-[10%] text-center">Kuota</th>
-                                <!-- Kolom Aksi dilebarkan -->
-                                <th class="py-4 px-6 w-[15%] text-center">Aksi</th>
+                            <tr class="bg-white border-b border-slate-100 text-xs uppercase tracking-widest text-slate-500 font-bold font-montserrat">
+                                <th class="px-6 py-5 text-center w-[5%]">No</th>
+                                <th class="px-6 py-5 w-[30%]">Nama Paket & Event</th>
+                                <th class="px-6 py-5 w-[25%]">Benefit / Keuntungan</th>
+                                <th class="px-6 py-5 w-[15%] text-right">Harga (Rp)</th>
+                                <th class="px-6 py-5 w-[10%] text-center">Kuota</th>
+                                <th class="px-6 py-5 w-[15%] text-center">Aksi</th>
                             </tr>
                         </thead>
-                        <tbody class="text-[14px] text-ink divide-y divide-hairline">
+                        <tbody class="text-[14px] text-slate-700">
                             @forelse($sponsorships as $index => $sponsor)
-                            <tr class="hover:bg-canvas-soft/30 transition-colors">
-                                <td class="py-4 px-6 font-medium text-ink-mute">{{ $index + 1 }}</td>
+                            <tr class="border-b border-slate-50 hover:bg-slate-50/50 transition-colors">
+                                <!-- Nomor -->
+                                <td class="px-6 py-4 text-center text-slate-400 font-bold">
+                                    {{ $index + 1 }}
+                                </td>
 
-                                <td class="py-4 px-6">
+                                <!-- Nama & Event -->
+                                <td class="px-6 py-4">
                                     <div class="flex items-center gap-4">
-                                        <div class="w-16 h-16 rounded-lg bg-hairline overflow-hidden shrink-0 shadow-sm flex items-center justify-center">
+                                        <div class="w-14 h-14 rounded-[12px] bg-slate-100 border border-slate-200 overflow-hidden shrink-0 flex items-center justify-center">
                                             @if($sponsor->image)
                                                 <img src="{{ asset('storage/' . $sponsor->image) }}" alt="{{ $sponsor->name }}" class="w-full h-full object-cover">
                                             @else
-                                                <span class="text-ink-mute text-xs text-center px-1">No Img</span>
+                                                <i data-lucide="image" class="w-6 h-6 text-slate-300"></i>
                                             @endif
                                         </div>
-
                                         <div>
-                                            <div class="font-medium text-[15px] text-ink mb-1">{{ $sponsor->name }}</div>
-                                            <div class="text-[12px] text-primary bg-primary/10 inline-block px-2 py-1 rounded-md mt-1">
-                                                📍 {{ $sponsor->event->name ?? 'Event Dihapus' }}
+                                            <div class="font-bold text-slate-900 text-[15px] mb-1.5">{{ $sponsor->name }}</div>
+                                            <div class="text-[11px] font-bold uppercase tracking-wider text-[#0066FF] bg-blue-50 border border-blue-100 inline-flex items-center gap-1 px-2.5 py-1 rounded-md">
+                                                <i data-lucide="map-pin" class="w-3 h-3"></i> {{ $sponsor->event->name ?? 'Event Dihapus' }}
                                             </div>
                                         </div>
                                     </div>
                                 </td>
 
-                                <td class="py-4 px-6">
-                                    <ul class="text-[13px] text-ink-mute list-disc list-inside">
+                                <!-- Benefit -->
+                                <td class="px-6 py-4">
+                                    <ul class="text-[13px] text-slate-600 font-medium list-disc list-inside space-y-1">
                                         @foreach(explode(',', $sponsor->benefits) as $benefit)
                                             <li>{{ trim($benefit) }}</li>
                                         @endforeach
                                     </ul>
                                 </td>
 
-                                <td class="py-4 px-6 text-right font-medium">
-                                    {{ number_format($sponsor->price, 0, ',', '.') }}
+                                <!-- Harga -->
+                                <td class="px-6 py-4 text-right">
+                                    <span class="font-black text-slate-800 font-montserrat text-base">
+                                        {{ number_format($sponsor->price, 0, ',', '.') }}
+                                    </span>
                                 </td>
 
-                                <td class="py-4 px-6 text-center">
-                                    <span class="bg-canvas-soft border border-hairline px-3 py-1 rounded-full text-[13px]">
+                                <!-- Kuota -->
+                                <td class="px-6 py-4 text-center">
+                                    <span class="bg-slate-100 border border-slate-200 text-slate-700 font-bold px-3 py-1.5 rounded-[8px] text-[13px]">
                                         {{ $sponsor->quota }}
                                     </span>
                                 </td>
 
-                                <td class="py-4 px-6">
-                                    <!-- TOMBOL AKSI BARU -->
+                                <!-- Aksi (Edit / Hapus) -->
+                                <td class="px-6 py-4 text-center">
                                     <div class="flex items-center justify-center gap-2">
-                                        <a href="{{ route('admin.sponsorships.edit', $sponsor->id) }}" class="text-[13px] bg-white border border-hairline text-ink hover:border-primary hover:text-primary px-4 py-2 rounded-full font-medium transition-colors shadow-sm">
-                                            Edit
+                                        <a href="{{ route('admin.sponsorships.edit', $sponsor->id) }}" class="text-slate-400 hover:text-[#0066FF] bg-white hover:bg-blue-50 border border-transparent hover:border-blue-200 p-2 rounded-xl transition-all" title="Edit Paket">
+                                            <i data-lucide="edit-3" class="w-4 h-4"></i>
                                         </a>
 
                                         <form action="{{ route('admin.sponsorships.destroy', $sponsor->id) }}" method="POST" onsubmit="return confirm('Yakin ingin menghapus paket sponsor ini?')" class="m-0">
                                             @csrf
                                             @method('DELETE')
-                                            <button type="submit" class="text-[13px] bg-ruby/10 border border-transparent text-ruby hover:bg-ruby hover:text-white px-4 py-2 rounded-full font-medium transition-colors">
-                                                Hapus
+                                            <button type="submit" class="text-slate-400 hover:text-[#FF3B30] bg-white hover:bg-red-50 border border-transparent hover:border-red-200 p-2 rounded-xl transition-all" title="Hapus Paket">
+                                                <i data-lucide="trash-2" class="w-4 h-4"></i>
                                             </button>
                                         </form>
                                     </div>
                                 </td>
                             </tr>
                             @empty
+                            <!-- Empty State -->
                             <tr>
-                                <td colspan="6" class="py-16 text-center">
-                                    <h5 class="text-[16px] font-medium text-ink mb-1">Belum ada paket sponsor</h5>
-                                    <p class="text-[14px] text-ink-mute mb-4">Buat paket pertama Anda untuk menarik sponsor.</p>
+                                <td colspan="6" class="px-6 py-20 text-center">
+                                    <div class="flex flex-col items-center justify-center">
+                                        <div class="w-16 h-16 bg-slate-50 text-slate-300 rounded-full flex items-center justify-center mb-4">
+                                            <i data-lucide="package-open" class="w-8 h-8"></i>
+                                        </div>
+                                        <h3 class="text-lg font-black text-slate-800 mb-1 font-montserrat">Belum Ada Paket Sponsor</h3>
+                                        <p class="text-slate-500 text-[14px] font-medium">Buat paket sponsor pertama Anda untuk menarik minat calon mitra acara.</p>
+                                    </div>
                                 </td>
                             </tr>
                             @endforelse
@@ -236,7 +279,13 @@
                     </table>
                 </div>
             </div>
+
         </div>
     </main>
+
+    <script>
+        // Inisialisasi ikon Lucide
+        lucide.createIcons();
+    </script>
 </body>
 </html>
