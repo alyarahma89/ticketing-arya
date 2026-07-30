@@ -2,39 +2,69 @@
 <html lang="id">
 <head>
     <meta charset="UTF-8">
-    <title>E-Ticket TICKS ID</title>
+    <title>E-Ticket ARTIX ID</title>
+    <!-- Import Font Resmi ARTIX ID -->
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@700;900&family=Exo+2:wght@500;700&display=swap" rel="stylesheet">
     <style>
+        /* Pengaturan Dasar Email */
         body {
-            font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
-            background-color: #e3e8ee;
+            font-family: 'Exo 2', Helvetica, Arial, sans-serif;
+            background-color: #F8FAFC;
             margin: 0;
             padding: 40px 20px;
         }
         /* Pembungkus utama tiket */
         .ticket-box {
             width: 100%;
-            max-width: 800px;
+            max-width: 750px;
             margin: 0 auto;
-            border-radius: 12px;
+            border-radius: 20px;
             overflow: hidden;
-            box-shadow: 0 10px 20px rgba(0,0,0,0.15);
+            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+            background-color: #ffffff;
         }
-        table { width: 100%; border-collapse: collapse; }
+        /* Layout menggunakan Tabel (Paling aman untuk semua aplikasi Email) */
+        table { width: 100%; border-collapse: collapse; margin: 0; padding: 0; }
         td { padding: 0; vertical-align: top; }
 
-        /* Area Hitam di Dalam Tiket Utama */
-        .black-box {
-            background-color: #111111;
-            color: #ffffff;
-            border-radius: 8px;
-            padding: 20px;
+        /* Area Kiri (Warna Tema) */
+        .main-area {
+            width: 70%;
+            padding: 30px;
         }
+
+        /* Area Dark Navy di Dalam Tiket Utama */
+        .inner-navy-box {
+            background-color: #041B4A; /* Warna Navy ARTIX */
+            color: #ffffff;
+            border-radius: 16px;
+            padding: 25px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+        }
+
         .event-title {
-            font-size: 28px;
+            font-family: 'Montserrat', Arial, sans-serif;
+            font-size: 26px;
             font-weight: 900;
             text-transform: uppercase;
-            margin: 0 0 15px 0;
+            margin: 0 0 20px 0;
+            line-height: 1.2;
+            color: #ffffff;
+        }
+
+        .label-text {
+            font-family: 'Montserrat', Arial, sans-serif;
+            font-size: 10px;
+            font-weight: 700;
+            text-transform: uppercase;
             letter-spacing: 1px;
+            margin: 0 0 4px 0;
+        }
+
+        .value-text {
+            font-size: 15px;
+            font-weight: 700;
+            margin: 0;
         }
 
         /* Area Sobekan Kanan (Stub) */
@@ -42,11 +72,11 @@
             background-color: #ffffff;
             width: 30%;
             text-align: center;
-            border-left: 4px dashed #bdc3c7;
+            border-left: 3px dashed #CBD5E1; /* Garis putus-putus */
             padding: 30px 20px;
         }
 
-        /* Kunci untuk Multi-Halaman */
+        /* Kunci untuk Cetak PDF / Multi-Halaman */
         .page-break { page-break-after: always; padding-bottom: 30px; }
         .page-break:last-child { page-break-after: auto; }
     </style>
@@ -56,69 +86,84 @@
     @foreach($transaction->tickets as $index => $ticket)
 
     @php
-        // RUMUS WARNA DINAMIS: Beda ID Event = Beda Warna Tema
-        $colorPalette = ['#F3A712', '#E74C3C', '#3498DB', '#9B59B6', '#1ABC9C', '#E67E22'];
-        $themeColor = $colorPalette[$transaction->event_id % count($colorPalette)];
+        // RUMUS WARNA DINAMIS: Palet Warna Resmi ARTIX ID
+        // Berisi: Biru, Oranye, Ungu, Merah, Cyan
+        $artixPalette = ['#0066FF', '#FF7A00', '#A100FF', '#FF3B30', '#00C2FF'];
+        $themeColor = $artixPalette[$transaction->event_id % count($artixPalette)];
     @endphp
 
     <div class="page-break">
         <div class="ticket-box">
             <table>
                 <tr>
-                    <td style="background-color: {{ $themeColor }}; width: 70%; padding: 25px;">
+                    <!-- ── BAGIAN KIRI (DETAIL UTAMA) ── -->
+                    <td class="main-area" style="background-color: {{ $themeColor }};">
 
-                        <div class="black-box">
+                        <!-- Kotak Informasi Event -->
+                        <div class="inner-navy-box">
                             <h1 class="event-title">{{ $transaction->event->name }}</h1>
 
                             <table>
                                 <tr>
-                                    <td style="width: 75%;">
-                                        <p style="color: {{ $themeColor }}; font-size: 11px; font-weight: bold; margin: 0; text-transform: uppercase;">Waktu Penyelenggaraan</p>
-                                        <p style="margin: 5px 0 0; font-size: 16px; font-weight: bold;">
+                                    <td style="width: 70%;">
+                                        <p class="label-text" style="color: #00C2FF;">Waktu Pelaksanaan</p>
+                                        <p class="value-text" style="margin-bottom: 15px;">
                                             {{ date('d M Y', strtotime($transaction->event->event_date)) }} | {{ date('H:i', strtotime($transaction->event->event_date)) }} WIB
                                         </p>
 
-                                        <p style="color: {{ $themeColor }}; font-size: 11px; font-weight: bold; margin: 15px 0 0; text-transform: uppercase;">Lokasi Event</p>
-                                        <p style="margin: 5px 0 0; font-size: 14px;">{{ $transaction->event->location }}</p>
+                                        <p class="label-text" style="color: #00C2FF;">Lokasi Acara</p>
+                                        <p class="value-text" style="font-size: 13px;">{{ $transaction->event->location }}</p>
                                     </td>
-                                    <td style="width: 25%; text-align: right; vertical-align: bottom;">
-                                        <img src="https://api.qrserver.com/v1/create-qr-code/?size=70x70&data={{ $ticket->ticket_code }}&color=ffffff&bgcolor=111111" width="70" height="70" alt="QR Small">
+                                    <td style="width: 30%; text-align: right; vertical-align: middle;">
+                                        <!-- QR Code Kecil di Kiri (Warna Navy di atas Putih agar mudah di-scan) -->
+                                        <div style="background-color: #ffffff; padding: 6px; border-radius: 8px; display: inline-block;">
+                                            <img src="https://api.qrserver.com/v1/create-qr-code/?size=80x80&data={{ $ticket->ticket_code }}&color=041B4A&bgcolor=ffffff" width="80" height="80" alt="QR Event" style="display: block;">
+                                        </div>
                                     </td>
                                 </tr>
                             </table>
                         </div>
 
-                        <table style="width: 100%; margin-top: 20px; color: #111111; font-weight: 900; font-size: 14px;">
+                        <!-- Data Transaksi Pengunjung -->
+                        <table style="width: 100%; margin-top: 20px; color: #ffffff;">
                             <tr>
                                 <td>
-                                    <span style="font-size: 11px; font-weight: bold; color: rgba(0,0,0,0.6); display: block;">PEMESAN</span>
-                                    {{ strtoupper($transaction->user->name ?? 'PENGUNJUNG') }}
+                                    <span class="label-text" style="color: rgba(255,255,255,0.7); display: block;">Pemesan</span>
+                                    <span style="font-size: 16px; font-weight: 700; font-family: 'Montserrat', sans-serif;">{{ strtoupper($transaction->user->name ?? 'PENGUNJUNG') }}</span>
                                 </td>
                                 <td style="text-align: center;">
-                                    <span style="font-size: 11px; font-weight: bold; color: rgba(0,0,0,0.6); display: block;">KATEGORI</span>
-                                    {{ strtoupper($transaction->event->category) }}
+                                    <span class="label-text" style="color: rgba(255,255,255,0.7); display: block;">Kategori</span>
+                                    <span style="font-size: 16px; font-weight: 700; font-family: 'Montserrat', sans-serif;">{{ strtoupper($transaction->event->category->name ?? 'REGULER') }}</span>
                                 </td>
                                 <td style="text-align: right;">
-                                    <span style="font-size: 11px; font-weight: bold; color: rgba(0,0,0,0.6); display: block;">STATUS</span>
-                                    LUNAS
+                                    <span class="label-text" style="color: rgba(255,255,255,0.7); display: block;">Order ID</span>
+                                    <span style="font-size: 16px; font-weight: 700; font-family: 'Montserrat', sans-serif;">#{{ $transaction->order_id }}</span>
                                 </td>
                             </tr>
                         </table>
 
                     </td>
 
+                    <!-- ── BAGIAN KANAN (SOBEKAN / TANDA MASUK) ── -->
                     <td class="stub-area">
-                        <p style="font-weight: 900; font-size: 16px; margin: 0 0 5px 0; color: #111;">TANDA MASUK</p>
-                        <p style="font-size: 11px; color: #7f8c8d; margin: 0 0 20px 0;">TIKET {{ $index + 1 }} DARI {{ $transaction->quantity }}</p>
+                        <!-- Panggil Logo ARTIX -->
+                        <img src="{{ asset('logo_hitam.png') }}" alt="ARTIX ID" style="max-width: 100px; margin-bottom: 20px;">
 
-                        <img src="https://api.qrserver.com/v1/create-qr-code/?size=130x130&data={{ $ticket->ticket_code }}&color=111111" width="130" height="130" alt="QR Scan">
+                        <p style="font-family: 'Montserrat', sans-serif; font-weight: 900; font-size: 18px; margin: 0 0 5px 0; color: #0F172A;">E-TICKET</p>
+                        <p style="font-size: 11px; font-weight: 700; color: #64748B; margin: 0 0 20px 0; text-transform: uppercase;">Tiket {{ $index + 1 }} dari {{ $transaction->quantity }}</p>
 
-                        <p style="font-weight: bold; font-size: 14px; letter-spacing: 1px; color: #111; margin: 15px 0 0;">
+                        <!-- QR Code Besar Utama (Hitam Putih agar sensor alat scan cepat membaca) -->
+                        <img src="https://api.qrserver.com/v1/create-qr-code/?size=140x140&data={{ $ticket->ticket_code }}&color=0F172A&bgcolor=ffffff" width="140" height="140" alt="QR Scan" style="display: block; margin: 0 auto;">
+
+                        <p style="font-family: 'Exo 2', sans-serif; font-weight: 700; font-size: 14px; letter-spacing: 2px; color: #0F172A; margin: 15px 0 0;">
                             {{ $ticket->ticket_code }}
                         </p>
-                        <p style="font-size: 10px; color: #bdc3c7; margin-top: 25px;">
-                            TICKS ID &copy; {{ date('Y') }}
-                        </p>
+
+                        <div style="margin-top: 30px; padding-top: 15px; border-top: 1px solid #E2E8F0;">
+                            <p style="font-size: 10px; font-weight: 700; color: #94A3B8; margin: 0;">
+                                Tunjukkan QR Code ini<br>saat masuk area event.
+                            </p>
+                        </div>
                     </td>
                 </tr>
             </table>

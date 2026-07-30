@@ -85,6 +85,9 @@ Route::middleware('auth')->group(function () {
 Route::middleware(['auth', 'role:admin,eo,panitia'])->group(function () {
     Route::get('/scanner', [CheckInController::class, 'index']);
     Route::post('/check-in-process', [CheckInController::class, 'process']);
+    // --- TAMBAHKAN DUA BARIS INI ---
+    Route::get('/panitia/attendance', [PanitiaController::class, 'attendance'])->name('panitia.attendance');
+    Route::get('/panitia/event-info', [PanitiaController::class, 'eventInfo'])->name('panitia.event_info');
 });
 
 // =========================================================
