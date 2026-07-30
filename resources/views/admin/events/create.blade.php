@@ -3,7 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Laporan Keuangan - ARTIX ID</title>
+    <title>Tambah Event Baru - ARTIX ID</title>
+    <link rel="icon" href="{{ asset('main_logo.png') }}" type="image/x-icon">
+
 
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -13,7 +15,6 @@
 
     <!-- Panggil Script Eksternal -->
     <script src="https://cdn.tailwindcss.com"></script>
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://unpkg.com/lucide@latest"></script>
 
     <!-- Konfigurasi Tailwind Sesuai Brand Guidelines -->
@@ -43,11 +44,26 @@
     <style>
         body { font-family: 'Exo 2', sans-serif; }
 
+        textarea::-webkit-scrollbar { width: 6px; }
+        textarea::-webkit-scrollbar-track { background: transparent; }
+        textarea::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
+        textarea::-webkit-scrollbar-thumb:hover { background: #0066FF; }
+
         /* Custom scrollbar untuk sidebar */
         .sidebar-scroll::-webkit-scrollbar { width: 4px; }
         .sidebar-scroll::-webkit-scrollbar-track { background: transparent; }
         .sidebar-scroll::-webkit-scrollbar-thumb { background: rgba(255, 255, 255, 0.15); border-radius: 10px; }
         .sidebar-scroll::-webkit-scrollbar-thumb:hover { background: rgba(255, 255, 255, 0.3); }
+
+        /* Memperbaiki tampilan icon kalender bawaan browser pada input datetime */
+        input[type="datetime-local"]::-webkit-calendar-picker-indicator {
+            cursor: pointer;
+            opacity: 0.6;
+            transition: 0.2s;
+        }
+        input[type="datetime-local"]::-webkit-calendar-picker-indicator:hover {
+            opacity: 1;
+        }
 
         /* Utility Class untuk Teks Bergradien */
         .text-gradient-orange {
@@ -56,21 +72,12 @@
             -webkit-text-fill-color: transparent;
             background-clip: text;
         }
-
-        /* Aturan untuk cetak PDF */
-        @media print {
-            .no-print { display: none !important; }
-            body { background: white !important; }
-            main { padding: 0 !important; overflow: visible !important; }
-            .shadow-sm { box-shadow: none !important; border: 1px solid #e2e8f0 !important; }
-            canvas { max-width: 100% !important; }
-        }
     </style>
 </head>
 <body class="bg-canvas-soft text-slate-800 flex h-screen overflow-hidden">
 
     <!-- ── SIDEBAR KIRI (Deep Navy) ── -->
-    <aside class="w-64 bg-artix-navy flex flex-col hidden lg:flex relative z-20 shrink-0 h-screen shadow-xl border-r border-white/5 no-print">
+    <aside class="w-64 bg-artix-navy flex flex-col hidden lg:flex relative z-20 shrink-0 h-screen shadow-xl border-r border-white/5">
 
         <!-- LOGO MAIN & TEKS -->
         <div class="h-20 shrink-0 flex items-center px-8 border-b border-white/10">
@@ -92,18 +99,18 @@
                 <a href="{{ route('admin.dashboard') }}" class="flex items-center gap-3 px-4 py-3 text-white/60 hover:text-white hover:bg-white/5 rounded-xl text-[14px] font-medium transition-all">
                     <i data-lucide="layout-dashboard" class="w-5 h-5"></i> Dasbor Saya
                 </a>
-                <a href="{{ route('admin.events.index') }}" class="flex items-center gap-3 px-4 py-3 text-white/60 hover:text-white hover:bg-white/5 rounded-xl text-[14px] font-medium transition-all">
+                <!-- Disorot karena ini halaman Event (EO) -->
+                <a href="{{ route('admin.events.index') }}" class="flex items-center gap-3 px-4 py-3 bg-[#0066FF] text-white rounded-xl text-[14px] font-bold transition-all shadow-md shadow-blue-500/20">
                     <i data-lucide="ticket" class="w-5 h-5"></i> Event Saya
                 </a>
                 <a href="{{ route('admin.transactions.index') }}" class="flex items-center gap-3 px-4 py-3 text-white/60 hover:text-white hover:bg-white/5 rounded-xl text-[14px] font-medium transition-all">
                     <i data-lucide="credit-card" class="w-5 h-5"></i> Penjualan Tiket
                 </a>
-                <a href="{{ route('admin.sponsorships.index') }}" class="flex items-center gap-3 px-4 py-3 text-white/60 hover:text-white hover:bg-white/5 rounded-xl text-[14px] font-medium transition-all">
-                    <i data-lucide="handshake" class="w-5 h-5"></i> Kerjasama Sponsor
+                <!-- MENU PENGAJUAN SPONSOR (ADMIN) -->
+                <a href="{{ route('admin.sponsorship_requests.index') }}" class="flex items-center gap-3 px-4 py-3 text-white/60 hover:text-white hover:bg-white/5 rounded-xl text-[14px] font-medium transition-all">
+                    <i data-lucide="inbox" class="w-5 h-5"></i> Pengajuan Masuk
                 </a>
-
-                <!-- Disorot karena ini halaman Laporan Event (EO) -->
-                <a href="{{ route('admin.reports.index') }}" class="flex items-center gap-3 px-4 py-3 bg-[#0066FF] text-white rounded-xl text-[14px] font-bold transition-all shadow-md shadow-blue-500/20">
+                <a href="{{ route('admin.reports.index') }}" class="flex items-center gap-3 px-4 py-3 text-white/60 hover:text-white hover:bg-white/5 rounded-xl text-[14px] font-medium transition-all">
                     <i data-lucide="file-bar-chart-2" class="w-5 h-5"></i> Laporan Event
                 </a>
 
@@ -114,7 +121,8 @@
                 <a href="{{ route('admin.dashboard') }}" class="flex items-center gap-3 px-4 py-3 text-white/60 hover:text-white hover:bg-white/5 rounded-xl text-[14px] font-medium transition-all">
                     <i data-lucide="layout-dashboard" class="w-5 h-5"></i> Ikhtisar Platform
                 </a>
-                <a href="{{ route('admin.events.index') }}" class="flex items-center gap-3 px-4 py-3 text-white/60 hover:text-white hover:bg-white/5 rounded-xl text-[14px] font-medium transition-all">
+                <!-- Disorot karena ini halaman Event (Admin) -->
+                <a href="{{ route('admin.events.index') }}" class="flex items-center gap-3 px-4 py-3 bg-[#0066FF] text-white rounded-xl text-[14px] font-bold transition-all shadow-md shadow-blue-500/20">
                     <i data-lucide="ticket" class="w-5 h-5"></i> Manajemen Event
                 </a>
                 <a href="{{ route('admin.categories.index') }}" class="flex items-center gap-3 px-4 py-3 text-white/60 hover:text-white hover:bg-white/5 rounded-xl text-[14px] font-medium transition-all">
@@ -129,9 +137,11 @@
                 <a href="{{ route('admin.sponsorships.index') }}" class="flex items-center gap-3 px-4 py-3 text-white/60 hover:text-white hover:bg-white/5 rounded-xl text-[14px] font-medium transition-all">
                     <i data-lucide="handshake" class="w-5 h-5"></i> Kelola Sponsorship
                 </a>
-
-                <!-- Disorot karena ini halaman Laporan Keseluruhan (Admin) -->
-                <a href="{{ route('admin.reports.index') }}" class="flex items-center gap-3 px-4 py-3 bg-[#0066FF] text-white rounded-xl text-[14px] font-bold transition-all shadow-md shadow-blue-500/20">
+                <!-- MENU PENGAJUAN SPONSOR (ADMIN) -->
+                <a href="{{ route('admin.sponsorship_requests.index') }}" class="flex items-center gap-3 px-4 py-3 text-white/60 hover:text-white hover:bg-white/5 rounded-xl text-[14px] font-medium transition-all">
+                    <i data-lucide="inbox" class="w-5 h-5"></i> Pengajuan Masuk
+                </a>
+                <a href="{{ route('admin.reports.index') }}" class="flex items-center gap-3 px-4 py-3 text-white/60 hover:text-white hover:bg-white/5 rounded-xl text-[14px] font-medium transition-all">
                     <i data-lucide="file-bar-chart-2" class="w-5 h-5"></i> Laporan Keseluruhan
                 </a>
             @endif
@@ -152,257 +162,288 @@
     <main class="flex-1 flex flex-col h-full overflow-y-auto relative z-10 w-full bg-[#F8FAFC]">
 
         <!-- HEADER KANAN ATAS -->
-        <header class="h-20 px-8 flex items-center justify-end gap-3 shrink-0 bg-white/50 backdrop-blur-md border-b border-slate-200/50 sticky top-0 z-50 no-print">
+        <header class="h-20 px-8 flex items-center justify-end gap-3 shrink-0 bg-white/50 backdrop-blur-md border-b border-slate-200/50 sticky top-0 z-50">
             <div class="flex items-center gap-3 bg-white px-4 py-2 rounded-full border border-slate-200 shadow-sm">
                 <div class="w-8 h-8 rounded-full bg-artix-blue flex items-center justify-center text-white text-xs font-bold uppercase shadow-inner">
                     {{ substr(Auth::user()->name ?? 'A', 0, 1) }}
                 </div>
                 <div class="flex flex-col text-left">
                     <span class="text-[13px] font-bold text-slate-800 leading-tight">{{ Auth::user()->name ?? 'Administrator' }}</span>
-                    <span class="text-[10px] text-artix-blue font-bold uppercase tracking-wider">{{ Auth::user()->role == 'eo' ? 'Event Organizer' : 'Platform Admin' }}</span>
+                    <span class="text-[10px] text-artix-blue font-bold uppercase tracking-wider">Event Creator</span>
                 </div>
             </div>
         </header>
 
-        <!-- ── KONTEN UTAMA LAPORAN ── -->
-        <div class="px-8 pt-10 pb-12">
+        <!-- ── HERO SECTION (Clean UI) ── -->
+        <div class="pt-10 pb-6 px-8 relative">
+            <div class="max-w-6xl w-full mx-auto relative z-10">
+                <!-- Tombol Kembali Minimalis -->
+                <a href="{{ route('admin.events.index') }}" class="inline-flex items-center gap-2 text-sm font-bold text-slate-500 hover:text-[#0066FF] transition-colors group mb-6 w-max">
+                    <i data-lucide="arrow-left" class="w-4 h-4 group-hover:-translate-x-1 transition-transform"></i> Kembali ke Daftar Event
+                </a>
 
-            <!-- Judul Halaman & Tombol Export -->
-            <div class="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-8">
-                <div>
-                    <h1 class="text-3xl font-black text-slate-900 mb-1 font-montserrat tracking-tight">Laporan Keuangan</h1>
-                    <p class="text-[14px] text-slate-500 font-medium">
-                        @if(Auth::user()->role === 'eo') Ringkasan pendapatan event Anda. @else Ringkasan pendapatan seluruh event di platform. @endif
-                    </p>
-                </div>
-
-                <!-- TOMBOL EXPORT (Sembunyikan saat cetak PDF) -->
-                <div class="flex flex-wrap gap-3 no-print">
-                    <!-- Download PDF -->
-                    <button type="submit" form="filterForm" name="export" value="pdf" class="bg-gradient-to-r from-red-500 to-[#FF3B30] text-white px-6 py-2.5 rounded-[12px] text-sm font-bold hover:shadow-lg hover:shadow-red-500/30 transition-all flex items-center gap-2 hover:-translate-y-0.5">
-                        <i data-lucide="file-text" class="w-4 h-4"></i> Download PDF
-                    </button>
-                    <!-- Download Excel -->
-                    <button type="submit" form="filterForm" name="export" value="excel" class="bg-gradient-to-r from-emerald-500 to-emerald-600 text-white px-6 py-2.5 rounded-[12px] text-sm font-bold hover:shadow-lg hover:shadow-emerald-500/30 transition-all flex items-center gap-2 hover:-translate-y-0.5">
-                        <i data-lucide="file-spreadsheet" class="w-4 h-4"></i> Download Excel
-                    </button>
+                <div class="flex flex-col md:flex-row md:items-start md:justify-between gap-4">
+                    <div>
+                        <span class="text-[#0066FF] font-bold text-xs uppercase tracking-widest bg-blue-50 px-3 py-1.5 rounded-full border border-blue-100 inline-block mb-3">Manajemen Acara</span>
+                        <h1 class="text-3xl font-black tracking-tight font-montserrat text-slate-900 mb-2">Tambah Event Baru</h1>
+                        <p class="text-[14px] text-slate-500 font-medium max-w-xl">Publikasikan informasi event, atur ketersediaan tiket, dan kelola rincian acara secara real-time ke dalam ekosistem ARTIX.</p>
+                    </div>
                 </div>
             </div>
+        </div>
 
-            <!-- ── FORM FILTER TANGGAL ── -->
-            <div class="bg-white p-6 rounded-[24px] border border-slate-200 shadow-sm mb-8 no-print">
-                <form id="filterForm" action="{{ route('admin.reports.index') }}" method="GET" class="flex flex-wrap items-end gap-5">
-                    <div>
-                        <label class="block text-[11px] font-bold text-slate-500 mb-2 uppercase tracking-widest">Dari Tanggal</label>
-                        <div class="relative">
-                            <span class="absolute inset-y-0 left-0 flex items-center pl-4 text-slate-400 pointer-events-none"><i data-lucide="calendar" class="w-4 h-4"></i></span>
-                            <input type="date" name="start_date" value="{{ request('start_date') }}" class="pl-10 pr-4 py-3 bg-slate-50 border border-slate-200 rounded-[12px] text-[14px] font-bold text-slate-700 outline-none focus:bg-white focus:border-[#0066FF] focus:ring-4 focus:ring-[#0066FF]/10 transition-all cursor-pointer">
+        <!-- ── MAIN FORM AREA ── -->
+        <div class="flex-1 max-w-6xl w-full mx-auto pb-10 px-6 relative z-20">
+
+            <form action="{{ route('admin.events.store') }}" method="POST" enctype="multipart/form-data">
+                @csrf
+
+                <!-- ALERT ERROR -->
+                @if ($errors->any())
+                    <div class="bg-red-50 border border-red-200 text-red-600 p-5 rounded-2xl mb-6 text-sm flex gap-3 items-start shadow-sm font-medium">
+                        <i data-lucide="alert-triangle" class="w-5 h-5 shrink-0 mt-0.5 text-red-500"></i>
+                        <div>
+                            <span class="font-bold block mb-1 text-red-700">Gagal menerbitkan event:</span>
+                            <ul class="list-disc list-inside space-y-0.5 opacity-90">
+                                @foreach ($errors->all() as $error)
+                                    <li>{{ $error }}</li>
+                                @endforeach
+                            </ul>
                         </div>
                     </div>
-                    <div>
-                        <label class="block text-[11px] font-bold text-slate-500 mb-2 uppercase tracking-widest">Sampai Tanggal</label>
-                        <div class="relative">
-                            <span class="absolute inset-y-0 left-0 flex items-center pl-4 text-slate-400 pointer-events-none"><i data-lucide="calendar" class="w-4 h-4"></i></span>
-                            <input type="date" name="end_date" value="{{ request('end_date') }}" class="pl-10 pr-4 py-3 bg-slate-50 border border-slate-200 rounded-[12px] text-[14px] font-bold text-slate-700 outline-none focus:bg-white focus:border-[#0066FF] focus:ring-4 focus:ring-[#0066FF]/10 transition-all cursor-pointer">
+                @endif
+
+                <div class="grid grid-cols-1 lg:grid-cols-3 gap-8 mt-4">
+
+                    <!-- ── KOLOM KIRI (Detail Utama Event) ── -->
+                    <div class="lg:col-span-2 space-y-6">
+                        <div class="bg-white border border-slate-200 rounded-[24px] shadow-sm p-8 space-y-6 relative overflow-hidden">
+                            <!-- Hiasan Garis Atas -->
+                            <div class="absolute top-0 inset-x-0 h-1.5 bg-gradient-to-r from-[#0066FF] to-[#00C2FF]"></div>
+
+                            <h2 class="text-lg font-black text-slate-800 font-montserrat border-b border-slate-100 pb-4 flex items-center gap-2.5">
+                                <div class="p-1.5 bg-blue-50 text-[#0066FF] rounded-lg"><i data-lucide="file-text" class="w-5 h-5"></i></div>
+                                Informasi Dasar Event
+                            </h2>
+
+                            <div>
+                                <label class="block text-[11px] font-bold text-slate-500 mb-2 uppercase tracking-widest">Nama Resmi Event</label>
+                                <div class="relative">
+                                    <span class="absolute inset-y-0 left-0 flex items-center pl-4 text-slate-400"><i data-lucide="type" class="w-5 h-5"></i></span>
+                                    <input type="text" name="name" id="name" value="{{ old('name') }}" required placeholder="Contoh: Artix Music Festival 2026"
+                                        class="w-full bg-slate-50 focus:bg-white border border-slate-200 text-slate-900 text-sm font-bold rounded-[12px] pl-11 pr-4 py-3.5 focus:outline-none focus:border-[#0066FF] focus:ring-4 focus:ring-[#0066FF]/10 transition-all duration-200 placeholder:font-medium placeholder:text-slate-400">
+                                </div>
+                            </div>
+
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                <div>
+                                    <label class="block text-[11px] font-bold text-slate-500 mb-2 uppercase tracking-widest">Kategori / Klaster</label>
+                                    <div class="relative">
+                                        <span class="absolute inset-y-0 left-0 flex items-center pl-4 text-slate-400"><i data-lucide="layout-grid" class="w-5 h-5"></i></span>
+                                        <select name="category_id" id="category-select" required class="w-full bg-slate-50 focus:bg-white border border-slate-200 text-slate-900 text-sm font-bold rounded-[12px] pl-11 pr-4 py-3.5 focus:outline-none focus:border-[#0066FF] focus:ring-4 focus:ring-[#0066FF]/10 transition-all duration-200 appearance-none cursor-pointer">
+                                            <option value="" disabled {{ old('category_id') ? '' : 'selected' }}>-- Pilih Kategori --</option>
+                                            @foreach($categories as $category)
+                                                <option value="{{ $category->id }}" {{ old('category_id') == $category->id ? 'selected' : '' }}>
+                                                    {{ $category->name }}
+                                                </option>
+                                            @endforeach
+                                        </select>
+                                        <span class="absolute inset-y-0 right-0 flex items-center pr-4 pointer-events-none text-slate-400"><i data-lucide="chevron-down" class="w-4 h-4"></i></span>
+                                    </div>
+                                </div>
+
+                                <div>
+                                    <label class="block text-[11px] font-bold text-slate-500 mb-2 uppercase tracking-widest">Waktu Pelaksanaan</label>
+                                    <div class="relative">
+                                        <span class="absolute inset-y-0 left-0 flex items-center pl-4 text-slate-400 pointer-events-none"><i data-lucide="calendar-clock" class="w-5 h-5"></i></span>
+                                        <input type="datetime-local" name="event_date" id="event_date" value="{{ old('event_date') }}" required
+                                            class="w-full bg-slate-50 focus:bg-white border border-slate-200 text-slate-900 text-sm font-bold rounded-[12px] pl-11 pr-4 py-3.5 focus:outline-none focus:border-[#0066FF] focus:ring-4 focus:ring-[#0066FF]/10 transition-all duration-200 cursor-text">
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div>
+                                <label class="block text-[11px] font-bold text-slate-500 mb-2 uppercase tracking-widest">Lokasi / Venue</label>
+                                <div class="relative">
+                                    <span class="absolute inset-y-0 left-0 flex items-center pl-4 text-slate-400"><i data-lucide="map-pin" class="w-5 h-5"></i></span>
+                                    <input type="text" name="location" id="location" value="{{ old('location') }}" required placeholder="Contoh: Gelora Bung Karno, Jakarta"
+                                        class="w-full bg-slate-50 focus:bg-white border border-slate-200 text-slate-900 text-sm font-bold rounded-[12px] pl-11 pr-4 py-3.5 focus:outline-none focus:border-[#0066FF] focus:ring-4 focus:ring-[#0066FF]/10 transition-all duration-200 placeholder:font-medium placeholder:text-slate-400">
+                                </div>
+                            </div>
+
+                            <div>
+                                <label class="block text-[11px] font-bold text-slate-500 mb-2 uppercase tracking-widest">Deskripsi Lengkap Acara</label>
+                                <textarea name="description" id="description" rows="5" required placeholder="Jelaskan detail acara, rundown, syarat dan ketentuan tiket..."
+                                    class="w-full bg-slate-50 focus:bg-white border border-slate-200 text-slate-900 text-sm font-medium rounded-[12px] px-4 py-3.5 focus:outline-none focus:border-[#0066FF] focus:ring-4 focus:ring-[#0066FF]/10 transition-all duration-200 placeholder:text-slate-400">{{ old('description') }}</textarea>
+                            </div>
+
+                            <!-- HIDDEN YOUTUBE FIELD (Aksen Merah) -->
+                            <div id="online-options" class="hidden animate-[fadeIn_0.3s_ease-in-out]">
+                                <label class="block text-[11px] font-bold text-[#FF3B30] mb-2 uppercase tracking-widest flex items-center gap-1.5"><i data-lucide="youtube" class="w-4 h-4"></i> Link Livestream YouTube</label>
+                                <div class="relative">
+                                    <span class="absolute inset-y-0 left-0 flex items-center pl-4 text-[#FF3B30]/60"><i data-lucide="link" class="w-5 h-5"></i></span>
+                                    <input type="url" name="youtube_link" id="youtube_link" value="{{ old('youtube_link') }}" placeholder="https://youtube.com/live/..."
+                                        class="w-full bg-red-50 focus:bg-white border border-red-200 focus:border-[#FF3B30] text-slate-900 text-sm font-bold rounded-[12px] pl-11 pr-4 py-3.5 focus:outline-none focus:ring-4 focus:ring-[#FF3B30]/10 transition-all duration-200 placeholder:font-medium placeholder:text-red-300">
+                                </div>
+                                <span class="text-[11px] font-medium text-slate-400 mt-2 block">*Kolom ini muncul khusus untuk kategori hybrid/online (Live Concert, Workshop, dll).</span>
+                            </div>
                         </div>
                     </div>
 
-                    <div class="flex gap-3">
-                        <button type="submit" class="bg-[#041B4A] hover:bg-slate-800 text-white px-6 py-3 rounded-[12px] text-sm font-bold transition-all shadow-md flex items-center gap-2">
-                            <i data-lucide="search" class="w-4 h-4"></i> Filter Data
+                    <!-- ── KOLOM KANAN (Harga, Kuota & Poster) ── -->
+                    <div class="space-y-6">
+
+                        <div class="bg-white border border-slate-200 rounded-[24px] shadow-sm p-6 space-y-6 relative overflow-hidden">
+                            <!-- Hiasan Garis Atas -->
+                            <div class="absolute top-0 inset-x-0 h-1.5 bg-gradient-to-r from-[#FF7A00] to-[#FF3B30]"></div>
+
+                            <h2 class="text-lg font-black text-slate-800 font-montserrat border-b border-slate-100 pb-4 flex items-center gap-2.5">
+                                <div class="p-1.5 bg-orange-50 text-[#FF7A00] rounded-lg"><i data-lucide="ticket" class="w-5 h-5"></i></div>
+                                Tiket & Kapasitas
+                            </h2>
+
+                            <div>
+                                <label class="block text-[11px] font-bold text-slate-500 mb-2 uppercase tracking-widest">Harga Tiket Offline</label>
+                                <div class="relative">
+                                    <span class="absolute inset-y-0 left-0 flex items-center pl-4 text-[#0066FF] font-black text-sm">Rp</span>
+                                    <input type="number" name="price" id="price" value="{{ old('price', 0) }}" required min="0" placeholder="0"
+                                        class="w-full bg-blue-50 focus:bg-white border border-blue-200 focus:border-[#0066FF] text-[#0066FF] text-lg font-black rounded-[12px] pl-12 pr-4 py-3 focus:outline-none focus:ring-4 focus:ring-[#0066FF]/10 transition-all duration-200">
+                                </div>
+                            </div>
+
+                            <!-- HIDDEN ONLINE PRICE FIELD -->
+                            <div id="online-price-wrapper" class="hidden animate-[fadeIn_0.3s_ease-in-out]">
+                                <label class="block text-[11px] font-bold text-[#FF3B30] mb-2 uppercase tracking-widest">Harga Tiket Online</label>
+                                <div class="relative">
+                                    <span class="absolute inset-y-0 left-0 flex items-center pl-4 text-[#FF3B30] font-black text-sm">Rp</span>
+                                    <input type="number" name="online_price" id="online_price" value="{{ old('online_price', 0) }}" min="0" placeholder="0"
+                                        class="w-full bg-red-50 focus:bg-white border border-red-200 focus:border-[#FF3B30] text-[#FF3B30] text-lg font-black rounded-[12px] pl-12 pr-4 py-3 focus:outline-none focus:ring-4 focus:ring-[#FF3B30]/10 transition-all duration-200">
+                                </div>
+                            </div>
+
+                            <div>
+                                <label class="block text-[11px] font-bold text-slate-500 mb-2 uppercase tracking-widest">Kuota Maksimal (Tiket)</label>
+                                <div class="relative">
+                                    <span class="absolute inset-y-0 left-0 flex items-center pl-4 text-slate-400"><i data-lucide="users" class="w-5 h-5"></i></span>
+                                    <input type="number" name="quota" id="quota" value="{{ old('quota') }}" required min="1" placeholder="Contoh: 500"
+                                        class="w-full bg-slate-50 focus:bg-white border border-slate-200 text-slate-900 text-sm font-bold rounded-[12px] pl-11 pr-4 py-3.5 focus:outline-none focus:border-[#0066FF] focus:ring-4 focus:ring-[#0066FF]/10 transition-all duration-200 placeholder:font-medium placeholder:text-slate-400">
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="bg-white border border-slate-200 rounded-[24px] shadow-sm p-6 space-y-4">
+                            <h2 class="text-base font-black text-slate-800 font-montserrat flex items-center gap-2.5">
+                                <div class="p-1.5 bg-purple-50 text-[#A100FF] rounded-lg"><i data-lucide="image" class="w-4 h-4"></i></div>
+                                Poster Promosi <span class="text-[11px] font-medium text-slate-400 font-exo">(Opsional)</span>
+                            </h2>
+
+                            <div class="relative group aspect-[4/5] w-full max-w-[220px] mx-auto rounded-2xl bg-slate-50 border-2 border-dashed border-slate-300 overflow-hidden flex items-center justify-center shadow-inner transition-colors hover:border-[#0066FF]/50">
+                                <div class="text-center p-4 transition-opacity duration-200" id="placeholder-box">
+                                    <i data-lucide="upload-cloud" class="w-10 h-10 text-slate-300 mx-auto mb-2"></i>
+                                    <span class="text-[#0066FF] text-xs font-bold block">Unggah Poster</span>
+                                    <span class="text-slate-400 text-[10px] font-medium block mt-1">Rasio Potret (4:5)</span>
+                                </div>
+                                <img id="badge-preview" class="w-full h-full object-cover hidden transition-transform duration-300 group-hover:scale-105">
+                                <div id="hover-overlay" class="absolute inset-0 bg-[#041B4A]/70 opacity-0 group-hover:opacity-100 transition-opacity hidden items-center justify-center backdrop-blur-sm">
+                                    <span class="text-white text-xs font-bold bg-[#0066FF] px-4 py-2 rounded-full shadow-lg flex items-center gap-1.5"><i data-lucide="refresh-cw" class="w-3 h-3"></i> Ganti Poster</span>
+                                </div>
+                            </div>
+
+                            <div>
+                                <input type="file" name="image" id="badge-input" accept="image/*"
+                                    class="w-full text-xs text-slate-500 font-medium file:mr-3 file:py-2.5 file:px-4 file:rounded-xl file:border-0 file:text-xs file:font-bold file:bg-blue-50 file:text-[#0066FF] hover:file:bg-[#0066FF] hover:file:text-white transition-all cursor-pointer border border-slate-200 rounded-[12px] p-1.5 bg-slate-50">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- ── ACTION BAR BAWAH ── -->
+                <div class="mt-8 bg-white border border-slate-200 rounded-[24px] p-6 shadow-lg flex flex-col sm:flex-row items-center justify-between gap-4 sticky bottom-6 z-40">
+                    <span class="text-[13px] text-slate-500 font-medium flex items-center gap-2">
+                        <i data-lucide="info" class="w-5 h-5 text-[#0066FF]"></i> Pastikan semua informasi acara sudah valid sebelum diterbitkan.
+                    </span>
+                    <div class="flex items-center gap-4 w-full sm:w-auto shrink-0">
+                        <a href="{{ route('admin.events.index') }}" class="text-sm text-slate-500 hover:text-slate-800 font-bold px-6 py-3.5 transition-colors rounded-[12px] hover:bg-slate-100 border border-transparent w-full sm:w-auto text-center">Batal</a>
+                        <button type="submit" class="bg-gradient-to-r from-[#0066FF] to-[#00C2FF] hover:opacity-90 text-white px-8 py-3.5 rounded-[12px] text-sm font-bold font-montserrat transition-all shadow-lg shadow-blue-500/30 hover:-translate-y-0.5 active:translate-y-0 w-full sm:w-auto text-center flex items-center justify-center gap-2">
+                            Publikasikan Event <i data-lucide="rocket" class="w-4 h-4"></i>
                         </button>
-                        <a href="{{ route('admin.reports.index') }}" class="bg-slate-100 text-slate-600 hover:text-slate-900 border border-slate-200 hover:border-slate-300 px-6 py-3 rounded-[12px] text-sm font-bold transition-all flex items-center gap-2">
-                            <i data-lucide="refresh-ccw" class="w-4 h-4"></i> Reset
-                        </a>
-                    </div>
-                </form>
-            </div>
-
-            <!-- ── KARTU RINGKASAN (SUMMARY) ── -->
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
-                <!-- Total Pendapatan -->
-                <div class="bg-white p-6 rounded-[20px] border border-slate-200 shadow-sm flex items-center justify-between relative overflow-hidden group hover:shadow-md transition-all">
-                    <div class="absolute top-0 left-0 w-1.5 h-full bg-[#0066FF]"></div>
-                    <div class="pl-2">
-                        <p class="text-[11px] font-bold text-slate-400 tracking-widest uppercase mb-1">Total Pendapatan Tiket</p>
-                        <h3 class="text-3xl font-black text-slate-800 font-montserrat">Rp {{ number_format($totalPendapatan, 0, ',', '.') }}</h3>
-                    </div>
-                    <div class="w-14 h-14 rounded-2xl bg-blue-50 flex items-center justify-center text-[#0066FF] shadow-inner border border-blue-100">
-                        <i data-lucide="banknote" class="w-7 h-7"></i>
                     </div>
                 </div>
-                <!-- Total Tiket Terjual -->
-                <div class="bg-white p-6 rounded-[20px] border border-slate-200 shadow-sm flex items-center justify-between relative overflow-hidden group hover:shadow-md transition-all">
-                    <div class="absolute top-0 left-0 w-1.5 h-full bg-[#FF7A00]"></div>
-                    <div class="pl-2">
-                        <p class="text-[11px] font-bold text-slate-400 tracking-widest uppercase mb-1">Total Tiket Terjual</p>
-                        <h3 class="text-3xl font-black text-slate-800 font-montserrat">{{ number_format($totalTiket, 0, ',', '.') }} <span class="text-sm font-bold text-slate-400 font-exo">Tiket</span></h3>
-                    </div>
-                    <div class="w-14 h-14 rounded-2xl bg-orange-50 flex items-center justify-center text-[#FF7A00] shadow-inner border border-orange-100">
-                        <i data-lucide="ticket" class="w-7 h-7"></i>
-                    </div>
-                </div>
-            </div>
-
-            <!-- ── GRAFIK PENDAPATAN HARIAN ── -->
-            <div class="bg-white p-8 rounded-[24px] border border-slate-200 shadow-sm mb-8">
-                <div class="flex items-center justify-between mb-6">
-                    <h2 class="text-lg font-black text-slate-800 font-montserrat flex items-center gap-2">
-                        <i data-lucide="trending-up" class="w-5 h-5 text-[#0066FF]"></i> Grafik Pendapatan Harian
-                    </h2>
-                    <span class="text-xs font-bold bg-slate-100 text-slate-500 px-3 py-1 rounded-lg">Rupiah (Rp)</span>
-                </div>
-                <div class="relative h-[320px] w-full">
-                    <canvas id="revenueChart"></canvas>
-                </div>
-            </div>
-
-            <!-- ── TABEL RINCIAN TRANSAKSI ── -->
-            <div class="bg-white border border-slate-200 rounded-[24px] overflow-hidden shadow-sm">
-                <div class="p-6 border-b border-slate-100 bg-slate-50/50">
-                    <h3 class="text-base font-black text-slate-800 font-montserrat">Rincian Transaksi Event</h3>
-                </div>
-                <div class="overflow-x-auto">
-                    <table class="w-full text-left border-collapse">
-                        <thead class="bg-white border-b border-slate-200 text-xs font-bold text-slate-500 uppercase tracking-widest font-montserrat">
-                            <tr>
-                                <th class="py-5 px-6">Tanggal Transaksi</th>
-                                <th class="py-5 px-6">Nama Event</th>
-                                <th class="py-5 px-6 text-center">Jml Tiket</th>
-                                <th class="py-5 px-6 text-right">Total Pendapatan</th>
-                            </tr>
-                        </thead>
-                        <tbody class="text-[14px] text-slate-700 divide-y divide-slate-100">
-                            @forelse($reports as $report)
-                            <tr class="hover:bg-slate-50/70 transition-colors">
-                                <td class="py-4 px-6 text-slate-500 font-medium">
-                                    <div class="flex items-center gap-2">
-                                        <i data-lucide="clock" class="w-4 h-4 text-slate-400"></i>
-                                        {{ $report->created_at->format('d M Y, H:i') }}
-                                    </div>
-                                </td>
-                                <td class="py-4 px-6 font-bold text-slate-800">{{ $report->event->name ?? 'Event Terhapus' }}</td>
-                                <td class="py-4 px-6 text-center">
-                                    <span class="bg-slate-100 border border-slate-200 text-slate-700 font-bold px-3 py-1 rounded-lg text-xs">
-                                        {{ $report->quantity }}
-                                    </span>
-                                </td>
-                                <td class="py-4 px-6 text-right font-black text-slate-800 font-montserrat">Rp {{ number_format($report->total_amount, 0, ',', '.') }}</td>
-                            </tr>
-                            @empty
-                            <tr>
-                                <td colspan="4" class="px-6 py-20 text-center">
-                                    <div class="flex flex-col items-center justify-center">
-                                        <div class="w-16 h-16 bg-slate-50 text-slate-300 rounded-full flex items-center justify-center mb-4">
-                                            <i data-lucide="inbox" class="w-8 h-8"></i>
-                                        </div>
-                                        <h3 class="text-lg font-black text-slate-800 mb-1 font-montserrat">Tidak Ada Data</h3>
-                                        <p class="text-slate-500 text-[14px] font-medium">Belum ada transaksi pendapatan pada rentang waktu ini.</p>
-                                    </div>
-                                </td>
-                            </tr>
-                            @endforelse
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-
+            </form>
         </div>
     </main>
 
-    <!-- ── SCRIPT GRAFIK CHART.JS ── -->
     <script>
         // Inisialisasi ikon Lucide
         lucide.createIcons();
 
-        document.addEventListener('DOMContentLoaded', function() {
-            // Ambil data yang dikirim dari Controller
-            const labels = @json($chartLabels);
-            const dataValues = @json($chartValues);
+        // --- SCRIPT 1: Preview Poster/Image ---
+        const badgeInput = document.getElementById('badge-input');
+        const badgePreview = document.getElementById('badge-preview');
+        const placeholderBox = document.getElementById('placeholder-box');
+        const hoverOverlay = document.getElementById('hover-overlay');
 
-            const ctx = document.getElementById('revenueChart').getContext('2d');
-
-            // Membuat efek gradasi warna di bawah garis grafik
-            let gradient = ctx.createLinearGradient(0, 0, 0, 400);
-            gradient.addColorStop(0, 'rgba(0, 102, 255, 0.4)'); // Artix Blue transparan
-            gradient.addColorStop(1, 'rgba(0, 102, 255, 0.0)'); // Memudar ke transparan penuh
-
-            new Chart(ctx, {
-                type: 'line',
-                data: {
-                    labels: labels,
-                    datasets: [{
-                        label: 'Pendapatan',
-                        data: dataValues,
-                        borderColor: '#0066FF', // Artix Blue
-                        backgroundColor: gradient, // Menggunakan gradasi yang dibuat di atas
-                        borderWidth: 3,
-                        pointBackgroundColor: '#ffffff',
-                        pointBorderColor: '#0066FF',
-                        pointBorderWidth: 2,
-                        pointRadius: 4,
-                        pointHoverRadius: 6,
-                        pointHoverBackgroundColor: '#0066FF',
-                        pointHoverBorderColor: '#ffffff',
-                        fill: true, // Mengaktifkan warna area di bawah garis
-                        tension: 0.4 // Membuat garis melengkung (smooth)
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    plugins: {
-                        legend: { display: false },
-                        tooltip: {
-                            backgroundColor: '#041B4A', // Deep Navy background
-                            titleFont: { family: 'Montserrat', size: 13, weight: 'bold' },
-                            bodyFont: { family: 'Exo 2', size: 14, weight: '600' },
-                            padding: 12,
-                            cornerRadius: 12,
-                            displayColors: false,
-                            callbacks: {
-                                label: function(context) {
-                                    let value = context.parsed.y;
-                                    return 'Rp ' + new Intl.NumberFormat('id-ID').format(value);
-                                }
-                            }
+        if(badgeInput) {
+            badgeInput.addEventListener('change', function() {
+                const file = this.files[0];
+                if(file) {
+                    const reader = new FileReader();
+                    reader.addEventListener('load', function() {
+                        if(placeholderBox) placeholderBox.classList.add('hidden');
+                        if(hoverOverlay) {
+                            hoverOverlay.classList.remove('hidden');
+                            hoverOverlay.classList.add('flex');
                         }
-                    },
-                    scales: {
-                        y: {
-                            beginAtZero: true,
-                            border: { display: false },
-                            grid: {
-                                color: '#f1f5f9',
-                                drawBorder: false,
-                            },
-                            ticks: {
-                                color: '#64748b',
-                                font: { family: 'Exo 2', weight: '600' },
-                                padding: 10,
-                                callback: function(value) {
-                                    if (value >= 1000000) {
-                                        return 'Rp ' + (value / 1000000) + ' Jt';
-                                    } else if (value >= 1000) {
-                                        return 'Rp ' + (value / 1000) + ' Rb';
-                                    }
-                                    return 'Rp ' + value;
-                                }
-                            }
-                        },
-                        x: {
-                            border: { display: false },
-                            grid: { display: false },
-                            ticks: {
-                                color: '#64748b',
-                                font: { family: 'Exo 2', weight: '600' },
-                                padding: 10
-                            }
-                        }
+                        badgePreview.classList.remove('hidden');
+                        badgePreview.setAttribute('src', this.result);
+                    });
+                    reader.readAsDataURL(file);
+                } else {
+                    badgePreview.classList.add('hidden');
+                    if(placeholderBox) placeholderBox.classList.remove('hidden');
+                    if(hoverOverlay) {
+                        hoverOverlay.classList.add('hidden');
+                        hoverOverlay.classList.remove('flex');
                     }
+                    badgePreview.removeAttribute('src');
                 }
             });
-        });
+        }
+
+        // --- SCRIPT 2: Logika Form Hybrid (YouTube & Harga Online) ---
+        const categorySelect = document.getElementById('category-select');
+        const onlineOptions = document.getElementById('online-options');
+        const onlinePriceWrapper = document.getElementById('online-price-wrapper');
+
+        // Pastikan nama kategori di database sesuai dengan ini (huruf besar/kecil diabaikan dalam logika text.toUpperCase)
+        const hybridCategories = ['LIVE CONCERT', 'WORKSHOP', 'STAND UP COMEDY'];
+
+        function toggleOnlineFields() {
+            if(categorySelect.selectedIndex >= 0) {
+                // Ambil teks dari opsi yang dipilih
+                const selectedText = categorySelect.options[categorySelect.selectedIndex].text.trim().toUpperCase();
+
+                if (hybridCategories.includes(selectedText)) {
+                    // Tampilkan kolom (menggunakan class bawaan Tailwind 'hidden')
+                    onlineOptions.classList.remove('hidden');
+                    onlinePriceWrapper.classList.remove('hidden');
+                } else {
+                    // Sembunyikan kolom
+                    onlineOptions.classList.add('hidden');
+                    onlinePriceWrapper.classList.add('hidden');
+
+                    // Reset nilai inputan ke default
+                    document.getElementById('youtube_link').value = '';
+                    document.getElementById('online_price').value = 0;
+                }
+            }
+        }
+
+        // Jalankan pengecekan saat pertama kali halaman dimuat
+        toggleOnlineFields();
+
+        // Jalankan pengecekan setiap kali pilihan dropdown berubah
+        categorySelect.addEventListener('change', toggleOnlineFields);
     </script>
 </body>
 </html>

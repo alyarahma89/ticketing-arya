@@ -4,6 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Kelola Sponsorship - ARTIX ID</title>
+    <link rel="icon" href="{{ asset('main_logo.png') }}" type="image/x-icon">
+
 
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -89,9 +91,12 @@
                     <i data-lucide="credit-card" class="w-5 h-5"></i> Penjualan Tiket
                 </a>
 
-                <!-- Disorot karena ini halaman Sponsorship (EO) -->
-                <a href="{{ route('admin.sponsorships.index') }}" class="flex items-center gap-3 px-4 py-3 bg-[#0066FF] text-white rounded-xl text-[14px] font-bold transition-all shadow-md shadow-blue-500/20">
-                    <i data-lucide="handshake" class="w-5 h-5"></i> Kerjasama Sponsor
+                <!-- MENU PENGAJUAN SPONSOR (ADMIN) -->
+                <a href="{{ route('admin.sponsorship_requests.index') }}" class="flex items-center gap-3 px-4 py-3 text-white/60 hover:text-white hover:bg-white/5 rounded-xl text-[14px] font-medium transition-all">
+                    <i data-lucide="inbox" class="w-5 h-5"></i> Pengajuan Masuk
+                </a>
+                <a href="{{ route('admin.reports.index') }}" class="flex items-center gap-3 px-4 py-3 text-white/60 hover:text-white hover:bg-white/5 rounded-xl text-[14px] font-medium transition-all">
+                    <i data-lucide="file-bar-chart-2" class="w-5 h-5"></i> Laporan Event
                 </a>
 
             <!-- MENU ADMIN UTAMA -->
@@ -117,6 +122,10 @@
                 <!-- Disorot karena ini halaman Sponsorship (Admin) -->
                 <a href="{{ route('admin.sponsorships.index') }}" class="flex items-center gap-3 px-4 py-3 bg-[#0066FF] text-white rounded-xl text-[14px] font-bold transition-all shadow-md shadow-blue-500/20">
                     <i data-lucide="handshake" class="w-5 h-5"></i> Kelola Sponsorship
+                </a>
+                <!-- MENU PENGAJUAN SPONSOR (ADMIN) -->
+                <a href="{{ route('admin.sponsorship_requests.index') }}" class="flex items-center gap-3 px-4 py-3 text-white/60 hover:text-white hover:bg-white/5 rounded-xl text-[14px] font-medium transition-all">
+                    <i data-lucide="inbox" class="w-5 h-5"></i> Pengajuan Masuk
                 </a>
 
                 <a href="{{ route('admin.reports.index') }}" class="flex items-center gap-3 px-4 py-3 text-white/60 hover:text-white hover:bg-white/5 rounded-xl text-[14px] font-medium transition-all">

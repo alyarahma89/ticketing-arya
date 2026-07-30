@@ -121,16 +121,23 @@
             </div>
 
             <!-- Desktop CTA & Theme Toggle -->
-            <div class="hidden md:flex items-center gap-4">
+            <div class="hidden md:flex items-center gap-5">
                 @auth
                     @if(Auth::user()->role === 'admin' || Auth::user()->role === 'eo')
                         <a href="{{ route('admin.dashboard') }}" class="text-sm font-bold transition-colors text-slate-600 hover:text-[#0066FF] dark:text-white/70 dark:hover:text-white">Dashboard</a>
                     @endif
+
+                    <!-- 1. LINK RIWAYAT (BARU DITAMBAHKAN DI SINI) -->
+                    <a href="{{ route('transaction.history') }}" class="text-sm font-bold transition-colors text-slate-600 hover:text-[#0066FF] dark:text-white/70 dark:hover:text-white flex items-center gap-1.5">
+                        <i data-lucide="clock" class="w-4 h-4"></i> Riwayat
+                    </a>
+
+                    <!-- 2. LINK PROFIL -->
                     <a href="{{ route('profile.edit') }}" class="text-sm font-bold transition-colors text-slate-600 hover:text-[#0066FF] dark:text-white/70 dark:hover:text-white">
                         Halo, {{ explode(' ', Auth::user()->name)[0] }}
                     </a>
 
-                    <!-- Tombol Logout -->
+                    <!-- 3. TOMBOL LOGOUT -->
                     <form action="{{ route('logout') }}" method="POST" class="m-0 flex items-center">
                         @csrf
                         <button type="submit" class="text-sm font-bold transition-colors text-red-500 hover:text-red-600 dark:text-red-400 dark:hover:text-red-300">
@@ -169,12 +176,23 @@
             <a href="#event-list" class="text-slate-600 hover:text-[#0066FF] dark:text-white/70 dark:hover:text-white py-1 text-sm font-bold transition-colors">Event</a>
             <a href="#packages" class="text-slate-600 hover:text-[#0066FF] dark:text-white/70 dark:hover:text-white py-1 text-sm font-bold transition-colors">Sponsorship</a>
             @auth
-                <a href="{{ route('profile.edit') }}" class="text-slate-600 hover:text-[#0066FF] dark:text-white/70 dark:hover:text-white py-1 text-sm font-bold transition-colors">Profil Saya</a>
+                @if(Auth::user()->role === 'admin' || Auth::user()->role === 'eo')
+                    <a href="{{ route('admin.dashboard') }}" class="text-slate-600 hover:text-[#0066FF] dark:text-white/70 dark:hover:text-white py-1 text-sm font-bold transition-colors">Dashboard</a>
+                @endif
+
+                <!-- LINK RIWAYAT DI MOBILE MENU -->
+                <a href="{{ route('transaction.history') }}" class="text-slate-600 hover:text-[#0066FF] dark:text-white/70 dark:hover:text-white py-1 text-sm font-bold transition-colors flex items-center gap-2">
+                    <i data-lucide="clock" class="w-4 h-4"></i> Riwayat
+                </a>
+
+                <a href="{{ route('profile.edit') }}" class="text-slate-600 hover:text-[#0066FF] dark:text-white/70 dark:hover:text-white py-1 text-sm font-bold transition-colors flex items-center gap-2">
+                    <i data-lucide="user" class="w-4 h-4"></i> Profil Saya
+                </a>
 
                 <form action="{{ route('logout') }}" method="POST" class="w-full m-0">
                     @csrf
-                    <button type="submit" class="w-full text-left text-red-500 hover:text-red-600 dark:text-red-400 py-1 text-sm font-bold transition-colors">
-                        Logout
+                    <button type="submit" class="w-full text-left text-red-500 hover:text-red-600 dark:text-red-400 py-1 text-sm font-bold transition-colors flex items-center gap-2">
+                        <i data-lucide="log-out" class="w-4 h-4"></i> Logout
                     </button>
                 </form>
             @else
@@ -193,39 +211,24 @@
         <!-- Latar Belakang Gelap (Ditampilkan hanya saat dark mode) -->
         <div class="absolute inset-0 pointer-events-none hidden dark:block" style="background: radial-gradient(ellipse 90% 70% at 50% -10%, #0A2A6E 0%, #041B4A 65%); z-index: -1;"></div>
 
-        <!-- Grid Overlay (Sekarang otomatis hilang di mode malam dengan fitur dark:hidden) -->
+        <!-- Grid Overlay -->
         <div class="absolute inset-0 pointer-events-none opacity-40 dark:hidden" style="background-image: linear-gradient(#CBD5E1 1px, transparent 1px), linear-gradient(90deg, #CBD5E1 1px, transparent 1px); background-size: 56px 56px;"></div>
 
         <!-- Orbs Cahaya -->
         <div class="absolute rounded-full pointer-events-none opacity-15 dark:opacity-10" style="width: 520px; height: 520px; top: 5%; left: 5%; background: #0066FF; filter: blur(120px); animation: orb1 8s ease-in-out infinite;"></div>
         <div class="absolute rounded-full pointer-events-none opacity-10 dark:opacity-10" style="width: 400px; height: 400px; bottom: 5%; right: 5%; background: #FF7A00; filter: blur(100px); animation: orb2 10s ease-in-out infinite 2s;"></div>
 
-
         <!-- Hero Content -->
         <div class="relative z-10 max-w-5xl mx-auto px-6 text-center pt-28 pb-10 flex flex-col items-center">
 
-            <!-- LOGO UTAMA (Diperbesar & Diberi Efek Glow untuk Mode Malam) -->
-
+            <!-- LOGO UTAMA -->
             <div class="relative flex justify-center w-full max-w-3xl mx-auto mb-6">
-
-                <!-- Efek Cahaya Putih Lembut (Hanya aktif di Mode Malam) -->
-                <!-- Ini berfungsi sebagai 'lampu sorot' dari belakang agar teks hitam di logo tetap terbaca -->
                 <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-3/4 h-3/4 bg-white/40 blur-[70px] rounded-full hidden dark:block pointer-events-none z-0"></div>
-
-                <!-- Gambar Logo -->
-                <!--
-                  PENJELASAN PERBAIKAN:
-                  Ditambahkan style="clip-path: inset(2px);"
-                  Kode ini akan memotong pinggiran gambar sebanyak 2 pixel dari atas, kanan, bawah, dan kiri
-                  untuk membuang garis kotor (artifact) bawaan dari file gambar.
-                -->
                 <img src="{{ asset('main_logo.png') }}"
                      alt="ARTIX ID Primary Logo"
                      class="relative z-10 h-48 md:h-64 lg:h-80 w-auto object-contain border-none outline-none drop-shadow-2xl hover:scale-105 transition-transform duration-500"
                      style="clip-path: inset(5px);">
             </div>
-
-            <!-- Catatan: Badge "Integrated Event Ecosystem" aku hapus karena teksnya sudah ada di dalam gambar logomu agar tidak berulang -->
 
             <!-- Headline Teks -->
             <h1 class="font-black leading-none tracking-tight mb-7 font-montserrat" style="font-size: clamp(3rem, 9vw, 6.5rem);">
@@ -235,12 +238,10 @@
                 <span class="text-gradient-orange dark:text-gradient-neon">EVENT</span>
             </h1>
 
-            <!-- Deskripsi Singkat -->
             <p class="text-lg md:text-xl max-w-2xl mx-auto mb-10 leading-relaxed font-medium text-slate-600 dark:text-white/55 transition-colors">
                 Dari ticketing hingga livestream, sponsorship hingga tournament — semua terintegrasi dalam satu ekosistem digital untuk event Indonesia yang lebih besar.
             </p>
 
-            <!-- Tombol Aksi -->
             <div class="flex flex-col sm:flex-row gap-4 justify-center mb-12">
                 <a href="#event-list" class="group inline-flex items-center justify-center gap-2 px-8 py-4 font-bold text-white rounded-xl transition-all hover:scale-105 shadow-xl font-montserrat" style="background: linear-gradient(135deg, #0066FF, #00C2FF);">
                     Cari Tiket Event
@@ -254,7 +255,6 @@
                 </a>
             </div>
 
-            <!-- Form Pencarian Database -->
             <form action="{{ url('/') }}" method="GET" class="max-w-3xl mx-auto p-4 rounded-2xl border shadow-xl relative z-20 transition-colors bg-white border-slate-200 dark:bg-white/5 dark:border-white/10 dark:backdrop-blur-md">
                 <div class="flex flex-col md:flex-row gap-3">
                     <input type="text" name="search" value="{{ request('search') }}" placeholder="Cari nama event atau kategori..." class="flex-1 rounded-xl px-4 py-3 text-sm font-medium focus:outline-none focus:ring-2 transition-all bg-slate-50 border border-slate-200 text-slate-900 focus:border-[#0066FF] focus:ring-[#0066FF]/20 dark:bg-[#020C1F] dark:border-white/10 dark:text-white dark:focus:border-[#00C2FF]">
@@ -273,7 +273,7 @@
         <div class="absolute bottom-0 inset-x-0 h-32 pointer-events-none transition-colors bg-gradient-to-t from-white to-transparent dark:from-[#030F2E] dark:to-transparent"></div>
     </section>
 
-    <!-- ── DAFTAR EVENT DINAMIS DARI DATABASE ──────────────────────── -->
+    <!-- ── DAFTAR EVENT DINAMIS ──────────────────────── -->
     <section id="event-list" class="py-20 transition-colors bg-white border-t border-slate-200 dark:bg-[#030F2E] dark:border-white/10">
         <div class="max-w-7xl mx-auto px-6">
             <div class="mb-12 flex items-center justify-between">
@@ -281,7 +281,6 @@
             </div>
 
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                <!-- Looping Database Event -->
                 @forelse($events as $event)
                 <div class="group relative p-4 rounded-3xl border shadow-sm transition-all duration-300 hover:-translate-y-2 hover:shadow-xl flex flex-col bg-white border-slate-200 dark:bg-white/5 dark:border-white/10 dark:hover:border-[#0066FF55] dark:hover:shadow-[0_8px_40px_rgba(0,102,255,0.35)]">
 
@@ -402,8 +401,8 @@
                 <div class="p-8 rounded-3xl border shadow-sm transition-all hover:-translate-y-1 bg-white border-slate-200 hover:shadow-xl dark:bg-white/5 dark:border-white/10 dark:hover:border-[#0066FF55] dark:hover:shadow-[0_8px_40px_rgba(0,102,255,0.35)] dark:hover:bg-[#0066FF08]">
                     <div class="mb-6 w-14 h-14 flex items-center justify-center rounded-2xl bg-blue-50 dark:bg-[#0066FF1E]">
                         <img src="{{ asset('images/ticketing.svg') }}"
-                            alt="Smart Ticketing"
-                            class="w-8 h-8">
+                             alt="Smart Ticketing"
+                             class="w-8 h-8">
                     </div>
                     <h3 class="font-bold text-xl mb-3 font-montserrat text-slate-900 dark:text-white">Smart Ticketing</h3>
                     <p class="text-sm leading-relaxed font-medium text-slate-600 dark:text-white/50">Jual tiket dengan sistem manajemen kapasitas, multi-kategori harga, dan payment gateway terintegrasi.</p>
@@ -413,8 +412,8 @@
                 <div class="p-8 rounded-3xl border shadow-sm transition-all hover:-translate-y-1 bg-white border-slate-200 hover:shadow-xl dark:bg-white/5 dark:border-white/10 dark:hover:border-[#FF3B3055] dark:hover:shadow-[0_8px_40px_rgba(255,59,48,0.35)] dark:hover:bg-[#FF3B3008]">
                     <div class="mb-6 w-14 h-14 flex items-center justify-center rounded-2xl bg-blue-50 dark:bg-[#0066FF1E]">
                         <img src="{{ asset('images/livestream.svg') }}"
-                            alt="Livestream HD"
-                            class="w-8 h-8">
+                             alt="Livestream HD"
+                             class="w-8 h-8">
                     </div>
                     <h3 class="font-bold text-xl mb-3 font-montserrat text-slate-900 dark:text-white">Livestream HD</h3>
                     <p class="text-sm leading-relaxed font-medium text-slate-600 dark:text-white/50">Broadcast ke seluruh Indonesia dengan latensi rendah. Monetisasi lewat tiket virtual dan sponsorship slot.</p>
@@ -424,8 +423,8 @@
                 <div class="p-8 rounded-3xl border shadow-sm transition-all hover:-translate-y-1 bg-white border-slate-200 hover:shadow-xl dark:bg-white/5 dark:border-white/10 dark:hover:border-[#A100FF55] dark:hover:shadow-[0_8px_40px_rgba(161,0,255,0.35)] dark:hover:bg-[#A100FF08]">
                     <div class="mb-6 w-14 h-14 flex items-center justify-center rounded-2xl bg-blue-50 dark:bg-[#0066FF1E]">
                         <img src="{{ asset('images/sponsorship.svg') }}"
-                            alt="Sponsorship Marketplace"
-                            class="w-8 h-8">
+                             alt="Sponsorship Marketplace"
+                             class="w-8 h-8">
                     </div>
                     <h3 class="font-bold text-xl mb-3 font-montserrat text-slate-900 dark:text-white">Sponsorship Marketplace</h3>
                     <p class="text-sm leading-relaxed font-medium text-slate-600 dark:text-white/50">AI-matching antara brand dan event. Proposal, kontrak, dan pembayaran dalam satu platform.</p>
@@ -435,8 +434,8 @@
                 <div class="p-8 rounded-3xl border shadow-sm transition-all hover:-translate-y-1 bg-white border-slate-200 hover:shadow-xl dark:bg-white/5 dark:border-white/10 dark:hover:border-[#0066FF55] dark:hover:shadow-[0_8px_40px_rgba(0,102,255,0.35)] dark:hover:bg-[#0066FF08]">
                     <div class="mb-6 w-14 h-14 flex items-center justify-center rounded-2xl bg-blue-50 dark:bg-[#0066FF1E]">
                         <img src="{{ asset('images/tournament.svg') }}"
-                            alt="Tournament System"
-                            class="w-8 h-8">
+                             alt="Tournament System"
+                             class="w-8 h-8">
                     </div>
                     <h3 class="font-bold text-xl mb-3 font-montserrat text-slate-900 dark:text-white">Tournament System</h3>
                     <p class="text-sm leading-relaxed font-medium text-slate-600 dark:text-white/50">Kelola bracket kompetisi secara real-time untuk event E-Sports, olahraga, maupun kompetisi akademik.</p>
@@ -446,8 +445,8 @@
                 <div class="p-8 rounded-3xl border shadow-sm transition-all hover:-translate-y-1 bg-white border-slate-200 hover:shadow-xl dark:bg-white/5 dark:border-white/10 dark:hover:border-[#FF3B3055] dark:hover:shadow-[0_8px_40px_rgba(255,59,48,0.35)] dark:hover:bg-[#FF3B3008]">
                     <div class="mb-6 w-14 h-14 flex items-center justify-center rounded-2xl bg-orange-50 dark:bg-[#FF3B301E]">
                         <img src="{{ asset('images/community.svg') }}"
-                            alt="Community Engagement"
-                            class="w-8 h-8">
+                             alt="Community Engagement"
+                             class="w-8 h-8">
                     </div>
                     <h3 class="font-bold text-xl mb-3 font-montserrat text-slate-900 dark:text-white">Community Engagement</h3>
                     <p class="text-sm leading-relaxed font-medium text-slate-600 dark:text-white/50">Bangun koneksi peserta sebelum, selama, dan setelah event untuk loyalitas komunitas jangka panjang.</p>
@@ -457,8 +456,8 @@
                 <div class="p-8 rounded-3xl border shadow-sm transition-all hover:-translate-y-1 bg-white border-slate-200 hover:shadow-xl dark:bg-white/5 dark:border-white/10 dark:hover:border-[#A100FF55] dark:hover:shadow-[0_8px_40px_rgba(161,0,255,0.35)] dark:hover:bg-[#A100FF08]">
                     <div class="mb-6 w-14 h-14 flex items-center justify-center rounded-2xl bg-purple-50 dark:bg-[#A100FF1E]">
                         <img src="{{ asset('images/analytics.svg') }}"
-                            alt="Analytics & Report"
-                            class="w-8 h-8">
+                             alt="Analytics & Report"
+                             class="w-8 h-8">
                     </div>
                     <h3 class="font-bold text-xl mb-3 font-montserrat text-slate-900 dark:text-white">Analytics & Report</h3>
                     <p class="text-sm leading-relaxed font-medium text-slate-600 dark:text-white/50">Data demografi, laporan penjualan tiket, hingga engagement secara live untuk optimasi event berikutnya.</p>

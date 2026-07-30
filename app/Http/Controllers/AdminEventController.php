@@ -7,8 +7,9 @@ use App\Models\Event;
 use App\Models\Transaction;
 use App\Models\User;
 use App\Models\Revenue;
-use App\Models\Category; // <-- JANGAN LUPA TAMBAHKAN INI
+use App\Models\Category;
 use App\Models\Sponsorship;
+use App\Models\SponsorshipTransaction; // <-- PERBAIKAN: Menambahkan model ini
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Auth;
@@ -19,51 +20,56 @@ class AdminEventController extends Controller
     {
         $user = Auth::user();
 
-        // 1. KITA BUAT PERSIAPAN PENGAMBILAN DATA (Belum dieksekusi)
+        // 1. KITA BUAT PERSIAPAN PENGAMBILAN DATA
         $queryEvent = Event::query();
         $queryTransaction = Transaction::where('payment_status', 'paid');
         $queryRevenue = Revenue::query();
-        $querySponsorship = Sponsorship::query();
+
+        // PERBAIKAN FINAL: Ambil transaksi yang statusnya DITERIMA & SUDAH LUNAS
+        $querySponsorApproved = SponsorshipTransaction::where('status', 'approved')
+                                    ->where('payment_status', 'paid') // <-- TAMBAHAN BARU
+                                    ->with('sponsorship');
 
         // 2. GERBANG LOGIKA ISOLASI: JIKA EO, KUNCI DATANYA HANYA UNTUK DIA
         if ($user->role === 'eo') {
-            // Hanya ambil event yang user_id-nya sama dengan ID EO yang login
+            // Hanya ambil event milik EO ini
             $queryEvent->where('user_id', $user->id);
 
-            // Hanya ambil transaksi yang terhubung ke event milik EO ini
+            // Hanya ambil transaksi tiket untuk event milik EO ini
             $queryTransaction->whereHas('event', function ($q) use ($user) {
                 $q->where('user_id', $user->id);
             });
 
-            // Hanya ambil pendapatan yang terhubung ke event milik EO ini
+            // Hanya ambil pendapatan tiket dari event milik EO ini
             $queryRevenue->whereHas('event', function ($q) use ($user) {
                 $q->where('user_id', $user->id);
             });
 
-            // Hanya ambil sponsorship yang terhubung ke event milik EO ini
-            $querySponsorship->whereHas('event', function ($q) use ($user) {
+            // Hanya ambil transaksi sponsor yang terhubung ke event milik EO ini
+            $querySponsorApproved->whereHas('sponsorship.event', function ($q) use ($user) {
                 $q->where('user_id', $user->id);
             });
         }
 
         // 3. EKSEKUSI PENGHITUNGAN KARTU STATISTIK
-        // (Akan otomatis menghitung semua untuk Admin, atau menghitung sebagian untuk EO)
         $eventAktif = $queryEvent->count();
         $tiketTerjual = $queryTransaction->sum('quantity');
         $totalPendapatan = $queryRevenue->sum('amount');
-        $pendapatanSponsor = $querySponsorship->sum('price');
 
-        // Mengambil 5 event terakhir (akan otomatis terfilter)
+        // PERBAIKAN: Menjumlahkan harga sponsor HANYA dari pengajuan yang disetujui dan lunas
+        $pendapatanSponsor = $querySponsorApproved->get()->sum(function ($transaction) {
+            return $transaction->sponsorship->price ?? 0;
+        });
+
+        // Mengambil 5 event terakhir
         $activeEvents = $queryEvent->latest()->take(5)->get();
 
-        // Khusus untuk jumlah pengguna (karena logikanya sedikit berbeda)
+        // Khusus untuk jumlah pengguna
         if ($user->role === 'eo') {
-            // EO hanya melihat total peserta unik yang pernah membeli tiket acaranya
             $totalPengguna = Transaction::whereHas('event', function ($q) use ($user) {
                 $q->where('user_id', $user->id);
             })->distinct('user_id')->count('user_id');
         } else {
-            // Admin melihat semua akun (User, EO, Panitia) yang terdaftar di aplikasi
             $totalPengguna = User::count();
         }
 
@@ -115,18 +121,16 @@ class AdminEventController extends Controller
     }
 
 
-    // HANYA UNTUK MANAJEMEN EVENT (Tabel)
-    // HANYA UNTUK MANAJEMEN EVENT (Tabel)
+    // ==========================================
+    // FUNGSI UNTUK MANAJEMEN EVENT
+    // ==========================================
     public function index()
     {
         $user = Auth::user();
 
-        // Cek jika yang login adalah EO
         if ($user->role === 'eo') {
-            // EO hanya mengambil event miliknya sendiri beserta relasi kategorinya
             $events = Event::with('category')->where('user_id', $user->id)->get();
         } else {
-            // Admin mengambil semua event beserta relasi kategorinya
             $events = Event::with('category')->get();
         }
 
@@ -135,22 +139,17 @@ class AdminEventController extends Controller
         return view('admin.events.index', compact('events', 'sponsorships'));
     }
 
-    // DIPERBARUI: Mengirim variabel $categories ke tampilan form tambah
     public function create()
     {
         $categories = Category::all();
         return view('admin.events.create', compact('categories'));
     }
 
-    // ==========================================
-    // FUNGSI UNTUK MENYIMPAN EVENT BARU (CREATE)
-    // ==========================================
     public function store(Request $request)
     {
-        // Validasi diperbarui: category menjadi category_id
         $validated = $request->validate([
             'name' => 'required|string|max:255',
-            'category_id' => 'required|exists:categories,id', // <-- Harus ada di tabel categories
+            'category_id' => 'required|exists:categories,id',
             'location' => 'required|string|max:255',
             'event_date' => 'required|date',
             'price' => 'required|numeric|min:0',
@@ -161,7 +160,6 @@ class AdminEventController extends Controller
             'youtube_link' => 'nullable|url|max:255',
         ]);
 
-        // DIPERBARUI: Logika Hybrid. Kita ambil dulu nama kategorinya berdasarkan category_id yang dipilih
         $kategoriDipilih = Category::find($request->category_id);
         $hybridCategories = ['LIVE CONCERT', 'WORKSHOP', 'STAND UP COMEDY'];
 
@@ -179,26 +177,21 @@ class AdminEventController extends Controller
         return redirect()->route('admin.events.index')->with('success', 'Event baru berhasil ditambahkan!');
     }
 
-    // DIPERBARUI: Mengirim variabel $categories ke tampilan form edit
     public function edit($id)
     {
         $event = Event::findOrFail($id);
-        $categories = Category::all(); // <-- Menambahkan data kategori
+        $categories = Category::all();
 
         return view('admin.events.edit', compact('event', 'categories'));
     }
 
-    // ==========================================
-    // FUNGSI UNTUK MENYIMPAN EDIT EVENT (UPDATE)
-    // ==========================================
     public function update(Request $request, $id)
     {
         $event = Event::findOrFail($id);
 
-        // Validasi diperbarui: category menjadi category_id
         $validated = $request->validate([
             'name' => 'required|string|max:255',
-            'category_id' => 'required|exists:categories,id', // <-- Diperbarui
+            'category_id' => 'required|exists:categories,id',
             'location' => 'required|string|max:255',
             'event_date' => 'required|date',
             'price' => 'required|numeric|min:0',
@@ -209,7 +202,6 @@ class AdminEventController extends Controller
             'youtube_link' => 'nullable|url|max:255',
         ]);
 
-        // DIPERBARUI: Logika Hybrid
         $kategoriDipilih = Category::find($request->category_id);
         $hybridCategories = ['LIVE CONCERT', 'WORKSHOP', 'STAND UP COMEDY'];
 
@@ -230,9 +222,6 @@ class AdminEventController extends Controller
         return redirect()->route('admin.events.index')->with('success', 'Data event berhasil diperbarui!');
     }
 
-    // ==========================================
-    // FUNGSI UNTUK MENGHAPUS EVENT (DESTROY)
-    // ==========================================
     public function destroy($id)
     {
         $event = Event::findOrFail($id);
@@ -247,28 +236,17 @@ class AdminEventController extends Controller
     }
 
     public function byCategory($id)
-{
-    // Mengambil data kategori
-    $category = Category::findOrFail($id);
+    {
+        $category = Category::findOrFail($id);
+        $events = Event::where('category_id', $id)->get();
+        $sponsorships = \App\Models\Sponsorship::all();
 
-    // Mengambil event berdasarkan kategori
-    $events = Event::where('category_id', $id)->get();
+        return view('events.index', compact('events', 'category', 'sponsorships'));
+    }
 
-    // TAMBAHKAN BARIS INI: Ambil juga data sponsorship
-    $sponsorships = \App\Models\Sponsorship::all();
-
-    // Pastikan $sponsorships ikut dikirim ke dalam fungsi compact() atau murni array
-    return view('events.index', compact('events', 'category', 'sponsorships'));
-}
-
-// Fungsi untuk menampilkan halaman katalog sponsor berdasarkan ID event
     public function sponsorship($id)
     {
-        // Mencari event berdasarkan ID, sekaligus menarik relasi 'sponsorships'
         $event = \App\Models\Event::with('sponsorships')->findOrFail($id);
-
-        // Mengarahkan ke file view baru bernama 'sponsorship.blade.php'
-        // dan mengirimkan variabel $event ke sana
         return view('sponsorship', compact('event'));
     }
 }

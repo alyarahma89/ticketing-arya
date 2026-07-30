@@ -73,6 +73,10 @@ Route::middleware('auth')->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
+
+    // TAMBAHKAN DUA BARIS INI UNTUK PENGAJUAN SPONSOR
+    Route::get('/sponsorship/{id}/apply', [App\Http\Controllers\SponsorshipController::class, 'apply'])->name('sponsorship.apply');
+    Route::post('/sponsorship/{id}/apply', [App\Http\Controllers\SponsorshipController::class, 'submitApplication'])->name('sponsorship.submit');
 });
 
 // =========================================================
@@ -110,6 +114,9 @@ Route::middleware(['auth', 'role:admin,eo'])->prefix('admin')->name('admin.')->g
     Route::get('/sponsorships/{id}/edit', [SponsorshipController::class, 'edit'])->name('sponsorships.edit');
     Route::put('/sponsorships/{id}', [SponsorshipController::class, 'update'])->name('sponsorships.update');
     Route::delete('/sponsorships/{id}', [SponsorshipController::class, 'destroy'])->name('sponsorships.destroy');
+
+    Route::get('/sponsorship-requests', [App\Http\Controllers\SponsorshipController::class, 'requests'])->name('sponsorship_requests.index');
+    Route::put('/sponsorship-requests/{id}/status', [App\Http\Controllers\SponsorshipController::class, 'updateStatus'])->name('sponsorship_requests.update');
 
     // CRUD Kategori
     Route::get('/categories', [AdminCategoryController::class, 'index'])->name('categories.index');

@@ -120,4 +120,91 @@ class SponsorshipController extends Controller
 
         return redirect()->route('admin.sponsorships.index')->with('success', 'Paket Sponsor berhasil dihapus!');
     }
+
+    // ==========================================
+    // FUNGSI UNTUK MENAMPILKAN FORMULIR PENGAJUAN (PUBLIK)
+    // ==========================================
+    public function apply($id)
+    {
+        // Mengambil data paket sponsor beserta event-nya
+        $sponsorship = \App\Models\Sponsorship::with('event')->findOrFail($id);
+
+        // Menampilkan halaman form
+        return view('sponsorship-apply', compact('sponsorship'));
+    }
+
+    // ==========================================
+    // FUNGSI UNTUK MENYIMPAN DATA PENGAJUAN (PUBLIK)
+    // ==========================================
+    public function submitApplication(Request $request, $id)
+    {
+        // 1. Validasi data yang diisi perusahaan
+        $request->validate([
+            'company_name' => 'required|string|max:255',
+            'company_email' => 'required|email|max:255',
+            'company_phone' => 'required|string|max:20',
+            'message' => 'nullable|string',
+        ]);
+
+        // 2. Simpan ke tabel sponsorship_transactions
+        \App\Models\SponsorshipTransaction::create([
+            'sponsorship_id' => $id,
+            'user_id' => \Illuminate\Support\Facades\Auth::id(),
+            'company_name' => $request->company_name,
+            'company_email' => $request->company_email,
+            'company_phone' => $request->company_phone,
+            'message' => $request->message,
+            'status' => 'pending', // Status otomatis pending (menunggu persetujuan EO)
+        ]);
+
+        // 3. Arahkan kembali ke beranda dengan pesan sukses
+        return redirect('/')->with('success', 'Pengajuan sponsorship berhasil dikirim! Silakan tunggu EO menghubungi Anda.');
+    }
+
+    // ==========================================
+    // FUNGSI UNTUK MENAMPILKAN DAFTAR PENGAJUAN (DI DASBOR EO/ADMIN)
+    // ==========================================
+    public function requests()
+    {
+        $user = \Illuminate\Support\Facades\Auth::user();
+
+        // Mulai query untuk mengambil data transaksi pengajuan beserta relasinya
+        $query = \App\Models\SponsorshipTransaction::with(['sponsorship.event', 'user'])->latest();
+
+        // Jika yang login adalah EO, pastikan dia hanya melihat pengajuan untuk event miliknya
+        if ($user->role === 'eo') {
+            $query->whereHas('sponsorship.event', function ($q) use ($user) {
+                $q->where('user_id', $user->id);
+            });
+        }
+
+        $requests = $query->get();
+
+        return view('admin.sponsorships.requests', compact('requests'));
+    }
+
+    // ==========================================
+    // FUNGSI UNTUK MENGUBAH STATUS PENGAJUAN (TERIMA/TOLAK)
+    // ==========================================
+    // ==========================================
+    // FUNGSI UNTUK MENGUBAH STATUS ATAU PEMBAYARAN PENGAJUAN
+    // ==========================================
+    public function updateStatus(\Illuminate\Http\Request $request, $id)
+    {
+        $transaction = \App\Models\SponsorshipTransaction::findOrFail($id);
+
+        // Jika EO mengubah status (Terima/Tolak)
+        if ($request->has('status')) {
+            $request->validate(['status' => 'required|in:pending,approved,rejected']);
+            $transaction->update(['status' => $request->status]);
+        }
+
+        // Jika EO menekan tombol "Tandai Lunas"
+        if ($request->has('payment_status')) {
+            $request->validate(['payment_status' => 'required|in:unpaid,paid']);
+            $transaction->update(['payment_status' => $request->payment_status]);
+        }
+
+        return back()->with('success', 'Data pengajuan sponsor berhasil diperbarui!');
+    }
 }

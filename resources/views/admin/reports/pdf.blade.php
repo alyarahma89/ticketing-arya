@@ -3,6 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <title>Laporan Keuangan - ARTIX ID</title>
+    <link rel="icon" href="{{ asset('main_logo.png') }}" type="image/x-icon">
+
     <style>
         /* Mengimpor font jika PDF engine mendukung (misal: mPDF atau wkhtmltopdf) */
         @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700;900&family=Exo+2:wght@400;600;700&display=swap');

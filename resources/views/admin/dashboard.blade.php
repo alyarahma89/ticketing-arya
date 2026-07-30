@@ -4,6 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Ikhtisar Platform - ARTIX ID</title>
+    <link rel="icon" href="{{ asset('main_logo.png') }}" type="image/x-icon">
+
 
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -61,22 +63,17 @@
     <!-- ── SIDEBAR KIRI (Deep Navy) ── -->
     <aside class="w-64 bg-artix-navy flex flex-col hidden lg:flex relative z-20 shrink-0 h-screen shadow-xl border-r border-white/5">
 
-        <!-- LOGO MAIN & TEKS DITAMBAHKAN DI SINI -->
+        <!-- LOGO MAIN & TEKS -->
         <div class="h-20 shrink-0 flex items-center px-8 border-b border-white/10">
-            <!-- Mengubah tag <a> menjadi flex container -->
             <a href="{{ url('/') }}" class="flex items-center gap-3 group">
-
-                <!-- Gambar Logo (Sebaiknya gunakan versi Icon Only agar teks tidak dobel) -->
                 <img src="{{ asset('main_logo.png') }}"
                      alt="ARTIX ID Logo"
                      class="h-10 w-auto object-contain group-hover:scale-105 transition-transform duration-300"
                      style="filter: drop-shadow(0px 0px 8px rgba(0, 102, 255, 0.4)); clip-path: inset(2px);">
 
-                <!-- Teks ARTIX ID -->
                 <span class="text-white font-black text-xl tracking-tight font-montserrat group-hover:opacity-90 transition-opacity">
                     ARTIX <span class="text-gradient-orange">ID</span>
                 </span>
-
             </a>
         </div>
 
@@ -96,8 +93,9 @@
                 <a href="{{ route('admin.transactions.index') }}" class="flex items-center gap-3 px-4 py-3 text-white/60 hover:text-white hover:bg-white/5 rounded-xl text-[14px] font-medium transition-all">
                     <i data-lucide="credit-card" class="w-5 h-5"></i> Penjualan Tiket
                 </a>
-                <a href="{{ route('admin.sponsorships.index') }}" class="flex items-center gap-3 px-4 py-3 text-white/60 hover:text-white hover:bg-white/5 rounded-xl text-[14px] font-medium transition-all">
-                    <i data-lucide="handshake" class="w-5 h-5"></i> Kerjasama Sponsor
+                <!-- MENU PENGAJUAN SPONSOR (EO) -->
+                <a href="{{ route('admin.sponsorship_requests.index') }}" class="flex items-center gap-3 px-4 py-3 text-white/60 hover:text-white hover:bg-white/5 rounded-xl text-[14px] font-medium transition-all">
+                    <i data-lucide="inbox" class="w-5 h-5"></i> Pengajuan Masuk
                 </a>
                 <a href="{{ route('admin.reports.index') }}" class="flex items-center gap-3 px-4 py-3 text-white/60 hover:text-white hover:bg-white/5 rounded-xl text-[14px] font-medium transition-all">
                     <i data-lucide="file-bar-chart-2" class="w-5 h-5"></i> Laporan Event
@@ -124,6 +122,10 @@
                 </a>
                 <a href="{{ route('admin.sponsorships.index') }}" class="flex items-center gap-3 px-4 py-3 text-white/60 hover:text-white hover:bg-white/5 rounded-xl text-[14px] font-medium transition-all">
                     <i data-lucide="handshake" class="w-5 h-5"></i> Kelola Sponsorship
+                </a>
+                <!-- MENU PENGAJUAN SPONSOR (ADMIN) -->
+                <a href="{{ route('admin.sponsorship_requests.index') }}" class="flex items-center gap-3 px-4 py-3 text-white/60 hover:text-white hover:bg-white/5 rounded-xl text-[14px] font-medium transition-all">
+                    <i data-lucide="inbox" class="w-5 h-5"></i> Pengajuan Masuk
                 </a>
                 <a href="{{ route('admin.reports.index') }}" class="flex items-center gap-3 px-4 py-3 text-white/60 hover:text-white hover:bg-white/5 rounded-xl text-[14px] font-medium transition-all">
                     <i data-lucide="file-bar-chart-2" class="w-5 h-5"></i> Laporan Keseluruhan
@@ -189,7 +191,7 @@
                 </div>
             @endif
 
-            <!-- ── KARTU STATISTIK (Menggunakan Aksen Warna Brand) ── -->
+            <!-- ── KARTU STATISTIK ── -->
             <div class="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-5 gap-5 mb-8">
 
                 <!-- Card 1: Omset (Aksen Blue) -->

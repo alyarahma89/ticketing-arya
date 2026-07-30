@@ -22,7 +22,7 @@ class CheckoutController extends Controller
         // Tambahkan validasi ticket_type
         $request->validate([
             'quantity' => 'required|integer|min:1',
-            'ticket_type' => 'required|in:offline,online' 
+            'ticket_type' => 'required|in:offline,online'
         ]);
 
         $user = Auth::user();
@@ -273,9 +273,26 @@ class CheckoutController extends Controller
         return "Status LUNAS. " . $transaction->quantity . " Tiket berhasil dicetak ke database & Email dikirim!";
     }
 
+    // ==========================================
+    // FUNGSI UNTUK MELIHAT RIWAYAT PESANAN (TIKET & SPONSOR)
+    // ==========================================
     public function history()
     {
-        $transactions = Transaction::with('event')->where('user_id', Auth::id())->orderBy('created_at', 'desc')->get();
-        return view('transactions.history', compact('transactions'));
+        $userId = \Illuminate\Support\Facades\Auth::id();
+
+        // 1. Ambil riwayat pembelian tiket
+        $ticketTransactions = \App\Models\Transaction::with('event')
+            ->where('user_id', $userId)
+            ->latest()
+            ->get();
+
+        // 2. Ambil riwayat pengajuan sponsorship
+        $sponsorshipTransactions = \App\Models\SponsorshipTransaction::with('sponsorship.event')
+            ->where('user_id', $userId)
+            ->latest()
+            ->get();
+
+        // 3. Tampilkan ke halaman riwayat
+        return view('history', compact('ticketTransactions', 'sponsorshipTransactions'));
     }
 }
