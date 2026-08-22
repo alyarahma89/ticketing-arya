@@ -9,81 +9,62 @@ use App\Models\User;
 use App\Models\Revenue;
 use App\Models\Category;
 use App\Models\Sponsorship;
-use App\Models\SponsorshipTransaction; // <-- PERBAIKAN: Menambahkan model ini
+use App\Models\SponsorshipTransaction;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Auth;
 
 class AdminEventController extends Controller
 {
-    public function dashboard()
+    // ==========================================
+    // FUNGSI DASHBOARD (STATISTIK OTOMATIS & FILTER TAHUN)
+    // ==========================================
+    public function dashboard(Request $request)
     {
         $user = Auth::user();
 
-        // 1. KITA BUAT PERSIAPAN PENGAMBILAN DATA
-        $queryEvent = Event::query();
-        $queryTransaction = Transaction::where('payment_status', 'paid');
-        $queryRevenue = Revenue::query();
+        $selectedYear = $request->input('year', 2026);
 
-        // PERBAIKAN FINAL: Ambil transaksi yang statusnya DITERIMA & SUDAH LUNAS
+        $queryEvent = Event::whereYear('event_date', $selectedYear);
+
+        $queryTransaction = Transaction::whereIn('payment_status', ['paid', 'success', 'settlement'])
+                                       ->whereYear('created_at', $selectedYear);
+
         $querySponsorApproved = SponsorshipTransaction::where('status', 'approved')
-                                    ->where('payment_status', 'paid') // <-- TAMBAHAN BARU
+                                    ->where('payment_status', 'paid')
+                                    ->whereYear('created_at', $selectedYear)
                                     ->with('sponsorship');
 
-        // 2. GERBANG LOGIKA ISOLASI: JIKA EO, KUNCI DATANYA HANYA UNTUK DIA
         if ($user->role === 'eo') {
-            // Hanya ambil event milik EO ini
             $queryEvent->where('user_id', $user->id);
 
-            // Hanya ambil transaksi tiket untuk event milik EO ini
             $queryTransaction->whereHas('event', function ($q) use ($user) {
                 $q->where('user_id', $user->id);
             });
 
-            // Hanya ambil pendapatan tiket dari event milik EO ini
-            $queryRevenue->whereHas('event', function ($q) use ($user) {
-                $q->where('user_id', $user->id);
-            });
-
-            // Hanya ambil transaksi sponsor yang terhubung ke event milik EO ini
             $querySponsorApproved->whereHas('sponsorship.event', function ($q) use ($user) {
                 $q->where('user_id', $user->id);
             });
         }
 
-        // 3. EKSEKUSI PENGHITUNGAN KARTU STATISTIK
         $eventAktif = $queryEvent->count();
-        $tiketTerjual = $queryTransaction->sum('quantity');
-        $totalPendapatan = $queryRevenue->sum('amount');
+        $tiketTerjual = (clone $queryTransaction)->sum('quantity');
+        $totalPendapatan = (clone $queryTransaction)->sum('total_amount');
 
-        // PERBAIKAN: Menjumlahkan harga sponsor HANYA dari pengajuan yang disetujui dan lunas
         $pendapatanSponsor = $querySponsorApproved->get()->sum(function ($transaction) {
             return $transaction->sponsorship->price ?? 0;
         });
 
-        // Mengambil 5 event terakhir
         $activeEvents = $queryEvent->latest()->take(5)->get();
 
-        // Khusus untuk jumlah pengguna
         if ($user->role === 'eo') {
-            $totalPengguna = Transaction::whereHas('event', function ($q) use ($user) {
-                $q->where('user_id', $user->id);
-            })->distinct('user_id')->count('user_id');
+            $totalPengguna = (clone $queryTransaction)->distinct('user_id')->count('user_id');
         } else {
-            $totalPengguna = User::count();
+            $totalPengguna = User::whereYear('created_at', $selectedYear)->count();
         }
 
-        // 4. EKSEKUSI DATA GRAFIK (Dengan filter yang sama)
-
-        // A. Grafik Penjualan Bulanan
-        $salesQuery = Revenue::whereYear('created_at', 2026);
-        if ($user->role === 'eo') {
-            $salesQuery->whereHas('event', function ($q) use ($user) {
-                $q->where('user_id', $user->id);
-            });
-        }
-
-        $monthlySales = $salesQuery->select(DB::raw('MONTH(created_at) as month'), DB::raw('SUM(amount) as total'))
+        $monthlySales = clone $queryTransaction;
+        $monthlySales = $monthlySales->select(DB::raw('MONTH(created_at) as month'), DB::raw('SUM(total_amount) as total'))
             ->groupBy('month')
             ->pluck('total', 'month')
             ->toArray();
@@ -93,10 +74,10 @@ class AdminEventController extends Controller
             $salesData[] = isset($monthlySales[$i]) ? $monthlySales[$i] / 1000000 : 0;
         }
 
-        // B. Grafik Proporsi Kategori
         $categoryQuery = Event::join('transactions', 'events.id', '=', 'transactions.event_id')
             ->join('categories', 'events.category_id', '=', 'categories.id')
-            ->where('transactions.payment_status', 'paid');
+            ->whereIn('transactions.payment_status', ['paid', 'success', 'settlement'])
+            ->whereYear('transactions.created_at', $selectedYear);
 
         if ($user->role === 'eo') {
             $categoryQuery->where('events.user_id', $user->id);
@@ -107,7 +88,6 @@ class AdminEventController extends Controller
             ->pluck('total', 'category_name')
             ->toArray();
 
-        // 5. KIRIM DATA KE HALAMAN VIEW
         return view('admin.dashboard', compact(
             'totalPendapatan',
             'tiketTerjual',
@@ -116,54 +96,85 @@ class AdminEventController extends Controller
             'pendapatanSponsor',
             'salesData',
             'categoryData',
-            'activeEvents'
+            'activeEvents',
+            'selectedYear'
         ));
     }
 
-
     // ==========================================
-    // FUNGSI UNTUK MANAJEMEN EVENT
+    // FUNGSI MENAMPILKAN DAFTAR EVENT (DENGAN SEARCH & FILTER)
     // ==========================================
-    public function index()
+    public function index(Request $request)
     {
         $user = Auth::user();
 
+        $query = Event::with('category');
+
         if ($user->role === 'eo') {
-            $events = Event::with('category')->where('user_id', $user->id)->get();
-        } else {
-            $events = Event::with('category')->get();
+            $query->where('user_id', $user->id);
         }
 
+        if ($request->has('search') && $request->search != '') {
+            $search = $request->search;
+            $query->where(function($q) use ($search) {
+                $q->where('name', 'like', '%' . $search . '%')
+                  ->orWhere('location', 'like', '%' . $search . '%');
+            });
+        }
+
+        if ($request->has('status') && $request->status != '') {
+            $sekarang = \Carbon\Carbon::now();
+
+            if ($request->status === 'active') {
+                $query->where('event_date', '>=', $sekarang);
+            } elseif ($request->status === 'inactive') {
+                $query->where('event_date', '<', $sekarang);
+            }
+        }
+
+        $events = $query->latest()->get();
         $sponsorships = Sponsorship::all();
 
         return view('admin.events.index', compact('events', 'sponsorships'));
     }
 
+    // ==========================================
+    // FUNGSI MENAMPILKAN FORM TAMBAH EVENT
+    // ==========================================
     public function create()
     {
         $categories = Category::all();
         return view('admin.events.create', compact('categories'));
     }
 
+    // ==========================================
+    // FUNGSI MENYIMPAN EVENT BARU (STORE)
+    // ==========================================
     public function store(Request $request)
     {
         $validated = $request->validate([
             'name' => 'required|string|max:255',
             'category_id' => 'required|exists:categories,id',
-            'location' => 'required|string|max:255',
+            'location' => 'nullable|string|max:255',
             'event_date' => 'required|date',
-            'price' => 'required|numeric|min:0',
+            'price' => 'nullable|numeric|min:0',
             'online_price' => 'nullable|numeric|min:0',
             'quota' => 'required|numeric|min:1',
             'description' => 'required|string',
             'image' => 'nullable|image|mimes:jpeg,png,jpg|max:2048',
             'youtube_link' => 'nullable|url|max:255',
+            'galleries.*' => 'nullable|image|mimes:jpeg,png,jpg|max:2048',
+            'secret_code' => 'nullable|string|max:255', // <-- INI YANG BARU KITA TAMBAHKAN
         ]);
 
-        $kategoriDipilih = Category::find($request->category_id);
-        $hybridCategories = ['LIVE CONCERT', 'WORKSHOP', 'STAND UP COMEDY'];
+        $validated['user_id'] = Auth::id();
 
-        if ($kategoriDipilih && !in_array(strtoupper($kategoriDipilih->name), $hybridCategories)) {
+        if (!$request->has('is_offline')) {
+            $validated['location'] = null;
+            $validated['price'] = 0;
+        }
+
+        if (!$request->has('is_online')) {
             $validated['youtube_link'] = null;
             $validated['online_price'] = 0;
         }
@@ -172,11 +183,25 @@ class AdminEventController extends Controller
             $validated['image'] = $request->file('image')->store('event-posters', 'public');
         }
 
-        Event::create($validated);
+        // Karena 'secret_code' sudah divalidasi, ia akan otomatis ikut tersimpan di sini
+        $event = Event::create($validated);
+
+        if ($request->hasFile('galleries')) {
+            foreach ($request->file('galleries') as $file) {
+                $path = $file->store('event-galleries', 'public');
+                \App\Models\Gallery::create([
+                    'event_id' => $event->id,
+                    'image'    => $path
+                ]);
+            }
+        }
 
         return redirect()->route('admin.events.index')->with('success', 'Event baru berhasil ditambahkan!');
     }
 
+    // ==========================================
+    // FUNGSI MENAMPILKAN FORM EDIT EVENT
+    // ==========================================
     public function edit($id)
     {
         $event = Event::findOrFail($id);
@@ -185,6 +210,9 @@ class AdminEventController extends Controller
         return view('admin.events.edit', compact('event', 'categories'));
     }
 
+    // ==========================================
+    // FUNGSI MENYIMPAN PERUBAHAN EVENT (UPDATE)
+    // ==========================================
     public function update(Request $request, $id)
     {
         $event = Event::findOrFail($id);
@@ -192,20 +220,24 @@ class AdminEventController extends Controller
         $validated = $request->validate([
             'name' => 'required|string|max:255',
             'category_id' => 'required|exists:categories,id',
-            'location' => 'required|string|max:255',
+            'location' => 'nullable|string|max:255',
             'event_date' => 'required|date',
-            'price' => 'required|numeric|min:0',
+            'price' => 'nullable|numeric|min:0',
             'online_price' => 'nullable|numeric|min:0',
             'quota' => 'required|numeric|min:1',
             'description' => 'required|string',
             'image' => 'nullable|image|mimes:jpeg,png,jpg|max:2048',
             'youtube_link' => 'nullable|url|max:255',
+            'galleries.*' => 'nullable|image|mimes:jpeg,png,jpg|max:2048',
+            'secret_code' => 'nullable|string|max:255', // <-- INI YANG BARU KITA TAMBAHKAN
         ]);
 
-        $kategoriDipilih = Category::find($request->category_id);
-        $hybridCategories = ['LIVE CONCERT', 'WORKSHOP', 'STAND UP COMEDY'];
+        if (!$request->has('is_offline')) {
+            $validated['location'] = null;
+            $validated['price'] = 0;
+        }
 
-        if ($kategoriDipilih && !in_array(strtoupper($kategoriDipilih->name), $hybridCategories)) {
+        if (!$request->has('is_online')) {
             $validated['youtube_link'] = null;
             $validated['online_price'] = 0;
         }
@@ -217,11 +249,25 @@ class AdminEventController extends Controller
             $validated['image'] = $request->file('image')->store('event-posters', 'public');
         }
 
+        // Karena 'secret_code' sudah divalidasi, ia akan otomatis ikut diperbarui di sini
         $event->update($validated);
+
+        if ($request->hasFile('galleries')) {
+            foreach ($request->file('galleries') as $file) {
+                $path = $file->store('event-galleries', 'public');
+                \App\Models\Gallery::create([
+                    'event_id' => $event->id,
+                    'image'    => $path
+                ]);
+            }
+        }
 
         return redirect()->route('admin.events.index')->with('success', 'Data event berhasil diperbarui!');
     }
 
+    // ==========================================
+    // FUNGSI MENGHAPUS EVENT (DESTROY)
+    // ==========================================
     public function destroy($id)
     {
         $event = Event::findOrFail($id);
@@ -235,6 +281,9 @@ class AdminEventController extends Controller
         return redirect()->route('admin.events.index')->with('success', 'Data event berhasil dihapus!');
     }
 
+    // ==========================================
+    // FUNGSI LAINNYA
+    // ==========================================
     public function byCategory($id)
     {
         $category = Category::findOrFail($id);

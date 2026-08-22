@@ -5,18 +5,59 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Models\Sponsorship;
 use App\Models\Event;
+use Illuminate\Support\Facades\Auth;
 
 class SponsorshipController extends Controller
 {
-    // ==========================================
-    // FUNGSI MENAMPILKAN DAFTAR SPONSOR (INDEX)
-    // ==========================================
-    public function index()
-    {
-        // Mengambil semua data sponsorship beserta data event yang terelasi, diurutkan dari yang terbaru
-        $sponsorships = Sponsorship::with('event')->latest()->get();
 
-        // Mengarahkan ke file resources/views/admin/sponsorships/index.blade.php
+    // ==========================================
+    // FUNGSI MENAMPILKAN DAFTAR SPONSORSHIP (DENGAN PENCARIAN & FILTER)
+    // ==========================================
+    public function index(Request $request)
+    {
+        $user = Auth::user();
+
+        // 1. Siapkan query dasar dengan relasi event
+        $query = \App\Models\Sponsorship::with('event');
+
+        // 2. Batasi khusus EO (Hanya lihat paket sponsor dari event miliknya)
+        if ($user->role === 'eo') {
+            $query->whereHas('event', function ($q) use ($user) {
+                $q->where('user_id', $user->id);
+            });
+        }
+
+        // 3. MESIN PENCARI (Berdasarkan Nama Paket atau Nama Event)
+        if ($request->has('search') && $request->search != '') {
+            $search = $request->search;
+            $query->where(function($q) use ($search) {
+                $q->where('name', 'like', '%' . $search . '%')
+                  ->orWhereHas('event', function($eq) use ($search) {
+                      $eq->where('name', 'like', '%' . $search . '%');
+                  });
+            });
+        }
+
+        // 4. MESIN FILTER STATUS (Berdasarkan Event Aktif vs Selesai)
+        if ($request->has('status') && $request->status != '') {
+            $sekarang = \Carbon\Carbon::now(); // Waktu saat ini
+
+            if ($request->status === 'active') {
+                // Tampilkan paket yang event-nya masih di masa depan
+                $query->whereHas('event', function($eq) use ($sekarang) {
+                    $eq->where('event_date', '>=', $sekarang);
+                });
+            } elseif ($request->status === 'inactive') {
+                // Tampilkan paket yang event-nya sudah berlalu
+                $query->whereHas('event', function($eq) use ($sekarang) {
+                    $eq->where('event_date', '<', $sekarang);
+                });
+            }
+        }
+
+        // 5. Eksekusi query (Urutkan dari yang terbaru)
+        $sponsorships = $query->latest()->get();
+
         return view('admin.sponsorships.index', compact('sponsorships'));
     }
 
@@ -25,8 +66,14 @@ class SponsorshipController extends Controller
     // ==========================================
     public function create()
     {
-        // Mengambil semua data event untuk ditampilkan di pilihan dropdown
-        $events = Event::all();
+        $user = Auth::user();
+
+        if ($user->role === 'eo') {
+            // Jika EO, hanya tampilkan event miliknya di pilihan dropdown
+            $events = Event::where('user_id', $user->id)->get();
+        } else {
+            $events = Event::all();
+        }
 
         return view('admin.sponsorships.create', compact('events'));
     }
@@ -36,48 +83,6 @@ class SponsorshipController extends Controller
     // ==========================================
     public function store(Request $request)
     {
-        // 1. Validasi Inputan
-        $validated = $request->validate([
-            'event_id' => 'required|exists:events,id',
-            'name'     => 'required|string|max:255',
-            'price'    => 'required|numeric|min:0',
-            'benefits' => 'required|string',
-            'quota'    => 'required|integer|min:1',
-            'image'    => 'nullable|image|mimes:jpeg,png,jpg|max:2048', // Validasi file gambar
-        ]);
-
-        // 2. Proses Upload Gambar
-        if ($request->hasFile('image')) {
-            // Simpan gambar ke folder 'storage/app/public/sponsors'
-            $validated['image'] = $request->file('image')->store('sponsors', 'public');
-        }
-
-        // 3. Simpan ke database
-        Sponsorship::create($validated);
-
-        // 4. Redirect kembali dengan pesan sukses
-        return redirect()->route('admin.sponsorships.index')->with('success', 'Paket Sponsor berhasil ditambahkan!');
-    }
-
-    // ==========================================
-    // FUNGSI MENAMPILKAN FORM EDIT (EDIT) ---> INI YANG TADI HILANG!
-    // ==========================================
-    public function edit($id)
-    {
-        $sponsor = Sponsorship::findOrFail($id);
-        $events = Event::all(); // Untuk dropdown pilihan event
-
-        return view('admin.sponsorships.edit', compact('sponsor', 'events'));
-    }
-
-    // ==========================================
-    // FUNGSI MENYIMPAN PERUBAHAN (UPDATE) ---> INI JUGA TADI HILANG!
-    // ==========================================
-    public function update(Request $request, $id)
-    {
-        $sponsor = Sponsorship::findOrFail($id);
-
-        // 1. Validasi Inputan Baru
         $validated = $request->validate([
             'event_id' => 'required|exists:events,id',
             'name'     => 'required|string|max:255',
@@ -87,17 +92,85 @@ class SponsorshipController extends Controller
             'image'    => 'nullable|image|mimes:jpeg,png,jpg|max:2048',
         ]);
 
-        // 2. Proses Upload Gambar Baru (Jika admin ganti gambar)
-        if ($request->hasFile('image')) {
-            // Hapus gambar lama agar tidak menumpuk di memori
-            if ($sponsor->image && \Storage::disk('public')->exists($sponsor->image)) {
-                \Storage::disk('public')->delete($sponsor->image);
+        $user = Auth::user();
+
+        // PENGAMANAN EKSTRA UNTUK EO
+        if ($user->role === 'eo') {
+            $eventMilikEO = Event::where('id', $request->event_id)->where('user_id', $user->id)->first();
+            // Jika EO mencoba memasukkan ID event orang lain, sistem akan menolak
+            if (!$eventMilikEO) {
+                return back()->with('error', 'Akses ditolak! Anda hanya dapat menambah sponsor untuk event Anda sendiri.');
             }
-            // Simpan gambar baru
+        }
+
+        if ($request->hasFile('image')) {
             $validated['image'] = $request->file('image')->store('sponsors', 'public');
         }
 
-        // 3. Update Database
+        Sponsorship::create($validated);
+
+        return redirect()->route('admin.sponsorships.index')->with('success', 'Paket Sponsor berhasil ditambahkan!');
+    }
+
+    // ==========================================
+    // FUNGSI MENAMPILKAN FORM EDIT (EDIT)
+    // ==========================================
+    public function edit($id)
+    {
+        $sponsor = Sponsorship::findOrFail($id);
+        $user = Auth::user();
+
+        if ($user->role === 'eo') {
+            // Cegah EO mengedit sponsor milik event orang lain
+            if ($sponsor->event->user_id !== $user->id) {
+                return redirect()->route('admin.sponsorships.index')->with('error', 'Akses ditolak! Ini bukan paket sponsor Anda.');
+            }
+            // Hanya tampilkan event miliknya di dropdown
+            $events = Event::where('user_id', $user->id)->get();
+        } else {
+            $events = Event::all();
+        }
+
+        return view('admin.sponsorships.edit', compact('sponsor', 'events'));
+    }
+
+    // ==========================================
+    // FUNGSI MENYIMPAN PERUBAHAN (UPDATE)
+    // ==========================================
+    public function update(Request $request, $id)
+    {
+        $sponsor = Sponsorship::findOrFail($id);
+        $user = Auth::user();
+
+        // Cegah EO mengupdate sponsor milik event orang lain
+        if ($user->role === 'eo' && $sponsor->event->user_id !== $user->id) {
+            return redirect()->route('admin.sponsorships.index')->with('error', 'Akses ditolak!');
+        }
+
+        $validated = $request->validate([
+            'event_id' => 'required|exists:events,id',
+            'name'     => 'required|string|max:255',
+            'price'    => 'required|numeric|min:0',
+            'benefits' => 'required|string',
+            'quota'    => 'required|integer|min:1',
+            'image'    => 'nullable|image|mimes:jpeg,png,jpg|max:2048',
+        ]);
+
+        // Cegah EO memindahkan sponsor ini ke event milik orang lain
+        if ($user->role === 'eo') {
+            $eventMilikEO = Event::where('id', $request->event_id)->where('user_id', $user->id)->first();
+            if (!$eventMilikEO) {
+                return back()->with('error', 'Akses ditolak! Event tujuan tidak valid.');
+            }
+        }
+
+        if ($request->hasFile('image')) {
+            if ($sponsor->image && \Storage::disk('public')->exists($sponsor->image)) {
+                \Storage::disk('public')->delete($sponsor->image);
+            }
+            $validated['image'] = $request->file('image')->store('sponsors', 'public');
+        }
+
         $sponsor->update($validated);
 
         return redirect()->route('admin.sponsorships.index')->with('success', 'Paket Sponsor berhasil diperbarui!');
@@ -109,13 +182,17 @@ class SponsorshipController extends Controller
     public function destroy($id)
     {
         $sponsor = Sponsorship::findOrFail($id);
+        $user = Auth::user();
 
-        // Hapus gambar dari folder komputermu (jika ada) agar tidak penuh
+        // Cegah EO menghapus sponsor milik event orang lain
+        if ($user->role === 'eo' && $sponsor->event->user_id !== $user->id) {
+            return redirect()->route('admin.sponsorships.index')->with('error', 'Akses ditolak!');
+        }
+
         if ($sponsor->image && \Storage::disk('public')->exists($sponsor->image)) {
             \Storage::disk('public')->delete($sponsor->image);
         }
 
-        // Hapus datanya dari database
         $sponsor->delete();
 
         return redirect()->route('admin.sponsorships.index')->with('success', 'Paket Sponsor berhasil dihapus!');
@@ -126,10 +203,7 @@ class SponsorshipController extends Controller
     // ==========================================
     public function apply($id)
     {
-        // Mengambil data paket sponsor beserta event-nya
         $sponsorship = \App\Models\Sponsorship::with('event')->findOrFail($id);
-
-        // Menampilkan halaman form
         return view('sponsorship-apply', compact('sponsorship'));
     }
 
@@ -138,7 +212,6 @@ class SponsorshipController extends Controller
     // ==========================================
     public function submitApplication(Request $request, $id)
     {
-        // 1. Validasi data yang diisi perusahaan
         $request->validate([
             'company_name' => 'required|string|max:255',
             'company_email' => 'required|email|max:255',
@@ -146,7 +219,6 @@ class SponsorshipController extends Controller
             'message' => 'nullable|string',
         ]);
 
-        // 2. Simpan ke tabel sponsorship_transactions
         \App\Models\SponsorshipTransaction::create([
             'sponsorship_id' => $id,
             'user_id' => \Illuminate\Support\Facades\Auth::id(),
@@ -154,52 +226,67 @@ class SponsorshipController extends Controller
             'company_email' => $request->company_email,
             'company_phone' => $request->company_phone,
             'message' => $request->message,
-            'status' => 'pending', // Status otomatis pending (menunggu persetujuan EO)
+            'status' => 'pending',
         ]);
 
-        // 3. Arahkan kembali ke beranda dengan pesan sukses
         return redirect('/')->with('success', 'Pengajuan sponsorship berhasil dikirim! Silakan tunggu EO menghubungi Anda.');
     }
 
+
     // ==========================================
-    // FUNGSI UNTUK MENAMPILKAN DAFTAR PENGAJUAN (DI DASBOR EO/ADMIN)
+    // FUNGSI MENAMPILKAN PENGAJUAN SPONSOR MASUK (DENGAN PENCARIAN)
     // ==========================================
-    public function requests()
+    public function requests(Request $request)
     {
-        $user = \Illuminate\Support\Facades\Auth::user();
+        $user = Auth::user();
 
-        // Mulai query untuk mengambil data transaksi pengajuan beserta relasinya
-        $query = \App\Models\SponsorshipTransaction::with(['sponsorship.event', 'user'])->latest();
+        // 1. Siapkan query dasar
+        // Asumsi nama Modelnya adalah SponsorshipTransaction atau SponsorshipRequest, sesuaikan jika berbeda.
+        $query = \App\Models\SponsorshipTransaction::with(['sponsorship.event']);
 
-        // Jika yang login adalah EO, pastikan dia hanya melihat pengajuan untuk event miliknya
+        // 2. Batasi khusus EO (Hanya lihat pengajuan untuk event miliknya)
         if ($user->role === 'eo') {
             $query->whereHas('sponsorship.event', function ($q) use ($user) {
                 $q->where('user_id', $user->id);
             });
         }
 
-        $requests = $query->get();
+        // 3. MESIN PENCARI (Berdasarkan Nama Perusahaan, Email, atau Nama Event)
+        if ($request->has('search') && $request->search != '') {
+            $search = $request->search;
+            $query->where(function($q) use ($search) {
+                $q->where('company_name', 'like', '%' . $search . '%')
+                  ->orWhere('company_email', 'like', '%' . $search . '%')
+                  ->orWhereHas('sponsorship.event', function($eq) use ($search) {
+                      $eq->where('name', 'like', '%' . $search . '%');
+                  });
+            });
+        }
+
+        // 4. Eksekusi query (Urutkan dari yang terbaru)
+        $requests = $query->latest()->get();
 
         return view('admin.sponsorships.requests', compact('requests'));
     }
 
     // ==========================================
-    // FUNGSI UNTUK MENGUBAH STATUS PENGAJUAN (TERIMA/TOLAK)
-    // ==========================================
-    // ==========================================
     // FUNGSI UNTUK MENGUBAH STATUS ATAU PEMBAYARAN PENGAJUAN
     // ==========================================
-    public function updateStatus(\Illuminate\Http\Request $request, $id)
+    public function updateStatus(Request $request, $id)
     {
         $transaction = \App\Models\SponsorshipTransaction::findOrFail($id);
+        $user = Auth::user();
 
-        // Jika EO mengubah status (Terima/Tolak)
+        // Keamanan ekstra: Cegah EO merubah status pengajuan event orang lain
+        if ($user->role === 'eo' && $transaction->sponsorship->event->user_id !== $user->id) {
+            return back()->with('error', 'Akses ditolak!');
+        }
+
         if ($request->has('status')) {
             $request->validate(['status' => 'required|in:pending,approved,rejected']);
             $transaction->update(['status' => $request->status]);
         }
 
-        // Jika EO menekan tombol "Tandai Lunas"
         if ($request->has('payment_status')) {
             $request->validate(['payment_status' => 'required|in:unpaid,paid']);
             $transaction->update(['payment_status' => $request->payment_status]);

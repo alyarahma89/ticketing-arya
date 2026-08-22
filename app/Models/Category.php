@@ -9,8 +9,11 @@ class Category extends Model
 {
     use HasFactory;
 
-    // Mematikan syarat perlindungan agar semua kolom (seperti 'name') bisa diisi otomatis
-    protected $guarded = [];
+    // MENGGUNAKAN $fillable: Memberitahu sistem bahwa kolom ini aman dan boleh diisi otomatis
+    protected $fillable = [
+        'name',
+        'image',
+    ];
 
     // Relasi: Satu kategori bisa dimiliki oleh banyak event
     public function events()

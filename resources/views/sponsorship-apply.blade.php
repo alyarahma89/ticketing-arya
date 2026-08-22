@@ -1,46 +1,8 @@
-<!DOCTYPE html>
-<html lang="id" class="light">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Pengajuan Sponsor - {{ $sponsorship->name }}</title>
-    <link rel="icon" href="{{ asset('main_logo.png') }}" type="image/x-icon">
+@extends('layouts.main')
 
-    <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700;800;900&family=Exo+2:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-    <script src="https://unpkg.com/lucide@latest"></script>
+@section('title', 'Pengajuan Sponsor - ' . $sponsorship->name . ' | ARTIX ID')
 
-    <script>
-        tailwind.config = {
-            darkMode: 'class',
-            theme: {
-                extend: {
-                    fontFamily: {
-                        'montserrat': ['Montserrat', 'sans-serif'],
-                        'exo': ['"Exo 2"', 'sans-serif'],
-                    }
-                }
-            }
-        }
-    </script>
-    <style>
-        body { font-family: 'Exo 2', sans-serif; transition: background-color 0.3s ease, color 0.3s ease; }
-    </style>
-</head>
-<body class="bg-[#F8FAFC] text-slate-900 dark:bg-[#041B4A] dark:text-white min-h-screen">
-
-    <!-- Navbar Sederhana -->
-    <nav class="bg-white/90 dark:bg-[#041B4A]/90 backdrop-blur-md border-b border-slate-200 dark:border-white/10 fixed top-0 inset-x-0 z-50">
-        <div class="max-w-5xl mx-auto px-6 h-20 flex items-center justify-between">
-            <a href="{{ url('/') }}" class="flex items-center">
-                <img src="{{ asset('logo_hitam.png') }}" class="h-8 block dark:hidden" alt="ARTIX ID">
-                <img src="{{ asset('logo_putih.png') }}" class="h-8 hidden dark:block" alt="ARTIX ID">
-            </a>
-            <a href="{{ url()->previous() }}" class="text-sm font-bold text-slate-500 hover:text-[#0066FF] dark:text-white/60 dark:hover:text-white flex items-center gap-2">
-                Batal & Kembali
-            </a>
-        </div>
-    </nav>
+@section('content')
 
     <div class="max-w-5xl mx-auto px-6 pt-32 pb-16">
         <div class="text-center mb-10">
@@ -130,6 +92,4 @@
         </div>
     </div>
 
-    <script>lucide.createIcons();</script>
-</body>
-</html>
+@endsection

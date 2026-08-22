@@ -129,28 +129,31 @@
         }
 
         function onScanSuccess(decodedText, decodedResult) {
+            // Cegah scan berulang-ulang dengan cepat
             if(isScanning) return;
             isScanning = true;
 
             showResult('loading', '');
 
-            fetch('/check-in-process', {
+            // PERUBAHAN: Mengarah ke route yang benar dan mengirim ticket_code
+            fetch('{{ route('panitia.scanner.process') }}', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
                     'X-CSRF-TOKEN': csrfToken
                 },
-                body: JSON.stringify({ order_id: decodedText })
+                body: JSON.stringify({ ticket_code: decodedText }) // Mengirim kode tiket, bukan struk
             })
             .then(response => response.json())
             .then(data => {
-                if(data.success) {
-                    showResult('success', `${data.message}<br><span class="text-emerald-900 font-semibold mt-1 block">Peserta: ${data.participant_name}</span>`);
+                // PERUBAHAN: Mengecek data.status sesuai balasan Controller
+                if(data.status === 'success') {
+                    showResult('success', data.message);
                 } else {
                     showResult('error', data.message);
                 }
 
-                // Sembunyikan notifikasi setelah 3 detik
+                // Sembunyikan notifikasi setelah 3 detik dan izinkan scan lagi
                 setTimeout(() => {
                     isScanning = false;
                     resultBox.classList.add('translate-y-2', 'opacity-0');
@@ -159,7 +162,7 @@
             })
             .catch(error => {
                 console.error('Error:', error);
-                showResult('error', 'Terjadi kesalahan sistem. Coba lagi.');
+                showResult('error', 'Terjadi kesalahan sistem atau jaringan. Coba lagi.');
                 isScanning = false;
             });
         }

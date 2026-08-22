@@ -94,15 +94,16 @@
             <div class="p-8 sm:p-10">
                 <!-- Header Logo & Teks -->
                 <div class="text-center mb-8">
-                    <div class="flex justify-center mb-6">
-                        <!-- Logo Hitam untuk Mode Terang -->
-                        <img src="{{ asset('logo_hitam.png') }}" alt="ARTIX ID Logo" class="h-10 object-contain block dark:hidden">
-                        <!-- Logo Putih untuk Mode Gelap -->
-                        <img src="{{ asset('logo_putih.png') }}" alt="ARTIX ID Logo" class="h-10 object-contain hidden dark:block" style="filter: drop-shadow(0px 0px 8px rgba(0, 102, 255, 0.4));">
-                    </div>
-                    <h3 class="text-2xl font-black font-montserrat text-slate-900 dark:text-white tracking-tight mb-2">Selamat Datang!</h3>
-                    <p class="text-sm font-medium text-slate-500 dark:text-white/50">Silakan masuk untuk melanjutkan akses ke ekosistem event Anda.</p>
+                <div class="flex justify-center mb-6">
+                    <!-- Logo Hitam untuk Mode Terang (Diperbesar menjadi h-16) -->
+                    <img src="{{ asset('logo_hitam.png') }}" alt="ARTIX ID Logo" class="h-16 w-auto object-contain block dark:hidden">
+
+                    <!-- Logo Putih untuk Mode Gelap (Diperbesar menjadi h-16) -->
+                    <img src="{{ asset('logo_putih.png') }}" alt="ARTIX ID Logo" class="h-16 w-auto object-contain hidden dark:block" style="filter: drop-shadow(0px 0px 8px rgba(0, 102, 255, 0.4));">
                 </div>
+                <h3 class="text-2xl font-black font-montserrat text-slate-900 dark:text-white tracking-tight mb-2">Selamat Datang!</h3>
+                <p class="text-sm font-medium text-slate-500 dark:text-white/50">Silakan masuk untuk melanjutkan akses ke ekosistem event Anda.</p>
+            </div>
 
                 <!-- Notifikasi Session -->
                 @if (session('status'))

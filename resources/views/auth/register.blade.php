@@ -6,7 +6,6 @@
     <title>Daftar Akun | ARTIX ID</title>
     <link rel="icon" href="{{ asset('main_logo.png') }}" type="image/x-icon">
 
-
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
 
@@ -57,16 +56,16 @@
 
         /* Animasi transisi form panitia */
         #staff_section {
-            transition: max-height 0.4s ease-in-out, opacity 0.4s ease-in-out, margin 0.3s ease;
+            transition: max-height 0.5s ease-in-out, opacity 0.4s ease-in-out, margin 0.3s ease;
             max-height: 0;
             opacity: 0;
             overflow: hidden;
             margin-top: 0;
         }
         #staff_section.show {
-            max-height: 200px;
+            max-height: 400px; /* Diperbesar agar muat dropdown */
             opacity: 1;
-            margin-top: 1.25rem; /* setara mt-5 */
+            margin-top: 1.25rem;
         }
     </style>
 </head>
@@ -85,14 +84,11 @@
         <div class="absolute rounded-full opacity-15 dark:opacity-10" style="width: 400px; height: 400px; bottom: -10%; right: -5%; background: #A100FF; filter: blur(100px); animation: orb2 10s ease-in-out infinite 2s;"></div>
     </div>
 
-    <!-- ── NAVIGASI ATAS (KEMBALI & TEMA) ── -->
+    <!-- ── NAVIGASI ATAS ── -->
     <div class="relative z-20 w-full max-w-7xl mx-auto px-6 py-6 flex justify-between items-center">
-        <!-- Tombol Kembali ke Beranda -->
         <a href="{{ url('/') }}" class="inline-flex items-center gap-2 text-sm font-bold text-slate-500 hover:text-[#0066FF] dark:text-white/60 dark:hover:text-white transition-colors">
             <i data-lucide="arrow-left" class="w-4 h-4"></i> Beranda
         </a>
-
-        <!-- Tombol Toggle Tema -->
         <button id="theme-toggle" class="p-2.5 rounded-full text-slate-500 bg-white border border-slate-200 shadow-sm hover:text-[#0066FF] dark:bg-white/10 dark:border-white/10 dark:text-white/70 dark:hover:text-white transition-all focus:outline-none">
             <i id="theme-icon" data-lucide="moon" class="w-4 h-4"></i>
         </button>
@@ -100,35 +96,42 @@
 
     <!-- ── KONTEN DAFTAR ── -->
     <div class="flex-1 flex items-center justify-center p-6 relative z-10 py-10">
-
-        <!-- Card Container -->
         <div class="w-full max-w-lg rounded-[24px] border shadow-2xl relative overflow-hidden transition-colors duration-300 bg-white border-slate-200 dark:bg-[#041B4A]/80 dark:border-[#1E2A4D] dark:backdrop-blur-xl">
-
-            <!-- Hiasan Garis Atas -->
             <div class="absolute top-0 left-0 right-0 h-1.5 bg-gradient-to-r from-[#0066FF] to-[#00C2FF]"></div>
 
             <div class="p-8 sm:p-10">
                 <!-- Header Logo & Teks -->
-                <div class="text-center mb-8">
+                <div class="text-center mb-6">
                     <div class="flex justify-center mb-6">
                         <!-- Logo Hitam untuk Mode Terang -->
-                        <img src="{{ asset('logo_hitam.png') }}" alt="ARTIX ID Logo" class="h-10 object-contain block dark:hidden">
+                        <img src="{{ asset('logo_hitam.png') }}" alt="ARTIX ID Logo" class="h-16 w-auto object-contain block dark:hidden">
                         <!-- Logo Putih untuk Mode Gelap -->
-                        <img src="{{ asset('logo_putih.png') }}" alt="ARTIX ID Logo" class="h-10 object-contain hidden dark:block" style="filter: drop-shadow(0px 0px 8px rgba(0, 102, 255, 0.4));">
+                        <img src="{{ asset('logo_putih.png') }}" alt="ARTIX ID Logo" class="h-16 w-auto object-contain hidden dark:block" style="filter: drop-shadow(0px 0px 8px rgba(0, 102, 255, 0.4));">
                     </div>
-                    <h3 class="text-2xl font-black font-montserrat text-slate-900 dark:text-white tracking-tight mb-2">Buat Akun Baru</h3>
-                    <p class="text-sm font-medium text-slate-500 dark:text-white/50">Daftar sekarang untuk mulai berburu tiket event seru.</p>
+                    <h3 class="text-2xl font-black font-montserrat text-slate-900 dark:text-white tracking-tight mb-2">Selamat Datang!</h3>
+                    <p class="text-sm font-medium text-slate-500 dark:text-white/50">Silakan isi formulir di bawah untuk bergabung dengan ARTIX ID.</p>
                 </div>
+
+                <!-- ── KOTAK NOTIFIKASI ERROR (PENTING) ── -->
+                @if ($errors->any())
+                    <div class="mb-6 p-4 bg-red-50 dark:bg-red-500/10 border border-red-200 dark:border-red-500/20 rounded-[12px] text-sm text-red-600 dark:text-red-400 font-medium flex items-start gap-3 shadow-sm">
+                        <i data-lucide="alert-triangle" class="w-5 h-5 shrink-0 mt-0.5"></i>
+                        <ul class="list-disc pl-4 space-y-1">
+                            @foreach ($errors->all() as $error)
+                                <li>{{ $error }}</li>
+                            @endforeach
+                        </ul>
+                    </div>
+                @endif
 
                 <!-- Form Register -->
                 <form method="POST" action="{{ route('register') }}">
                     @csrf
 
-                    <!-- PILIH JENIS AKUN (Styled Radio Buttons) -->
+                    <!-- PILIH JENIS AKUN -->
                     <div class="mb-6">
                         <label class="block text-[11px] font-bold uppercase tracking-widest text-slate-500 dark:text-white/50 mb-3">Pilih Jenis Akun</label>
                         <div class="flex gap-3">
-                            <!-- Tombol Pelanggan -->
                             <div class="flex-1">
                                 <input type="radio" name="account_type" id="type_user" value="user" class="peer hidden" checked onchange="toggleRole()">
                                 <label for="type_user" class="block w-full text-center py-3 px-3 rounded-[12px] border text-sm font-bold cursor-pointer transition-all shadow-sm
@@ -139,8 +142,6 @@
                                     Pelanggan
                                 </label>
                             </div>
-
-                            <!-- Tombol Panitia / EO -->
                             <div class="flex-1">
                                 <input type="radio" name="account_type" id="type_staff" value="staff" class="peer hidden" onchange="toggleRole()">
                                 <label for="type_staff" class="block w-full text-center py-3 px-3 rounded-[12px] border text-sm font-bold cursor-pointer transition-all shadow-sm
@@ -165,12 +166,8 @@
                                    placeholder="Masukkan nama lengkap Anda"
                                    class="w-full pl-11 pr-4 py-3.5 rounded-[12px] border text-sm font-bold focus:outline-none transition-all placeholder:font-medium placeholder:text-slate-400 dark:placeholder:text-white/30
                                           bg-slate-50 border-slate-200 text-slate-900 focus:border-[#0066FF] focus:bg-white focus:ring-4 focus:ring-[#0066FF]/10
-                                          dark:bg-[#0F1730] dark:border-[#1E2A4D] dark:text-white dark:focus:border-[#0066FF] dark:focus:bg-[#0F1730] dark:focus:ring-[#0066FF]/20
-                                          @error('name') border-red-500 focus:border-red-500 focus:ring-red-100 dark:border-red-500 @enderror">
+                                          dark:bg-[#0F1730] dark:border-[#1E2A4D] dark:text-white dark:focus:border-[#0066FF] dark:focus:bg-[#0F1730] dark:focus:ring-[#0066FF]/20">
                         </div>
-                        @error('name')
-                            <p class="text-red-500 dark:text-red-400 text-xs font-bold mt-2">{{ $message }}</p>
-                        @enderror
                     </div>
 
                     <!-- Input Email -->
@@ -184,15 +181,11 @@
                                    placeholder="contoh@email.com"
                                    class="w-full pl-11 pr-4 py-3.5 rounded-[12px] border text-sm font-bold focus:outline-none transition-all placeholder:font-medium placeholder:text-slate-400 dark:placeholder:text-white/30
                                           bg-slate-50 border-slate-200 text-slate-900 focus:border-[#0066FF] focus:bg-white focus:ring-4 focus:ring-[#0066FF]/10
-                                          dark:bg-[#0F1730] dark:border-[#1E2A4D] dark:text-white dark:focus:border-[#0066FF] dark:focus:bg-[#0F1730] dark:focus:ring-[#0066FF]/20
-                                          @error('email') border-red-500 focus:border-red-500 focus:ring-red-100 dark:border-red-500 @enderror">
+                                          dark:bg-[#0F1730] dark:border-[#1E2A4D] dark:text-white dark:focus:border-[#0066FF] dark:focus:bg-[#0F1730] dark:focus:ring-[#0066FF]/20">
                         </div>
-                        @error('email')
-                            <p class="text-red-500 dark:text-red-400 text-xs font-bold mt-2">{{ $message }}</p>
-                        @enderror
                     </div>
 
-                    <!-- Kolom Grup (Password & Konfirmasi) untuk Tampilan Desktop -->
+                    <!-- Grup Password -->
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-5 mb-2">
                         <!-- Input Password -->
                         <div>
@@ -202,26 +195,17 @@
                                     <i data-lucide="lock" class="w-5 h-5"></i>
                                 </div>
                                 <input id="password" type="password" name="password" required
-                                       placeholder="Minimal 8 karakter"
+                                       placeholder="Contoh: ArT1x_@2026!"
                                        class="w-full pl-11 pr-10 py-3.5 rounded-[12px] border text-sm font-bold focus:outline-none transition-all placeholder:font-medium placeholder:text-slate-400 dark:placeholder:text-white/30
                                               bg-slate-50 border-slate-200 text-slate-900 focus:border-[#0066FF] focus:bg-white focus:ring-4 focus:ring-[#0066FF]/10
-                                              dark:bg-[#0F1730] dark:border-[#1E2A4D] dark:text-white dark:focus:border-[#0066FF] dark:focus:bg-[#0F1730] dark:focus:ring-[#0066FF]/20
-                                              @error('password') border-red-500 focus:border-red-500 focus:ring-red-100 dark:border-red-500 @enderror">
-
-                                <!-- Toggle Button Password -->
+                                              dark:bg-[#0F1730] dark:border-[#1E2A4D] dark:text-white dark:focus:border-[#0066FF] dark:focus:bg-[#0F1730] dark:focus:ring-[#0066FF]/20">
                                 <button type="button" onclick="togglePassword('password', 'icon-pwd')" class="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 dark:text-white/40 dark:hover:text-white focus:outline-none p-1 transition-colors">
-                                    <svg id="icon-pwd" class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path>
-                                    </svg>
+                                    <i id="icon-pwd" data-lucide="eye" class="w-4 h-4"></i>
                                 </button>
                             </div>
-                            @error('password')
-                                <p class="text-red-500 dark:text-red-400 text-xs font-bold mt-2">{{ $message }}</p>
-                            @enderror
                         </div>
 
-                        <!-- Input Konfirmasi Password -->
+                        <!-- Konfirmasi Password -->
                         <div>
                             <label for="password_confirmation" class="block text-[11px] font-bold uppercase tracking-widest text-slate-500 dark:text-white/50 mb-2.5">Ulangi Sandi</label>
                             <div class="relative">
@@ -233,40 +217,57 @@
                                        class="w-full pl-11 pr-10 py-3.5 rounded-[12px] border text-sm font-bold focus:outline-none transition-all placeholder:font-medium placeholder:text-slate-400 dark:placeholder:text-white/30
                                               bg-slate-50 border-slate-200 text-slate-900 focus:border-[#0066FF] focus:bg-white focus:ring-4 focus:ring-[#0066FF]/10
                                               dark:bg-[#0F1730] dark:border-[#1E2A4D] dark:text-white dark:focus:border-[#0066FF] dark:focus:bg-[#0F1730] dark:focus:ring-[#0066FF]/20">
-
-                                <!-- Toggle Button Password Confirm -->
                                 <button type="button" onclick="togglePassword('password_confirmation', 'icon-pwd-confirm')" class="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 dark:text-white/40 dark:hover:text-white focus:outline-none p-1 transition-colors">
-                                    <svg id="icon-pwd-confirm" class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path>
-                                    </svg>
+                                    <i id="icon-pwd-confirm" data-lucide="eye" class="w-4 h-4"></i>
                                 </button>
                             </div>
                         </div>
                     </div>
 
-                    <!-- BAGIAN KODE RAHASIA PANITIA (Animasi Expand) -->
+                    <!-- Keterangan Syarat Password Keamanan Tinggi -->
+                    <p class="text-[10px] text-slate-500 dark:text-white/50 mt-2 mb-4 leading-relaxed font-medium">
+                        *Minimal 8 karakter, wajib mengandung huruf (Besar & kecil), angka, dan simbol (@, #, $, dll).
+                    </p>
+
+                    <!-- ── BAGIAN KHUSUS PANITIA (Animasi Expand) ── -->
                     <div id="staff_section">
                         <div class="p-5 rounded-[12px] border border-dashed transition-colors bg-blue-50/50 border-blue-200 dark:bg-[#0066FF]/10 dark:border-[#0066FF]/40">
-                            <label for="secret_code" class="flex items-center gap-2 text-[11px] font-bold uppercase tracking-widest text-blue-600 dark:text-[#00C2FF] mb-2.5">
-                                <i data-lucide="key" class="w-4 h-4"></i>
-                                Kode Akses EO
-                            </label>
-                            <input id="secret_code" type="text" name="secret_code" value="{{ old('secret_code') }}"
-                                   placeholder="Masukkan kode unik dari Admin"
-                                   class="w-full px-4 py-3 rounded-[12px] border text-sm font-bold focus:outline-none transition-all placeholder:font-medium placeholder:text-slate-400 dark:placeholder:text-white/30
-                                          bg-white border-blue-200 text-slate-900 focus:border-[#0066FF] focus:ring-4 focus:ring-[#0066FF]/10
-                                          dark:bg-[#0F1730] dark:border-[#0066FF]/40 dark:text-white dark:focus:border-[#00C2FF] dark:focus:ring-[#00C2FF]/20
-                                          @error('secret_code') border-red-500 focus:border-red-500 focus:ring-red-100 dark:border-red-500 @enderror">
-                            <p class="text-[11px] text-slate-500 dark:text-white/50 mt-2.5 leading-relaxed font-medium">
-                                *Wajib diisi agar akun divalidasi sebagai Penyelenggara Event (EO) untuk mengakses fitur Dashboard.
-                            </p>
-                            @error('secret_code')
-                                <p class="text-red-500 dark:text-red-400 text-xs font-bold mt-2">{{ $message }}</p>
-                            @enderror
+
+                            <!-- Dropdown Jabatan / Peran -->
+                            <div class="mb-4">
+                                <label for="role_type" class="flex items-center gap-2 text-[11px] font-bold uppercase tracking-widest text-blue-600 dark:text-[#00C2FF] mb-2.5">
+                                    <i data-lucide="badge-check" class="w-4 h-4"></i>
+                                    Peran / Jabatan
+                                </label>
+                                <select id="role_type" name="role_type"
+                                        class="w-full px-4 py-3 rounded-[12px] border text-sm font-bold focus:outline-none transition-all appearance-none cursor-pointer
+                                               bg-white border-blue-200 text-slate-900 focus:border-[#0066FF] focus:ring-4 focus:ring-[#0066FF]/10
+                                               dark:bg-[#0F1730] dark:border-[#0066FF]/40 dark:text-white dark:focus:border-[#00C2FF] dark:focus:ring-[#00C2FF]/20">
+                                    <option value="" disabled selected>Pilih peran Anda di Event ini</option>
+                                    <option value="eo">Penyelenggara Inti (EO / Admin Event)</option>
+                                    <option value="panitia_tiket">Petugas Scanner Tiket (Check-In)</option>
+                                    <option value="panitia_lapangan">Staff Lapangan / Keamanan</option>
+                                </select>
+                            </div>
+
+                            <!-- Input Kode Rahasia -->
+                            <div>
+                                <label for="secret_code" class="flex items-center gap-2 text-[11px] font-bold uppercase tracking-widest text-blue-600 dark:text-[#00C2FF] mb-2.5">
+                                    <i data-lucide="key" class="w-4 h-4"></i>
+                                    Kode Akses Event
+                                </label>
+                                <input id="secret_code" type="text" name="secret_code" value="{{ old('secret_code') }}"
+                                       placeholder="Minta kode akses pada pembuat Event"
+                                       class="w-full px-4 py-3 rounded-[12px] border text-sm font-bold focus:outline-none transition-all placeholder:font-medium placeholder:text-slate-400 dark:placeholder:text-white/30
+                                              bg-white border-blue-200 text-slate-900 focus:border-[#0066FF] focus:ring-4 focus:ring-[#0066FF]/10
+                                              dark:bg-[#0F1730] dark:border-[#0066FF]/40 dark:text-white dark:focus:border-[#00C2FF] dark:focus:ring-[#00C2FF]/20">
+                                <p class="text-[11px] text-slate-500 dark:text-white/50 mt-2.5 leading-relaxed font-medium">
+                                    *Kode ini akan mengaitkan akun Anda secara otomatis dengan Event terkait.
+                                </p>
+                            </div>
                         </div>
                     </div>
-                    <!-- AKHIR BAGIAN KODE RAHASIA -->
+                    <!-- AKHIR BAGIAN KHUSUS PANITIA -->
 
                     <!-- Tombol Submit -->
                     <button type="submit" class="w-full flex justify-center items-center gap-2 bg-[#0066FF] hover:bg-blue-700 text-white font-bold font-montserrat text-sm py-4 rounded-[12px] shadow-lg hover:shadow-blue-500/30 hover:-translate-y-0.5 transition-all duration-200 mt-6 mb-6 border border-[#0066FF]">
@@ -288,7 +289,6 @@
 
     <!-- Script Fungsionalitas -->
     <script>
-        // Mengaktifkan Ikon Lucide
         lucide.createIcons();
 
         // ── LOGIKA DARK MODE TOGGLE ──
@@ -298,8 +298,7 @@
 
         function toggleTheme() {
             const isDark = html.classList.toggle('dark');
-            const iconName = isDark ? 'sun' : 'moon';
-            themeIcon.setAttribute('data-lucide', iconName);
+            themeIcon.setAttribute('data-lucide', isDark ? 'sun' : 'moon');
             lucide.createIcons();
         }
         if(themeToggle) themeToggle.addEventListener('click', toggleTheme);
@@ -309,18 +308,14 @@
             const input = document.getElementById(inputId);
             const icon = document.getElementById(iconId);
 
-            // SVG Path Mata Terbuka
-            const eyeOpen = `<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path>`;
-            // SVG Path Mata Tertutup (Eye Slash)
-            const eyeClosed = `<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.88 9.88l-3.29-3.29m7.532 7.532l3.29 3.29M3 3l3.59 3.59m0 0A9.953 9.953 0 0112 5c4.478 0 8.268 2.943 9.543 7a10.025 10.025 0 01-4.132 5.411m0 0L21 21"></path>`;
-
             if (input.type === "password") {
                 input.type = "text";
-                icon.innerHTML = eyeClosed;
+                icon.setAttribute('data-lucide', 'eye-off');
             } else {
                 input.type = "password";
-                icon.innerHTML = eyeOpen;
+                icon.setAttribute('data-lucide', 'eye');
             }
+            lucide.createIcons();
         }
 
         // ── FUNGSI TOGGLE FORM KODE PANITIA ──
@@ -328,19 +323,21 @@
             const isStaff = document.getElementById('type_staff').checked;
             const staffSection = document.getElementById('staff_section');
             const secretCodeInput = document.getElementById('secret_code');
+            const roleTypeInput = document.getElementById('role_type');
 
             if (isStaff) {
                 staffSection.classList.add('show');
                 secretCodeInput.setAttribute('required', 'required');
+                roleTypeInput.setAttribute('required', 'required');
             } else {
                 staffSection.classList.remove('show');
                 secretCodeInput.removeAttribute('required');
-                // Hapus nilai (value) jika user berubah pikiran kembali ke pelanggan
+                roleTypeInput.removeAttribute('required');
                 secretCodeInput.value = '';
+                roleTypeInput.value = '';
             }
         }
 
-        // Inisialisasi saat pertama kali dimuat
         window.onload = function() {
             toggleRole();
         };

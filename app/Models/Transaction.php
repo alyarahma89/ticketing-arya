@@ -9,6 +9,7 @@ class Transaction extends Model
 {
     use HasFactory;
 
+    // Karena menggunakan array kosong, semua kolom baru otomatis diizinkan untuk diisi
     protected $guarded = [];
 
     // Relasi: Transaksi ini milik Event apa?
@@ -20,7 +21,7 @@ class Transaction extends Model
     // Relasi: Transaksi ini milik User siapa?
     public function user()
     {
-        return $this->belongsTo(User::class); // Pastikan model User ada bawaan Laravel
+        return $this->belongsTo(User::class);
     }
 
     // Relasi: Satu Transaksi bisa membuahkan banyak Tiket fisik/QR

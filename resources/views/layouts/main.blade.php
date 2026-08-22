@@ -1,294 +1,328 @@
 <!DOCTYPE html>
-<html lang="id">
+<html lang="id" class="light">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-    <title>TICKS ID | Ekosistem Event Terpadu</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>@yield('title', 'ARTIX ID | Integrated Event Ecosystem')</title>
+    <link rel="icon" href="{{ asset('main_logo.png') }}" type="image/x-icon">
 
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
 
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;14..32,400;14..32,500;14..32,600;14..32,700&family=Syne:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700;800;900&family=Exo+2:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+
+    <!-- Konfigurasi Tailwind untuk Dark Mode -->
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    fontFamily: {
+                        'montserrat': ['Montserrat', 'sans-serif'],
+                        'exo': ['"Exo 2"', 'sans-serif'],
+                    }
+                }
+            }
+        }
+    </script>
 
     <style>
-        /* ===== STRIPI-INSPIRED DESIGN SYSTEM (TICKS ID) ===== */
-        :root {
-            --primary: #696FC7;
-            --primary-deep: #3D365C;
-            --primary-press: #7C4585;
-            --primary-soft: #C95792;
-            --primary-subdued: #F8B55F;
-            --brand-dark: #1c1e54;
-            --ink: #0d253d;
-            --ink-secondary: #273951;
-            --ink-mute: #64748d;
-            --canvas: #ffffff;
-            --canvas-soft: #f6f9fc;
-            --canvas-cream: #f5e9d4;
-            --hairline: #e3e8ee;
-            --ruby: #ea2261;
-
-            --font-sans: 'Inter', system-ui, sans-serif;
-            --rounded-pill: 9999px;
-        }
-
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-
+        /* Pengaturan Dasar Transisi Mode */
         body {
-            font-family: var(--font-sans);
-            background: var(--canvas-soft);
-            color: var(--ink);
-            -webkit-font-smoothing: antialiased;
-            display: flex;
-            flex-direction: column;
-            min-height: 100vh;
+            font-family: 'Exo 2', sans-serif;
+            overflow-x: hidden;
+            transition: background-color 0.3s ease, color 0.3s ease;
         }
 
-        /* ─── GLOBAL NAVBAR (Bersih & Menyatu) ─── */
-        .site-nav {
-            background: transparent;
-            padding: 20px 0;
-            position: absolute; /* Agar background di bawahnya bisa naik ke atas */
-            top: 0; left: 0; right: 0;
-            z-index: 1030;
+        /* Animasi Bola Cahaya (Orb) */
+        @keyframes orb1 {
+            0%, 100% { transform: scale(1) translate(0,0); }
+            50% { transform: scale(1.15) translate(30px, -20px); }
         }
-        .nav-brand {
-            font-family: 'Syne', sans-serif;
-            font-weight: 800;
-            font-size: 24px;
-            letter-spacing: -0.5px;
-            color: #ffffff !important;
-            text-decoration: none;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-        .nav-links {
-            display: flex;
-            align-items: center;
-            gap: 20px;
-            list-style: none;
-            margin: 0;
-            padding: 0;
-        }
-        .nav-links a {
-            color: rgba(255,255,255,0.8);
-            text-decoration: none;
-            font-weight: 500;
-            font-size: 15px;
-            transition: color 0.2s;
-        }
-        .nav-links a:hover, .nav-links a.active {
-            color: var(--primary-subdued);
+        @keyframes orb2 {
+            0%, 100% { transform: scale(1) translate(0,0); }
+            50% { transform: scale(1.1) translate(-25px, 15px); }
         }
 
-        /* Tombol Navbar */
-        .btn-nav-login {
-            background: rgba(255,255,255,0.15);
-            color: #ffffff;
-            border: 1px solid rgba(255,255,255,0.2);
-            padding: 8px 20px;
-            border-radius: var(--rounded-pill);
-            font-weight: 500;
-            font-size: 14px;
-            text-decoration: none;
-            transition: all 0.2s;
-            backdrop-filter: blur(4px);
-        }
-        .btn-nav-login:hover { background: rgba(255,255,255,0.25); color: #fff; }
+        /* Custom Scrollbar Dinamis */
+        ::-webkit-scrollbar { width: 6px; }
+        html.light ::-webkit-scrollbar { background: #F1F5F9; }
+        html.light ::-webkit-scrollbar-thumb { background: #CBD5E1; border-radius: 3px; }
+        html.dark ::-webkit-scrollbar { background: #020C1F; }
+        html.dark ::-webkit-scrollbar-thumb { background: rgba(0,102,255,0.4); border-radius: 3px; }
 
-        .btn-nav-register {
-            background: var(--primary);
-            color: #ffffff;
-            border: none;
-            padding: 8px 24px;
-            border-radius: var(--rounded-pill);
-            font-weight: 600;
-            font-size: 14px;
-            text-decoration: none;
-            transition: all 0.2s;
-            box-shadow: 0 4px 12px rgba(105,111,199,0.3);
+        /* Utility Class untuk Teks Bergradien */
+        .text-gradient-dark {
+            background: linear-gradient(135deg, #214587 0%, #1e66d3 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
         }
-        .btn-nav-register:hover { background: var(--primary-press); color: #fff; transform: translateY(-1px); }
-
-        /* ─── GLOBAL FOOTER (Premium & Padat) ─── */
-        .site-footer {
-            background: var(--brand-dark);
-            color: rgba(255,255,255,0.7);
-            padding: 64px 0 24px;
-            margin-top: auto; /* Mendorong footer ke bawah jika konten sedikit */
-            border-top: 4px solid var(--primary);
+        .text-gradient-main {
+            background: linear-gradient(135deg,#ffffff 0%,#b8d4ff 60%,#00C2FF 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
         }
-        .footer-brand-title {
-            font-family: 'Syne', sans-serif;
-            font-weight: 800;
-            font-size: 24px;
-            color: #ffffff;
-            margin-bottom: 12px;
-            display: flex;
-            align-items: center;
-            gap: 10px;
+        .text-gradient-orange {
+            background: linear-gradient(135deg,#FF7A00,#FF3B30);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
         }
-        .footer-heading {
-            font-family: var(--font-sans);
-            font-weight: 600;
-            font-size: 13px;
-            text-transform: uppercase;
-            letter-spacing: 0.8px;
-            color: var(--primary-subdued);
-            margin-bottom: 20px;
+        .text-gradient-blue {
+            background: linear-gradient(135deg,#0066FF,#00C2FF);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
         }
-        .footer-links { list-style: none; padding: 0; margin: 0; }
-        .footer-links li { margin-bottom: 12px; }
-        .footer-links a {
-            color: rgba(255,255,255,0.6);
-            text-decoration: none;
-            font-size: 14px;
-            transition: color 0.2s;
-        }
-        .footer-links a:hover { color: #ffffff; }
-
-        /* Form Subscribe */
-        .newsletter-form { display: flex; margin-top: 16px; }
-        .newsletter-form input {
-            background: rgba(255,255,255,0.05);
-            border: 1px solid rgba(255,255,255,0.1);
-            color: white;
-            padding: 10px 16px;
-            border-radius: 50px 0 0 50px;
-            outline: none;
-            width: 100%;
-            font-size: 14px;
-        }
-        .newsletter-form input::placeholder { color: rgba(255,255,255,0.3); }
-        .newsletter-form button {
-            background: var(--primary);
-            color: white;
-            border: none;
-            padding: 10px 20px;
-            border-radius: 0 50px 50px 0;
-            font-weight: 600;
-            font-size: 13px;
-            transition: background 0.2s;
-        }
-        .newsletter-form button:hover { background: var(--primary-press); }
-
-        .footer-bottom {
-            border-top: 1px solid rgba(255,255,255,0.1);
-            margin-top: 48px;
-            padding-top: 24px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            flex-wrap: wrap;
-            gap: 16px;
-            font-size: 13px;
-            color: rgba(255,255,255,0.4);
-        }
-        .social-icons a {
-            color: rgba(255,255,255,0.6);
-            font-size: 18px;
-            margin-left: 16px;
-            transition: color 0.2s;
-        }
-        .social-icons a:hover { color: var(--primary-subdued); }
     </style>
-</head>
-<body>
-    
 
-    <nav class="site-nav">
-        <div class="container d-flex align-items-center justify-content-between">
-            <a href="{{ url('/') }}" class="nav-brand">
-                🎫 TICKS ID
+    <!-- Slot khusus jika halaman anak butuh style tambahan -->
+    @stack('styles')
+</head>
+<body class="bg-[#F8FAFC] text-slate-900 dark:bg-[#041B4A] dark:text-white flex flex-col min-h-screen relative">
+
+    <!-- ── DEFINISI GRADIEN UNTUK IKON SVG BRAND GUIDELINE ── -->
+    <svg width="0" height="0" class="hidden">
+        <defs>
+            <linearGradient id="grad-blue" x1="0%" y1="0%" x2="100%" y2="100%">
+                <stop offset="0%" stop-color="#0066FF" />
+                <stop offset="100%" stop-color="#00C2FF" />
+            </linearGradient>
+            <linearGradient id="grad-orange" x1="0%" y1="0%" x2="100%" y2="100%">
+                <stop offset="0%" stop-color="#FF3B30" />
+                <stop offset="100%" stop-color="#FFB000" />
+            </linearGradient>
+            <linearGradient id="grad-purple" x1="0%" y1="0%" x2="100%" y2="100%">
+                <stop offset="0%" stop-color="#A100FF" />
+                <stop offset="100%" stop-color="#0066FF" />
+            </linearGradient>
+        </defs>
+    </svg>
+
+    <!-- ── NAVBAR ──────────────────────────────────────── -->
+    <nav id="navbar" class="fixed top-0 inset-x-0 z-50 transition-all duration-300 bg-transparent border-transparent">
+        <div class="max-w-7xl mx-auto px-6 lg:px-10 flex items-center justify-between py-4">
+
+            <!-- Logo Dinamis -->
+            <a href="{{ url('/') }}" class="flex items-center shrink-0">
+                <img src="{{ asset('logo_hitam.png') }}" alt="ARTIX ID Logo Hitam" class="h-10 md:h-14 w-auto object-contain transition-all duration-300 block dark:hidden">
+                <img src="{{ asset('logo_putih.png') }}" alt="ARTIX ID Logo Putih" class="h-10 md:h-14 w-auto object-contain transition-all duration-300 hidden dark:block" style="filter: drop-shadow(0px 0px 8px rgba(0, 102, 255, 0.5));">
             </a>
 
-            <button class="navbar-toggler d-lg-none border-0 text-white" type="button" data-bs-toggle="collapse" data-bs-target="#navMain">
-                <i class="bi bi-list fs-1"></i>
-            </button>
-
-            <div class="collapse navbar-collapse d-lg-flex justify-content-end align-items-center gap-4" id="navMain">
-                <ul class="nav-links mt-3 mt-lg-0">
-                    <li><a href="{{ url('/') }}">Beranda</a></li>
-                    <li><a href="{{ url('/#packages') }}">Sponsorship</a></li>
-                    <li><a href="{{ url('/#event-list') }}">Daftar Event</a></li>
-                </ul>
-
-                <div class="d-flex align-items-center gap-2 mt-3 mt-lg-0">
-                    @auth
-                        <a href="{{ url('/dashboard') }}" class="btn-nav-register">📁 Buka Dashboard</a>
-                    @else
-                        <a href="{{ route('login') }}" class="btn-nav-login">Masuk</a>
-                        <a href="{{ route('register') }}" class="btn-nav-register">Daftar EO</a>
-                    @endauth
-                </div>
+            <!-- Desktop Links -->
+            <div class="hidden md:flex items-center gap-8">
+                <a href="{{ url('/') }}#event-list" class="text-sm font-bold transition-colors text-slate-600 hover:text-[#0066FF] dark:text-white/70 dark:hover:text-white">Event</a>
+                <a href="{{ url('/') }}#packages" class="text-sm font-bold transition-colors text-slate-600 hover:text-[#0066FF] dark:text-white/70 dark:hover:text-white">Sponsorship</a>
             </div>
+
+            <!-- Desktop CTA & Theme Toggle -->
+            <div class="hidden md:flex items-center gap-5">
+                @auth
+                    @if(Auth::user()->role === 'admin' || Auth::user()->role === 'eo')
+                        <a href="{{ route('admin.dashboard') }}" class="text-sm font-bold transition-colors text-slate-600 hover:text-[#0066FF] dark:text-white/70 dark:hover:text-white">Dashboard</a>
+                    @endif
+
+                    <!-- LINK RIWAYAT -->
+                    <a href="{{ route('transaction.history') }}" class="text-sm font-bold transition-colors text-slate-600 hover:text-[#0066FF] dark:text-white/70 dark:hover:text-white flex items-center gap-1.5">
+                        <i data-lucide="clock" class="w-4 h-4"></i> Riwayat
+                    </a>
+
+                    <!-- LINK PROFIL -->
+                    <a href="{{ route('profile.edit') }}" class="text-sm font-bold transition-colors text-slate-600 hover:text-[#0066FF] dark:text-white/70 dark:hover:text-white">
+                        Halo, {{ explode(' ', Auth::user()->name)[0] }}
+                    </a>
+
+                    <!-- TOMBOL LOGOUT -->
+                    <form action="{{ route('logout') }}" method="POST" class="m-0 flex items-center">
+                        @csrf
+                        <button type="submit" class="text-sm font-bold transition-colors text-red-500 hover:text-red-600 dark:text-red-400 dark:hover:text-red-300">
+                            Logout
+                        </button>
+                    </form>
+                @else
+                    <a href="{{ route('login') }}" class="text-sm font-bold transition-colors text-slate-600 hover:text-[#0066FF] dark:text-white/70 dark:hover:text-white">Masuk</a>
+                    <a href="{{ route('register') }}" class="px-5 py-2.5 text-sm font-bold text-white rounded-xl transition-all hover:opacity-90 hover:scale-105 shadow-md"
+                        style="background: linear-gradient(135deg, #0066FF, #00C2FF); font-family: 'Montserrat', sans-serif;">
+                        Mulai Gratis
+                    </a>
+                @endauth
+
+                <!-- Tombol Toggle Mode Gelap/Terang Desktop -->
+                <button id="theme-toggle-desktop" class="p-2.5 ml-2 rounded-full text-slate-500 bg-slate-200 hover:text-[#0066FF] dark:bg-white/10 dark:text-white/70 dark:hover:text-white transition-all focus:outline-none shadow-inner">
+                    <i id="theme-icon-desktop" data-lucide="moon" class="w-5 h-5"></i>
+                </button>
+            </div>
+
+            <!-- Mobile Toggle -->
+            <div class="flex items-center gap-3 md:hidden">
+                <button id="theme-toggle-mobile" class="p-2 rounded-full text-slate-500 bg-slate-200 dark:bg-white/10 dark:text-white/70 transition-all focus:outline-none shadow-inner">
+                    <i id="theme-icon-mobile" data-lucide="moon" class="w-5 h-5"></i>
+                </button>
+                <button id="mobile-menu-btn" class="text-slate-800 dark:text-white p-1 focus:outline-none">
+                    <i data-lucide="menu" class="w-6 h-6" id="menu-icon"></i>
+                </button>
+            </div>
+        </div>
+
+        <!-- Mobile Drawer -->
+        <div id="mobile-drawer" class="hidden md:hidden px-6 py-5 flex-col gap-4 border-t bg-white border-slate-200 dark:bg-[#041B4A] dark:border-white/10 shadow-xl transition-colors duration-300">
+            <a href="{{ url('/') }}#event-list" class="text-slate-600 hover:text-[#0066FF] dark:text-white/70 dark:hover:text-white py-1 text-sm font-bold transition-colors">Event</a>
+            <a href="{{ url('/') }}#packages" class="text-slate-600 hover:text-[#0066FF] dark:text-white/70 dark:hover:text-white py-1 text-sm font-bold transition-colors">Sponsorship</a>
+            @auth
+                @if(Auth::user()->role === 'admin' || Auth::user()->role === 'eo')
+                    <a href="{{ route('admin.dashboard') }}" class="text-slate-600 hover:text-[#0066FF] dark:text-white/70 dark:hover:text-white py-1 text-sm font-bold transition-colors">Dashboard</a>
+                @endif
+                <a href="{{ route('transaction.history') }}" class="text-slate-600 hover:text-[#0066FF] dark:text-white/70 dark:hover:text-white py-1 text-sm font-bold transition-colors flex items-center gap-2">
+                    <i data-lucide="clock" class="w-4 h-4"></i> Riwayat
+                </a>
+                <a href="{{ route('profile.edit') }}" class="text-slate-600 hover:text-[#0066FF] dark:text-white/70 dark:hover:text-white py-1 text-sm font-bold transition-colors flex items-center gap-2">
+                    <i data-lucide="user" class="w-4 h-4"></i> Profil Saya
+                </a>
+                <form action="{{ route('logout') }}" method="POST" class="w-full m-0">
+                    @csrf
+                    <button type="submit" class="w-full text-left text-red-500 hover:text-red-600 dark:text-red-400 py-1 text-sm font-bold transition-colors flex items-center gap-2">
+                        <i data-lucide="log-out" class="w-4 h-4"></i> Logout
+                    </button>
+                </form>
+            @else
+                <a href="{{ route('login') }}" class="text-slate-600 hover:text-[#0066FF] dark:text-white/70 dark:hover:text-white py-1 text-sm font-bold transition-colors">Masuk</a>
+                <a href="{{ route('register') }}" class="mt-2 px-5 py-3 text-sm font-bold text-white rounded-xl text-center shadow-md" style="background: linear-gradient(135deg, #0066FF, #00C2FF);">
+                    Mulai Gratis
+                </a>
+            @endauth
         </div>
     </nav>
 
-    <main class="flex-grow-1">
+    <!-- ── LUBANG KONTEN HALAMAN ───────────────────────── -->
+    <main class="flex-grow">
         @yield('content')
     </main>
 
-    <footer class="site-footer">
-        <div class="container">
-            <div class="row g-5">
-
-                <div class="col-lg-4 col-md-6">
-                    <div class="footer-brand-title">
-                        🎟️ TICKS ID
+    <!-- ── FOOTER ──────────────────────────────────────── -->
+    <footer class="py-16 transition-colors bg-[#F8FAFC] border-t border-slate-200 dark:bg-[#020C1F] dark:border-white/10">
+        <div class="max-w-7xl mx-auto px-6">
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-10 mb-12">
+                <div>
+                    <div class="flex items-center mb-5">
+                        <img src="{{ asset('logo_hitam.png') }}" alt="ARTIX ID Logo Hitam" class="h-8 object-contain block dark:hidden">
+                        <img src="{{ asset('logo_putih.png') }}" alt="ARTIX ID Logo Putih" class="h-8 object-contain hidden dark:block" style="filter: drop-shadow(0px 0px 8px rgba(0, 102, 255, 0.3));">
                     </div>
-                    <p style="font-size: 14px; line-height: 1.6; margin-bottom: 24px;">
-                        Integrated Event Ecosystem Platform. Solusi terbaik untuk manajemen tiket event, check-in QR Code, hingga pencarian sponsor dalam satu sistem modern.
+                    <p class="text-sm leading-relaxed mb-6 font-medium text-slate-500 dark:text-white/40">
+                        Platform event ecosystem terbesar di Indonesia. Menghubungkan penyelenggara, sponsor, dan peserta.
                     </p>
-                    <div class="social-icons" style="margin-left: -16px;">
-                        <a href="#"><i class="bi bi-facebook"></i></a>
-                        <a href="#"><i class="bi bi-twitter-x"></i></a>
-                        <a href="#"><i class="bi bi-instagram"></i></a>
-                        <a href="#"><i class="bi bi-linkedin"></i></a>
+                    <div class="flex gap-3">
+                        <a href="#" class="w-9 h-9 rounded-xl flex items-center justify-center text-xs font-bold border transition-all shadow-sm bg-white border-slate-200 text-slate-500 hover:border-[#0066FF] hover:text-[#0066FF] dark:bg-transparent dark:border-white/10 dark:text-white/40 dark:hover:border-[#0066FF]/60 dark:hover:text-white">IG</a>
+                        <a href="#" class="w-9 h-9 rounded-xl flex items-center justify-center text-xs font-bold border transition-all shadow-sm bg-white border-slate-200 text-slate-500 hover:border-[#0066FF] hover:text-[#0066FF] dark:bg-transparent dark:border-white/10 dark:text-white/40 dark:hover:border-[#0066FF]/60 dark:hover:text-white">TW</a>
+                        <a href="#" class="w-9 h-9 rounded-xl flex items-center justify-center text-xs font-bold border transition-all shadow-sm bg-white border-slate-200 text-slate-500 hover:border-[#0066FF] hover:text-[#0066FF] dark:bg-transparent dark:border-white/10 dark:text-white/40 dark:hover:border-[#0066FF]/60 dark:hover:text-white">YT</a>
                     </div>
                 </div>
 
-                <div class="col-lg-2 col-md-3 col-6">
-                    <div class="footer-heading">Jelajahi</div>
-                    <ul class="footer-links">
-                        <li><a href="#">Semua Event</a></li>
-                        <li><a href="#">Live Concert</a></li>
-                        <li><a href="#">Tournament Sport</a></li>
-                        <li><a href="#">Sponsorship Marketplace</a></li>
+                <div>
+                    <h4 class="font-black text-sm mb-5 tracking-wide uppercase font-montserrat text-slate-900 dark:text-white">Platform</h4>
+                    <ul class="flex flex-col gap-3">
+                        <li><a href="#" class="text-sm font-medium transition-colors text-slate-500 hover:text-[#0066FF] dark:text-white/40 dark:hover:text-white/80">Ticketing</a></li>
+                        <li><a href="#" class="text-sm font-medium transition-colors text-slate-500 hover:text-[#0066FF] dark:text-white/40 dark:hover:text-white/80">Livestream</a></li>
+                        <li><a href="#" class="text-sm font-medium transition-colors text-slate-500 hover:text-[#0066FF] dark:text-white/40 dark:hover:text-white/80">Tournament</a></li>
                     </ul>
                 </div>
 
-                <div class="col-lg-2 col-md-3 col-6">
-                    <div class="footer-heading">Perusahaan</div>
-                    <ul class="footer-links">
-                        <li><a href="#">Tentang Kami</a></li>
-                        <li><a href="#">Hubungi Kami</a></li>
-                        <li><a href="#">Kebijakan Privasi</a></li>
-                        <li><a href="#">Syarat & Ketentuan</a></li>
+                <div>
+                    <h4 class="font-black text-sm mb-5 tracking-wide uppercase font-montserrat text-slate-900 dark:text-white">Company</h4>
+                    <ul class="flex flex-col gap-3">
+                        <li><a href="#" class="text-sm font-medium transition-colors text-slate-500 hover:text-[#0066FF] dark:text-white/40 dark:hover:text-white/80">Tentang Kami</a></li>
+                        <li><a href="#" class="text-sm font-medium transition-colors text-slate-500 hover:text-[#0066FF] dark:text-white/40 dark:hover:text-white/80">Karir</a></li>
+                        <li><a href="#" class="text-sm font-medium transition-colors text-slate-500 hover:text-[#0066FF] dark:text-white/40 dark:hover:text-white/80">Blog</a></li>
                     </ul>
                 </div>
 
-                <div class="col-lg-4 col-md-6">
-                    <div class="footer-heading">Stay In The Loop</div>
-                    <p style="font-size: 14px; line-height: 1.6; margin-bottom: 0;">
-                        Dapatkan informasi event terbaru, promo tiket, dan tips mengelola event dari kami.
-                    </p>
-                    <form action="#" class="newsletter-form">
-                        <input type="email" placeholder="Alamat email kamu..." required>
-                        <button type="submit">Subscribe</button>
-                    </form>
+                <div>
+                    <h4 class="font-black text-sm mb-5 tracking-wide uppercase font-montserrat text-slate-900 dark:text-white">Support</h4>
+                    <ul class="flex flex-col gap-3">
+                        <li><a href="#" class="text-sm font-medium transition-colors text-slate-500 hover:text-[#0066FF] dark:text-white/40 dark:hover:text-white/80">Help Center</a></li>
+                        <li><a href="#" class="text-sm font-medium transition-colors text-slate-500 hover:text-[#0066FF] dark:text-white/40 dark:hover:text-white/80">Kontak</a></li>
+                        <li><a href="#" class="text-sm font-medium transition-colors text-slate-500 hover:text-[#0066FF] dark:text-white/40 dark:hover:text-white/80">Privacy Policy</a></li>
+                    </ul>
                 </div>
-
             </div>
 
-            <div class="footer-bottom">
-                <div>&copy; {{ date('Y') }} <strong>TICKS ID</strong>. Seluruh Hak Cipta Dilindungi.</div>
-                <div>Dirancang dengan ❤️ untuk Ekosistem Event Indonesia</div>
+            <div class="flex flex-col md:flex-row items-center justify-between pt-8 border-t gap-3 border-slate-200 dark:border-white/10">
+                <p class="text-sm font-bold text-slate-400 dark:font-normal dark:text-white/30">© {{ date('Y') }} ARTIX ID. All rights reserved.</p>
+                <p class="text-sm font-bold text-slate-400 dark:font-normal dark:text-white/30">hello@artix.id · artix.id</p>
             </div>
         </div>
     </footer>
 
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // Inisialisasi ikon
+        lucide.createIcons();
+
+        // ── LOGIKA DARK MODE TOGGLE ──
+        const themeToggleDesktop = document.getElementById('theme-toggle-desktop');
+        const themeIconDesktop = document.getElementById('theme-icon-desktop');
+        const themeToggleMobile = document.getElementById('theme-toggle-mobile');
+        const themeIconMobile = document.getElementById('theme-icon-mobile');
+        const html = document.documentElement;
+
+        function toggleTheme() {
+            const isDark = html.classList.toggle('dark');
+            const iconName = isDark ? 'sun' : 'moon';
+            if(themeIconDesktop) themeIconDesktop.setAttribute('data-lucide', iconName);
+            if(themeIconMobile) themeIconMobile.setAttribute('data-lucide', iconName);
+            lucide.createIcons();
+        }
+
+        if(themeToggleDesktop) themeToggleDesktop.addEventListener('click', toggleTheme);
+        if(themeToggleMobile) themeToggleMobile.addEventListener('click', toggleTheme);
+
+        // ── LOGIKA NAVBAR SAAT SCROLL ──
+        const navbar = document.getElementById('navbar');
+        window.addEventListener('scroll', () => {
+            if (window.scrollY > 40) {
+                if (html.classList.contains('dark')) {
+                    navbar.style.background = 'rgba(4, 27, 74, 0.9)';
+                    navbar.style.borderBottom = '1px solid rgba(255, 255, 255, 0.05)';
+                } else {
+                    navbar.style.background = 'rgba(255, 255, 255, 0.9)';
+                    navbar.style.borderBottom = '1px solid rgba(0, 0, 0, 0.05)';
+                }
+                navbar.style.backdropFilter = 'blur(16px)';
+            } else {
+                navbar.style.background = 'transparent';
+                navbar.style.backdropFilter = 'none';
+                navbar.style.borderBottom = 'none';
+            }
+        });
+
+        // ── LOGIKA MOBILE MENU ──
+        const menuBtn = document.getElementById('mobile-menu-btn');
+        const drawer = document.getElementById('mobile-drawer');
+        const menuIcon = document.getElementById('menu-icon');
+        let isMenuOpen = false;
+
+        if(menuBtn) {
+            menuBtn.addEventListener('click', () => {
+                isMenuOpen = !isMenuOpen;
+                if (isMenuOpen) {
+                    drawer.classList.remove('hidden');
+                    drawer.classList.add('flex');
+                    menuIcon.setAttribute('data-lucide', 'x');
+                } else {
+                    drawer.classList.add('hidden');
+                    drawer.classList.remove('flex');
+                    menuIcon.setAttribute('data-lucide', 'menu');
+                }
+                lucide.createIcons();
+            });
+        }
+    </script>
+
+    <!-- Slot khusus untuk script tambahan halaman anak -->
+    @stack('scripts')
 </body>
 </html>

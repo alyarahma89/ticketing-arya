@@ -22,6 +22,7 @@ class User extends Authenticatable
         'email',
         'password',
         'role',
+        'event_id', // Tambahkan kolom event_id agar bisa diisi saat pendaftaran panitia
     ];
 
     /**

@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\Transaction;
+use App\Models\Event; // Pastikan ini ditambahkan di atas
 use Illuminate\Support\Facades\Auth;
 use Carbon\Carbon;
 use Barryvdh\DomPDF\Facade\Pdf;
@@ -17,15 +18,23 @@ class AdminReportController extends Controller
         // 1. Siapkan query dasar: Ambil transaksi yang SUDAH DIBAYAR saja
         $query = Transaction::with(['user', 'event'])->whereIn('payment_status', ['paid', 'success', 'settlement']);
 
-        // 2. Filter Role (Admin vs EO)
-        // Logika ini sudah sangat benar! Admin akan melewatkan filter ini.
+        // ==========================================
+        // DATA EVENT AKTIF & TIDAK AKTIF
+        // ==========================================
+        $eventQuery = \App\Models\Event::query();
+
         if ($user->role === 'eo') {
             $query->whereHas('event', function ($q) use ($user) {
                 $q->where('user_id', $user->id);
             });
+            $eventQuery->where('user_id', $user->id);
         }
 
-        // 3. Filter Tanggal
+        $now = Carbon::now();
+        $activeEventsCount = (clone $eventQuery)->where('event_date', '>=', $now)->count();
+        $inactiveEventsCount = (clone $eventQuery)->where('event_date', '<', $now)->count();
+
+        // 2. Filter Tanggal Transaksi
         if ($request->filled('start_date') && $request->filled('end_date')) {
             $query->whereBetween('created_at', [
                 $request->start_date . ' 00:00:00',
@@ -33,15 +42,37 @@ class AdminReportController extends Controller
             ]);
         }
 
-        // 4. Ambil data yang sudah difilter
         $reports = $query->latest()->get();
 
+        // 3. Hitung Ringkasan (Total Uang dan Total Tiket)
+        $totalPendapatan = $reports->sum('total_amount');
+        $totalTiket = $reports->sum('quantity');
+
+        // 4. PERSIAPAN DATA GRAFIK & EVENT POPULER
+        $chartDataRaw = $reports->groupBy(function($item) {
+            return Carbon::parse($item->created_at)->format('d M Y');
+        })->map(function($row) {
+            return $row->sum('total_amount');
+        });
+
+        $chartLabels = $chartDataRaw->keys()->toArray();
+        $chartValues = $chartDataRaw->values()->toArray();
+
+        $popularEventsList = $reports->groupBy(function($item) {
+            return $item->event->name ?? 'Event Terhapus';
+        })->map(function($group) {
+            return $group->sum('quantity');
+        })->sortByDesc(function($count) {
+            return $count;
+        })->take(5);
+
+        $popularEventLabels = $popularEventsList->keys()->toArray();
+        $popularEventValues = $popularEventsList->values()->toArray();
+
         // ==========================================
-        // FITUR EXPORT (EXCEL & PDF)
+        // FITUR EXPORT (EXCEL & PDF) - Dipindah ke bawah agar semua data terhitung
         // ==========================================
         if ($request->has('export')) {
-
-            // 1. Logika Jika Export EXCEL
             if ($request->export === 'excel') {
                 $fileName = 'laporan_pendapatan_' . date('Y-m-d') . '.csv';
                 $headers = [
@@ -68,32 +99,22 @@ class AdminReportController extends Controller
                 return response()->stream($callback, 200, $headers);
             }
 
-            // 2. Logika Jika Export PDF
             if ($request->export === 'pdf') {
-                $pdf = Pdf::loadView('admin.reports.pdf', compact('reports'));
-
-                // Mengubah nama file menjadi ARTIX_ID
+                // Semua variabel baru dikirim ke PDF
+                $pdf = Pdf::loadView('admin.reports.pdf', compact(
+                    'reports', 'totalPendapatan', 'totalTiket',
+                    'activeEventsCount', 'inactiveEventsCount', 'popularEventsList'
+                ));
                 return $pdf->download('Laporan_Pendapatan_ARTIX_ID_' . date('Y-m-d') . '.pdf');
             }
         }
 
-        // ==========================================
-        // PERSIAPAN DATA GRAFIK (CHART.JS)
-        // ==========================================
-        $chartDataRaw = $reports->groupBy(function($item) {
-            return Carbon::parse($item->created_at)->format('d M Y');
-        })->map(function($row) {
-            return $row->sum('total_amount');
-        });
-
-        $chartLabels = $chartDataRaw->keys()->toArray();
-        $chartValues = $chartDataRaw->values()->toArray();
-
-        // 5. Hitung Ringkasan (Total Uang dan Total Tiket)
-        $totalPendapatan = $reports->sum('total_amount');
-        $totalTiket = $reports->sum('quantity');
-
-        // 6. Kirim ke tampilan (View)
-        return view('admin.reports.index', compact('reports', 'totalPendapatan', 'totalTiket', 'chartLabels', 'chartValues'));
+        // 5. Kirim ke tampilan web (View)
+        return view('admin.reports.index', compact(
+            'reports', 'totalPendapatan', 'totalTiket',
+            'chartLabels', 'chartValues',
+            'activeEventsCount', 'inactiveEventsCount',
+            'popularEventLabels', 'popularEventValues'
+        ));
     }
 }

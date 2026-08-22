@@ -3,13 +3,10 @@
 <head>
     <meta charset="UTF-8">
     <title>Laporan Keuangan - ARTIX ID</title>
-    <link rel="icon" href="{{ asset('main_logo.png') }}" type="image/x-icon">
 
     <style>
-        /* Mengimpor font jika PDF engine mendukung (misal: mPDF atau wkhtmltopdf) */
         @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700;900&family=Exo+2:wght@400;600;700&display=swap');
 
-        /* Setel Font Default dan Ukuran Kertas */
         body {
             font-family: 'Exo 2', 'Helvetica Neue', Helvetica, Arial, sans-serif;
             font-size: 12px;
@@ -21,38 +18,64 @@
         /* --- BAGIAN KOP LAPORAN (HEADER) --- */
         .header-table {
             width: 100%;
-            border-bottom: 3px solid #0066FF; /* Garis Artix Blue */
+            border-bottom: 3px solid #0066FF;
             padding-bottom: 15px;
-            margin-bottom: 25px;
+            margin-bottom: 20px;
         }
-        .header-logo {
-            width: 30%;
-            text-align: left;
-            vertical-align: middle;
-        }
-        .header-logo img {
-            max-height: 45px; /* Sesuaikan tinggi logo */
-        }
-        .header-text {
-            width: 70%;
-            text-align: right;
-            vertical-align: middle;
-        }
+        .header-logo { width: 30%; text-align: left; vertical-align: middle; }
+        .header-logo img { max-height: 45px; }
+        .header-text { width: 70%; text-align: right; vertical-align: middle; }
         .header-text h1 {
             margin: 0;
             font-family: 'Montserrat', sans-serif;
             font-size: 22px;
             font-weight: 900;
-            color: #041B4A; /* Deep Navy */
+            color: #041B4A;
             text-transform: uppercase;
             letter-spacing: 1px;
         }
-        .header-text p {
-            margin: 5px 0 0 0;
-            font-size: 11px;
-            color: #64748b;
-        }
+        .header-text p { margin: 5px 0 0 0; font-size: 11px; color: #64748b; }
         .text-blue { color: #0066FF; font-weight: 700; }
+
+        /* --- KOTAK RINGKASAN (SUMMARY BOX) --- */
+        .summary-box {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 25px;
+        }
+        .summary-box td {
+            background-color: #f8fafc;
+            border: 1px solid #e2e8f0;
+            padding: 12px;
+            text-align: center;
+            width: 25%;
+        }
+        .summary-box .title {
+            font-size: 9px;
+            color: #64748b;
+            text-transform: uppercase;
+            font-weight: bold;
+            margin-bottom: 5px;
+            display: block;
+            letter-spacing: 0.5px;
+        }
+        .summary-box .value {
+            font-size: 14px;
+            font-weight: bold;
+            color: #041B4A;
+        }
+
+        /* --- JUDUL BAGIAN --- */
+        .section-title {
+            font-family: 'Montserrat', sans-serif;
+            font-size: 14px;
+            font-weight: bold;
+            color: #041B4A;
+            margin-bottom: 10px;
+            text-transform: uppercase;
+            border-bottom: 2px solid #e2e8f0;
+            padding-bottom: 5px;
+        }
 
         /* --- BAGIAN TABEL DATA --- */
         .data-table {
@@ -62,29 +85,23 @@
         }
         .data-table th, .data-table td {
             border: 1px solid #e2e8f0;
-            padding: 12px 10px;
+            padding: 10px 8px;
         }
         .data-table th {
-            background-color: #041B4A; /* Deep Navy */
+            background-color: #041B4A;
             color: #ffffff;
             font-family: 'Montserrat', sans-serif;
             font-size: 11px;
             text-transform: uppercase;
             text-align: left;
-            letter-spacing: 0.5px;
         }
-        /* Efek Zebra (Belang-belang) untuk baris tabel */
-        .data-table tbody tr:nth-child(even) {
-            background-color: #f8fafc;
-        }
-
-        /* Baris Total di Bawah Tabel */
+        .data-table tbody tr:nth-child(even) { background-color: #f8fafc; }
         .data-table tfoot th, .data-table tfoot td {
-            background-color: #0066FF; /* Artix Blue */
+            background-color: #0066FF;
             color: #ffffff;
             font-family: 'Montserrat', sans-serif;
             font-weight: 700;
-            font-size: 13px;
+            font-size: 12px;
             border: 1px solid #0066FF;
         }
 
@@ -94,7 +111,6 @@
         .font-bold { font-weight: bold; }
 
         /* --- BAGIAN CATATAN KAKI (FOOTER) --- */
-        /* Posisi fixed bottom memastikan footer muncul di setiap halaman PDF */
         .footer {
             position: fixed;
             bottom: -20px;
@@ -105,28 +121,18 @@
             font-size: 10px;
             color: #94a3b8;
         }
-        .footer-table {
-            width: 100%;
-            border: none;
-        }
-        .footer-table td {
-            border: none;
-            padding: 0;
-        }
+        .footer-table { width: 100%; border: none; }
+        .footer-table td { border: none; padding: 0; }
     </style>
 </head>
 <body>
 
-    <!-- BAGIAN HEADER (KOP LAPORAN) MENGGUNAKAN TABEL -->
+    <!-- KOP LAPORAN -->
     <table class="header-table">
         <tr>
-            <!-- Kolom Kiri: Logo -->
             <td class="header-logo">
-                <!-- Penting: Gunakan public_path() agar library PDF bisa menemukan file gambar di server lokal -->
                 <img src="{{ public_path('main_logo.png') }}" alt="ARTIX ID Logo">
             </td>
-
-            <!-- Kolom Kanan: Informasi Laporan -->
             <td class="header-text">
                 <h1>Laporan Keuangan <span style="color: #FF7A00;">Event</span></h1>
                 <p>
@@ -140,27 +146,67 @@
         </tr>
     </table>
 
-    <!-- BAGIAN ISI (TABEL DATA) -->
+    <!-- KOTAK RINGKASAN (BARU) -->
+    <table class="summary-box">
+        <tr>
+            <td>
+                <span class="title">Total Pendapatan</span>
+                <span class="value" style="color: #0066FF;">Rp {{ number_format($totalPendapatan, 0, ',', '.') }}</span>
+            </td>
+            <td>
+                <span class="title">Tiket Terjual</span>
+                <span class="value" style="color: #FF7A00;">{{ $totalTiket }} Pax</span>
+            </td>
+            <td>
+                <span class="title">Event Aktif</span>
+                <span class="value" style="color: #A100FF;">{{ $activeEventsCount }} Event</span>
+            </td>
+            <td>
+                <span class="title">Event Selesai</span>
+                <span class="value">{{ $inactiveEventsCount }} Event</span>
+            </td>
+        </tr>
+    </table>
+
+    <!-- TABEL TOP 5 EVENT POPULER (BARU) -->
+    <div class="section-title">Top 5 Event Populer (Terlaris)</div>
+    <table class="data-table" style="margin-bottom: 25px;">
+        <thead>
+            <tr>
+                <th width="15%" class="text-center">Peringkat</th>
+                <th width="65%">Nama Event</th>
+                <th width="20%" class="text-center">Tiket Terjual</th>
+            </tr>
+        </thead>
+        <tbody>
+            @php $rank = 1; @endphp
+            @forelse($popularEventsList as $eventName => $ticketsCount)
+                <tr>
+                    <td class="text-center font-bold" style="color: #FF7A00;">#{{ $rank++ }}</td>
+                    <td class="font-bold">{{ $eventName }}</td>
+                    <td class="text-center">{{ $ticketsCount }} Tiket</td>
+                </tr>
+            @empty
+                <tr>
+                    <td colspan="3" class="text-center">Belum ada data event populer.</td>
+                </tr>
+            @endforelse
+        </tbody>
+    </table>
+
+    <!-- TABEL RINCIAN TRANSAKSI -->
+    <div class="section-title">Rincian Transaksi Pendapatan</div>
     <table class="data-table">
         <thead>
             <tr>
                 <th width="20%">Tanggal Transaksi</th>
                 <th width="40%">Nama Event</th>
                 <th width="15%" class="text-center">Jml Tiket</th>
-                <th width="25%" class="text-right">Total Pendapatan (Rp)</th>
+                <th width="25%" class="text-right">Total Pendapatan</th>
             </tr>
         </thead>
         <tbody>
-            @php
-                $totalUang = 0;
-                $totalTiket = 0;
-            @endphp
-
             @forelse($reports as $report)
-                @php
-                    $totalUang += $report->total_amount;
-                    $totalTiket += $report->quantity;
-                @endphp
                 <tr>
                     <td>{{ $report->created_at->format('d/m/Y H:i') }}</td>
                     <td class="font-bold">{{ $report->event->name ?? 'Event Terhapus' }}</td>
@@ -173,17 +219,16 @@
                 </tr>
             @endforelse
         </tbody>
-        <!-- BAGIAN TOTAL KESELURUHAN DI BAWAH TABEL -->
         <tfoot>
             <tr>
                 <td colspan="2" class="text-right">TOTAL KESELURUHAN</td>
                 <td class="text-center">{{ $totalTiket }}</td>
-                <td class="text-right">Rp {{ number_format($totalUang, 0, ',', '.') }}</td>
+                <td class="text-right">Rp {{ number_format($totalPendapatan, 0, ',', '.') }}</td>
             </tr>
         </tfoot>
     </table>
 
-    <!-- BAGIAN FOOTER -->
+    <!-- FOOTER -->
     <div class="footer">
         <table class="footer-table">
             <tr>

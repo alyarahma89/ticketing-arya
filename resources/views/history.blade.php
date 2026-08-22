@@ -87,14 +87,24 @@
                     <div class="space-y-6">
                         @foreach($ticketTransactions as $ticket)
                         <div class="border border-slate-200 dark:border-white/10 rounded-2xl p-5 flex flex-col md:flex-row gap-5 items-start md:items-center hover:bg-slate-50 dark:hover:bg-white/5 transition-colors relative overflow-hidden">
-                            <!-- Garis Status -->
-                            <div class="absolute left-0 top-0 bottom-0 w-1.5 {{ in_array($ticket->payment_status, ['paid', 'success', 'settlement']) ? 'bg-[#0066FF]' : 'bg-orange-500' }}"></div>
+
+                            <!-- Garis Status Samping -->
+                            <div class="absolute left-0 top-0 bottom-0 w-1.5
+                                {{ in_array($ticket->payment_status, ['paid', 'success', 'settlement']) ? 'bg-[#0066FF]' :
+                                  ($ticket->payment_status === 'refunded' ? 'bg-slate-400' : 'bg-orange-500') }}">
+                            </div>
 
                             <div class="flex-grow pl-2">
-                                <div class="flex items-center gap-2 mb-1">
+                                <div class="flex items-center flex-wrap gap-2 mb-1">
                                     <span class="text-[10px] font-bold uppercase tracking-widest text-slate-400 dark:text-white/40">ID: #{{ $ticket->order_id }}</span>
+
+                                    <!-- Label Status Badge -->
                                     @if(in_array($ticket->payment_status, ['paid', 'success', 'settlement']))
                                         <span class="bg-blue-50 text-[#0066FF] dark:bg-[#0066FF20] dark:text-[#00C2FF] px-2 py-0.5 rounded text-[10px] font-bold uppercase">Lunas</span>
+                                    @elseif($ticket->payment_status === 'refund_requested')
+                                        <span class="bg-orange-50 text-orange-600 dark:bg-[#FF7A0020] dark:text-[#FFB000] px-2 py-0.5 rounded text-[10px] font-bold uppercase">Refund Diproses</span>
+                                    @elseif($ticket->payment_status === 'refunded')
+                                        <span class="bg-slate-100 text-slate-500 dark:bg-white/10 dark:text-white/50 px-2 py-0.5 rounded text-[10px] font-bold uppercase">Dikembalikan</span>
                                     @else
                                         <span class="bg-orange-50 text-orange-600 dark:bg-[#FF7A0020] dark:text-[#FFB000] px-2 py-0.5 rounded text-[10px] font-bold uppercase">Menunggu Pembayaran</span>
                                     @endif
@@ -112,15 +122,29 @@
                                     <p class="text-xs font-bold text-slate-500 dark:text-white/50">{{ $ticket->quantity }} Tiket</p>
                                 </div>
 
+                                <!-- 3. Area Tombol Aksi (Telah dibersihkan dari form Refund) -->
                                 @if(in_array($ticket->payment_status, ['paid', 'success', 'settlement']))
-                                    <a href="{{ route('ticket.download', $ticket->id) }}" class="w-full md:w-auto text-center bg-slate-100 hover:bg-slate-200 dark:bg-white/10 dark:hover:bg-white/20 text-slate-700 dark:text-white px-4 py-2 rounded-xl text-sm font-bold transition-colors flex items-center justify-center gap-2">
-                                        <i data-lucide="download" class="w-4 h-4"></i> Unduh E-Ticket
-                                    </a>
+                                    <div class="flex flex-col md:flex-row gap-2 w-full md:w-auto mt-2">
+                                        <!-- Tombol Unduh -->
+                                        <a href="{{ route('ticket.download', $ticket->id) }}" class="flex-1 md:flex-none text-center bg-slate-100 hover:bg-slate-200 dark:bg-white/10 dark:hover:bg-white/20 text-slate-700 dark:text-white px-4 py-2 rounded-xl text-sm font-bold transition-colors flex items-center justify-center gap-2">
+                                            <i data-lucide="download" class="w-4 h-4"></i> Unduh E-Tiket
+                                        </a>
+                                    </div>
+                                @elseif($ticket->payment_status === 'refund_requested')
+                                    <div class="w-full md:w-auto mt-2 text-center bg-orange-50 border border-orange-200 text-orange-600 dark:bg-orange-500/10 dark:border-orange-500/30 dark:text-orange-400 px-4 py-2 rounded-xl text-sm font-bold flex items-center justify-center gap-2">
+                                        <i data-lucide="clock" class="w-4 h-4"></i> Proses Refund Oleh Panitia
+                                    </div>
+                                @elseif($ticket->payment_status === 'refunded')
+                                    <div class="w-full md:w-auto mt-2 text-center bg-slate-100 border border-slate-200 text-slate-500 dark:bg-white/5 dark:border-white/10 dark:text-white/40 px-4 py-2 rounded-xl text-sm font-bold flex items-center justify-center gap-2">
+                                        <i data-lucide="check-circle" class="w-4 h-4"></i> Dana Dikembalikan
+                                    </div>
                                 @else
-                                    <button onclick="alert('Silakan cek email Anda untuk instruksi pembayaran lebih lanjut.')" class="w-full md:w-auto text-center bg-gradient-to-r from-[#FF7A00] to-[#FF3B30] text-white px-4 py-2 rounded-xl text-sm font-bold shadow-md transition-all hover:scale-[1.02]">
+                                    <button onclick="alert('Silakan cek email Anda untuk instruksi pembayaran lebih lanjut.')" class="w-full md:w-auto text-center bg-gradient-to-r from-[#FF7A00] to-[#FF3B30] text-white px-4 py-2 rounded-xl text-sm font-bold shadow-md transition-all hover:scale-[1.02] mt-2">
                                         Bayar Sekarang
                                     </button>
                                 @endif
+                                <!-- Akhir Area Tombol Aksi -->
+
                             </div>
                         </div>
                         @endforeach

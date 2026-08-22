@@ -1,66 +1,14 @@
-<!DOCTYPE html>
-<html lang="id" class="light">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-    <title>{{ $event->name }} | ARTIX ID</title>
-    <link rel="icon" href="{{ asset('main_logo.png') }}" type="image/x-icon">
+@extends('layouts.main')
 
-    <!-- Tailwind CSS -->
-    <script src="https://cdn.tailwindcss.com"></script>
+@section('title', $event->name . ' | ARTIX ID')
 
-    <!-- Google Fonts -->
-    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700;800;900&family=Exo+2:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-
-    <!-- Lucide Icons -->
-    <script src="https://unpkg.com/lucide@latest"></script>
-
-    <!-- Konfigurasi Tailwind untuk Dark Mode -->
-    <script>
-        tailwind.config = {
-            darkMode: 'class',
-            theme: {
-                extend: {
-                    fontFamily: {
-                        'montserrat': ['Montserrat', 'sans-serif'],
-                        'exo': ['"Exo 2"', 'sans-serif'],
-                    }
-                }
-            }
-        }
-    </script>
+<!-- ── MENYUNTIKKAN CSS KHUSUS HALAMAN DETAIL ── -->
+@push('styles')
+    <!-- Library Swiper CSS untuk Galeri Foto -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css"/>
 
     <style>
-        body {
-            font-family: 'Exo 2', sans-serif;
-            overflow-x: hidden;
-            transition: background-color 0.3s ease, color 0.3s ease;
-        }
-
-        /* Animasi Bola Cahaya (Orb) */
-        @keyframes orb1 {
-            0%, 100% { transform: scale(1) translate(0,0); }
-            50% { transform: scale(1.15) translate(30px, -20px); }
-        }
-        @keyframes orb2 {
-            0%, 100% { transform: scale(1) translate(0,0); }
-            50% { transform: scale(1.1) translate(-25px, 15px); }
-        }
-
-        /* Custom Scrollbar Dinamis */
-        ::-webkit-scrollbar { width: 6px; }
-        html.light ::-webkit-scrollbar { background: #F1F5F9; }
-        html.light ::-webkit-scrollbar-thumb { background: #CBD5E1; border-radius: 3px; }
-        html.dark ::-webkit-scrollbar { background: #020C1F; }
-        html.dark ::-webkit-scrollbar-thumb { background: rgba(0,102,255,0.4); border-radius: 3px; }
-
-        /* Gradasi Teks Sesuai Panduan */
-        .text-gradient-main {
-            background: linear-gradient(135deg, #0066FF 0%, #00C2FF 100%);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-        }
+        /* Gradasi Teks Khusus Tiket */
         .text-gradient-ticket {
             background: linear-gradient(135deg, #FF3B30 0%, #FFB000 100%);
             -webkit-background-clip: text;
@@ -74,125 +22,29 @@
         }
 
         /* Light Mode Styles */
-        html.light .ticket-card {
-            background: #F8FAFC;
-            border: 1px solid #E2E8F0;
-        }
-        html.light .ticket-card:hover {
-            border-color: #93C5FD;
-            background: #EFF6FF;
-            transform: translateY(-2px);
-        }
-        html.light .ticket-card:has(input:checked) {
-            border-color: #0066FF;
-            background: #DBEAFE;
-            box-shadow: 0 4px 15px rgba(0, 102, 255, 0.15);
-        }
+        html.light .ticket-card { background: #F8FAFC; border: 1px solid #E2E8F0; }
+        html.light .ticket-card:hover { border-color: #93C5FD; background: #EFF6FF; transform: translateY(-2px); }
+        html.light .ticket-card:has(input:checked) { border-color: #0066FF; background: #DBEAFE; box-shadow: 0 4px 15px rgba(0, 102, 255, 0.15); }
         html.light .custom-radio { border-color: #CBD5E1; }
         html.light .ticket-card:has(input:checked) .custom-radio { border-color: #0066FF; }
 
-        /* Dark Mode Styles (Sesuai UI/UX Guideline) */
-        html.dark .ticket-card {
-            background: #0F1730;
-            border: 1px solid #1E2A4D;
-        }
-        html.dark .ticket-card:hover {
-            border-color: #0066FF;
-            background: rgba(0, 102, 255, 0.1);
-            transform: translateY(-2px);
-        }
-        html.dark .ticket-card:has(input:checked) {
-            border-color: #00C2FF;
-            background: rgba(0, 102, 255, 0.2);
-            box-shadow: 0 8px 30px rgba(0, 194, 255, 0.25);
-        }
+        /* Dark Mode Styles */
+        html.dark .ticket-card { background: #0F1730; border: 1px solid #1E2A4D; }
+        html.dark .ticket-card:hover { border-color: #0066FF; background: rgba(0, 102, 255, 0.1); transform: translateY(-2px); }
+        html.dark .ticket-card:has(input:checked) { border-color: #00C2FF; background: rgba(0, 102, 255, 0.2); box-shadow: 0 8px 30px rgba(0, 194, 255, 0.25); }
         html.dark .custom-radio { border-color: rgba(255,255,255,0.3); }
         html.dark .ticket-card:has(input:checked) .custom-radio { border-color: #00C2FF; }
 
         .ticket-card:has(input:checked) .radio-dot { opacity: 1; transform: scale(1); }
         .radio-dot { opacity: 0; transform: scale(0.5); transition: all 0.2s ease; }
+
+        /* ===== CSS KHUSUS THUMBNAIL GAYA SHOPEE ===== */
+        .thumbGallerySwiper .swiper-slide { opacity: 0.4; border: 2px solid transparent; transition: all 0.3s ease; }
+        .thumbGallerySwiper .swiper-slide-thumb-active { opacity: 1; border-color: #0066FF; }
     </style>
-</head>
-<body class="bg-[#F8FAFC] text-slate-900 dark:bg-[#041B4A] dark:text-white flex flex-col min-h-screen relative">
+@endpush
 
-    <!-- ── NAVBAR ──────────────────────────────────────── -->
-    <nav id="navbar" class="fixed top-0 inset-x-0 z-50 transition-all duration-300 bg-transparent border-transparent">
-        <div class="max-w-7xl mx-auto px-6 lg:px-10 flex items-center justify-between py-4">
-
-            <!-- Logo Dinamis -->
-            <a href="{{ url('/') }}" class="flex items-center shrink-0">
-                <img src="{{ asset('logo_hitam.png') }}" alt="ARTIX ID Logo Hitam" class="h-10 md:h-14 w-auto object-contain transition-all duration-300 block dark:hidden">
-                <img src="{{ asset('logo_putih.png') }}" alt="ARTIX ID Logo Putih" class="h-10 md:h-14 w-auto object-contain transition-all duration-300 hidden dark:block" style="filter: drop-shadow(0px 0px 8px rgba(0, 102, 255, 0.5));">
-            </a>
-
-            <!-- Desktop Links -->
-            <div class="hidden md:flex items-center gap-8">
-                <a href="{{ url('/#event-list') }}" class="text-sm font-bold transition-colors text-slate-600 hover:text-[#0066FF] dark:text-white/70 dark:hover:text-white">Event</a>
-                <a href="{{ url('/#packages') }}" class="text-sm font-bold transition-colors text-slate-600 hover:text-[#0066FF] dark:text-white/70 dark:hover:text-white">Sponsorship</a>
-            </div>
-
-            <!-- Desktop CTA & Theme Toggle -->
-            <div class="hidden md:flex items-center gap-4">
-                @auth
-                    @if(Auth::user()->role === 'admin' || Auth::user()->role === 'eo')
-                        <a href="{{ route('admin.dashboard') }}" class="text-sm font-bold transition-colors text-slate-600 hover:text-[#0066FF] dark:text-white/70 dark:hover:text-white">Dashboard</a>
-                    @endif
-                    <a href="{{ route('profile.edit') }}" class="text-sm font-bold transition-colors text-slate-600 hover:text-[#0066FF] dark:text-white/70 dark:hover:text-white">
-                        Halo, {{ explode(' ', Auth::user()->name)[0] }}
-                    </a>
-
-                    <form action="{{ route('logout') }}" method="POST" class="m-0 flex items-center">
-                        @csrf
-                        <button type="submit" class="text-sm font-bold transition-colors text-red-500 hover:text-red-600 dark:text-red-400 dark:hover:text-red-300">
-                            Logout
-                        </button>
-                    </form>
-                @else
-                    <a href="{{ route('login') }}" class="text-sm font-bold transition-colors text-slate-600 hover:text-[#0066FF] dark:text-white/70 dark:hover:text-white">Masuk</a>
-                    <a href="{{ route('register') }}" class="px-5 py-2.5 text-sm font-bold text-white rounded-xl transition-all hover:opacity-90 hover:scale-105 shadow-md"
-                        style="background: linear-gradient(135deg, #0066FF, #00C2FF); font-family: 'Montserrat', sans-serif;">
-                        Mulai Gratis
-                    </a>
-                @endauth
-
-                <!-- Tombol Toggle Mode -->
-                <button id="theme-toggle-desktop" class="p-2.5 ml-2 rounded-full text-slate-500 bg-slate-200 hover:text-[#0066FF] dark:bg-white/10 dark:text-white/70 dark:hover:text-white transition-all focus:outline-none shadow-inner">
-                    <i id="theme-icon-desktop" data-lucide="moon" class="w-5 h-5"></i>
-                </button>
-            </div>
-
-            <!-- Mobile Toggle -->
-            <div class="flex items-center gap-3 md:hidden">
-                <button id="theme-toggle-mobile" class="p-2 rounded-full text-slate-500 bg-slate-200 dark:bg-white/10 dark:text-white/70 transition-all focus:outline-none shadow-inner">
-                    <i id="theme-icon-mobile" data-lucide="moon" class="w-5 h-5"></i>
-                </button>
-
-                <button id="mobile-menu-btn" class="text-slate-800 dark:text-white p-1 focus:outline-none">
-                    <i data-lucide="menu" class="w-6 h-6" id="menu-icon"></i>
-                </button>
-            </div>
-        </div>
-
-        <!-- Mobile Drawer -->
-        <div id="mobile-drawer" class="hidden md:hidden px-6 py-5 flex-col gap-4 border-t bg-white border-slate-200 dark:bg-[#041B4A] dark:border-white/10 shadow-xl transition-colors duration-300">
-            <a href="{{ url('/#event-list') }}" class="text-slate-600 hover:text-[#0066FF] dark:text-white/70 dark:hover:text-white py-1 text-sm font-bold transition-colors">Event</a>
-            <a href="{{ url('/#packages') }}" class="text-slate-600 hover:text-[#0066FF] dark:text-white/70 dark:hover:text-white py-1 text-sm font-bold transition-colors">Sponsorship</a>
-            @auth
-                <a href="{{ route('profile.edit') }}" class="text-slate-600 hover:text-[#0066FF] dark:text-white/70 dark:hover:text-white py-1 text-sm font-bold transition-colors">Profil Saya</a>
-                <form action="{{ route('logout') }}" method="POST" class="w-full m-0">
-                    @csrf
-                    <button type="submit" class="w-full text-left text-red-500 hover:text-red-600 dark:text-red-400 py-1 text-sm font-bold transition-colors">
-                        Logout
-                    </button>
-                </form>
-            @else
-                <a href="{{ route('login') }}" class="text-slate-600 hover:text-[#0066FF] dark:text-white/70 dark:hover:text-white py-1 text-sm font-bold transition-colors">Masuk</a>
-                <a href="{{ route('register') }}" class="mt-2 px-5 py-3 text-sm font-bold text-white rounded-xl text-center shadow-md" style="background: linear-gradient(135deg, #0066FF, #00C2FF);">
-                    Mulai Gratis
-                </a>
-            @endauth
-        </div>
-    </nav>
+@section('content')
 
     <!-- Orbs Latar Belakang -->
     <div class="fixed inset-0 pointer-events-none z-0">
@@ -201,7 +53,7 @@
     </div>
 
     <!-- ── KONTEN UTAMA DETAIL EVENT ───────────────────── -->
-    <main class="flex-grow pt-32 pb-20 relative z-10">
+    <div class="pt-32 pb-20 relative z-10">
         <div class="max-w-7xl mx-auto px-6">
 
             <!-- BAGIAN PESAN ERROR / SUKSES -->
@@ -240,10 +92,53 @@
                 <!-- Kolom Kiri: Poster, Judul, Info, & S&K -->
                 <div class="lg:col-span-2 flex flex-col gap-6">
 
-                    <!-- Poster Event -->
-                    <div class="relative w-full h-[400px] rounded-3xl overflow-hidden border shadow-lg group bg-slate-100 border-slate-200 dark:bg-[#0A1A3A] dark:border-white/10 transition-colors">
-                        <img src="{{ $event->image ? asset('storage/' . $event->image) : 'https://images.unsplash.com/photo-1470225620780-dba8ba36b745?auto=format&fit=crop&w=1200&q=80' }}" alt="{{ $event->name }}" class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105">
-                        <div class="absolute inset-0 bg-gradient-to-t from-slate-900/80 via-transparent to-transparent dark:from-[#041B4A]/90 transition-colors"></div>
+                    <!-- ── GALERI EVENT (STYLE SHOPEE) ── -->
+                    <div class="flex flex-col gap-3">
+                        <!-- GAMBAR UTAMA BESAR -->
+                        <div class="relative w-full h-[400px] rounded-3xl overflow-hidden border shadow-sm group bg-slate-100 border-slate-200 dark:bg-[#0A1A3A] dark:border-white/10 transition-colors">
+                            <div class="swiper mainGallerySwiper w-full h-full">
+                                <div class="swiper-wrapper">
+                                    <!-- Slide 1: Poster Utama -->
+                                    <div class="swiper-slide relative cursor-grab">
+                                        <img src="{{ $event->image ? asset('storage/' . $event->image) : 'https://images.unsplash.com/photo-1470225620780-dba8ba36b745?auto=format&fit=crop&w=1200&q=80' }}" alt="{{ $event->name }}" class="w-full h-full object-cover">
+                                        <div class="absolute inset-0 bg-gradient-to-t from-slate-900/50 to-transparent pointer-events-none"></div>
+                                    </div>
+
+                                    <!-- Slide Tambahan: Galeri -->
+                                    @if($event->galleries && $event->galleries->count() > 0)
+                                        @foreach($event->galleries as $gallery)
+                                            <div class="swiper-slide relative cursor-grab">
+                                                <img src="{{ asset('storage/' . $gallery->image) }}" class="w-full h-full object-cover">
+                                                <div class="absolute inset-0 bg-gradient-to-t from-slate-900/50 to-transparent pointer-events-none"></div>
+                                            </div>
+                                        @endforeach
+                                    @endif
+                                </div>
+
+                                <!-- Tombol Navigasi -->
+                                <div class="swiper-button-next z-20 cursor-pointer !text-white after:!text-xl !w-10 !h-10 bg-black/30 hover:bg-black/60 rounded-full backdrop-blur-sm transition-all opacity-0 group-hover:opacity-100"></div>
+                                <div class="swiper-button-prev z-20 cursor-pointer !text-white after:!text-xl !w-10 !h-10 bg-black/30 hover:bg-black/60 rounded-full backdrop-blur-sm transition-all opacity-0 group-hover:opacity-100"></div>
+                            </div>
+                        </div>
+
+                        <!-- THUMBNAILS (KOTAK KECIL DI BAWAH) -->
+                        @if($event->galleries && $event->galleries->count() > 0)
+                        <div class="swiper thumbGallerySwiper w-full h-20 md:h-24 px-1 py-1">
+                            <div class="swiper-wrapper">
+                                <!-- Thumb 1: Poster Utama -->
+                                <div class="swiper-slide cursor-pointer rounded-xl overflow-hidden shadow-sm">
+                                    <img src="{{ $event->image ? asset('storage/' . $event->image) : 'https://images.unsplash.com/photo-1470225620780-dba8ba36b745?auto=format&fit=crop&w=1200&q=80' }}" class="w-full h-full object-cover">
+                                </div>
+
+                                <!-- Thumb Tambahan: Galeri -->
+                                @foreach($event->galleries as $gallery)
+                                    <div class="swiper-slide cursor-pointer rounded-xl overflow-hidden shadow-sm">
+                                        <img src="{{ asset('storage/' . $gallery->image) }}" class="w-full h-full object-cover">
+                                    </div>
+                                @endforeach
+                            </div>
+                        </div>
+                        @endif
                     </div>
 
                     <!-- Informasi Utama Event -->
@@ -299,7 +194,7 @@
 
                 </div>
 
-                <!-- Kolom Kanan: Panel Pembelian Diperbarui -->
+                <!-- Kolom Kanan: Panel Pembelian -->
                 <div class="lg:col-span-1">
                     <div class="sticky top-24">
                         <div class="rounded-3xl border overflow-hidden shadow-xl relative transition-colors bg-white border-slate-200 dark:bg-[#041B4A] dark:border-[#1E2A4D] dark:backdrop-blur-md">
@@ -329,8 +224,8 @@
                                                     </div>
                                                     <input type="radio" name="ticket_type" value="offline" class="hidden" checked onchange="updateTotal()">
                                                     <div>
-                                                        <span class="font-bold text-base block font-['Montserrat'] mb-0.5 text-slate-800 dark:text-white">🎫 Tiket Offline</span>
-                                                        <span class="text-[11px] font-bold text-slate-500 dark:text-white/50 dark:font-medium">Akses langsung di Venue</span>
+                                                        <span class="font-bold text-base block font-['Montserrat'] mb-0.5 text-slate-800 dark:text-white">Tiket Offline</span>
+                                                        <span class="text-[11px] font-bold text-slate-500 dark:text-white/50 dark:font-medium">Acara Langsung di Tempat</span>
                                                     </div>
                                                 </div>
                                                 <span class="font-black text-xl text-gradient-ticket relative z-10 xl:text-right" data-price="{{ $event->price }}">
@@ -369,7 +264,7 @@
                                         </span>
                                     </div>
 
-                                    <!-- Jumlah Pesanan (Sesuai Gaya Input Field Guideline) -->
+                                    <!-- Jumlah Pesanan -->
                                     <div class="mb-6">
                                         <label class="block text-[11px] font-bold uppercase tracking-widest mb-3 text-slate-400 dark:text-white/50">Jumlah Pesanan</label>
                                         <div class="relative">
@@ -386,7 +281,6 @@
                                         </div>
                                     </div>
 
-                                    <!-- Garis Pembatas -->
                                     <hr class="border-slate-200 dark:border-white/10 mb-6 transition-colors">
 
                                     <!-- Total Bayar -->
@@ -395,7 +289,7 @@
                                         <span class="font-black text-2xl text-gradient-ticket font-montserrat" id="totalPriceDisplay"></span>
                                     </div>
 
-                                    <!-- Tombol Submit (Sesuai Gaya Button Primary Guideline) -->
+                                    <!-- Tombol Submit -->
                                     @if($event->quota > 0)
                                         <button type="submit" class="w-full py-4 font-bold text-[#FFFFFF] rounded-[12px] transition-all hover:-translate-y-1 flex items-center justify-center gap-2 font-montserrat bg-[#0066FF] hover:bg-blue-700 shadow-lg hover:shadow-blue-500/30">
                                             Proses Pembayaran <i data-lucide="credit-card" class="w-5 h-5"></i>
@@ -418,124 +312,17 @@
 
             </div>
         </div>
-    </main>
+    </div>
 
-    <!-- ── FOOTER ──────────────────────────────────────── -->
-    <footer class="py-16 transition-colors bg-[#F8FAFC] border-t border-slate-200 dark:bg-[#020C1F] dark:border-white/10">
-        <div class="max-w-7xl mx-auto px-6">
-            <div class="grid grid-cols-1 md:grid-cols-4 gap-10 mb-12">
-                <div>
-                    <!-- Logo Footer -->
-                    <div class="flex items-center mb-5">
-                        <img src="{{ asset('logo_hitam.png') }}" alt="ARTIX ID Logo Hitam" class="h-8 object-contain block dark:hidden">
-                        <img src="{{ asset('logo_putih.png') }}" alt="ARTIX ID Logo Putih" class="h-8 object-contain hidden dark:block" style="filter: drop-shadow(0px 0px 8px rgba(0, 102, 255, 0.3));">
-                    </div>
-                    <p class="text-sm leading-relaxed mb-6 font-medium text-slate-500 dark:text-white/40">
-                        Platform event ecosystem terbesar di Indonesia. Menghubungkan penyelenggara, sponsor, dan peserta.
-                    </p>
-                    <div class="flex gap-3">
-                        <a href="#" class="w-9 h-9 rounded-xl flex items-center justify-center text-xs font-bold border transition-all shadow-sm bg-white border-slate-200 text-slate-500 hover:border-[#0066FF] hover:text-[#0066FF] dark:bg-transparent dark:border-white/10 dark:text-white/40 dark:hover:border-[#0066FF]/60 dark:hover:text-white">IG</a>
-                        <a href="#" class="w-9 h-9 rounded-xl flex items-center justify-center text-xs font-bold border transition-all shadow-sm bg-white border-slate-200 text-slate-500 hover:border-[#0066FF] hover:text-[#0066FF] dark:bg-transparent dark:border-white/10 dark:text-white/40 dark:hover:border-[#0066FF]/60 dark:hover:text-white">TW</a>
-                        <a href="#" class="w-9 h-9 rounded-xl flex items-center justify-center text-xs font-bold border transition-all shadow-sm bg-white border-slate-200 text-slate-500 hover:border-[#0066FF] hover:text-[#0066FF] dark:bg-transparent dark:border-white/10 dark:text-white/40 dark:hover:border-[#0066FF]/60 dark:hover:text-white">YT</a>
-                    </div>
-                </div>
+@endsection
 
-                <div>
-                    <h4 class="font-black text-sm mb-5 tracking-wide uppercase font-montserrat text-slate-900 dark:text-white">Platform</h4>
-                    <ul class="flex flex-col gap-3">
-                        <li><a href="#" class="text-sm font-medium transition-colors text-slate-500 hover:text-[#0066FF] dark:text-white/40 dark:hover:text-white/80">Ticketing</a></li>
-                        <li><a href="#" class="text-sm font-medium transition-colors text-slate-500 hover:text-[#0066FF] dark:text-white/40 dark:hover:text-white/80">Livestream</a></li>
-                        <li><a href="#" class="text-sm font-medium transition-colors text-slate-500 hover:text-[#0066FF] dark:text-white/40 dark:hover:text-white/80">Tournament</a></li>
-                    </ul>
-                </div>
-
-                <div>
-                    <h4 class="font-black text-sm mb-5 tracking-wide uppercase font-montserrat text-slate-900 dark:text-white">Company</h4>
-                    <ul class="flex flex-col gap-3">
-                        <li><a href="#" class="text-sm font-medium transition-colors text-slate-500 hover:text-[#0066FF] dark:text-white/40 dark:hover:text-white/80">Tentang Kami</a></li>
-                        <li><a href="#" class="text-sm font-medium transition-colors text-slate-500 hover:text-[#0066FF] dark:text-white/40 dark:hover:text-white/80">Karir</a></li>
-                        <li><a href="#" class="text-sm font-medium transition-colors text-slate-500 hover:text-[#0066FF] dark:text-white/40 dark:hover:text-white/80">Blog</a></li>
-                    </ul>
-                </div>
-
-                <div>
-                    <h4 class="font-black text-sm mb-5 tracking-wide uppercase font-montserrat text-slate-900 dark:text-white">Support</h4>
-                    <ul class="flex flex-col gap-3">
-                        <li><a href="#" class="text-sm font-medium transition-colors text-slate-500 hover:text-[#0066FF] dark:text-white/40 dark:hover:text-white/80">Help Center</a></li>
-                        <li><a href="#" class="text-sm font-medium transition-colors text-slate-500 hover:text-[#0066FF] dark:text-white/40 dark:hover:text-white/80">Kontak</a></li>
-                        <li><a href="#" class="text-sm font-medium transition-colors text-slate-500 hover:text-[#0066FF] dark:text-white/40 dark:hover:text-white/80">Privacy Policy</a></li>
-                    </ul>
-                </div>
-            </div>
-
-            <div class="flex flex-col md:flex-row items-center justify-between pt-8 border-t gap-3 border-slate-200 dark:border-white/10">
-                <p class="text-sm font-bold text-slate-400 dark:font-normal dark:text-white/30">© {{ date('Y') }} ARTIX ID. All rights reserved.</p>
-                <p class="text-sm font-bold text-slate-400 dark:font-normal dark:text-white/30">hello@artix.id · artix.id</p>
-            </div>
-        </div>
-    </footer>
+<!-- ── MENYUNTIKKAN SCRIPT KHUSUS HALAMAN DETAIL ── -->
+@push('scripts')
+    <!-- Library Swiper JS -->
+    <script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
 
     <script>
-        lucide.createIcons();
-
-        // ── LOGIKA DARK MODE TOGGLE ──
-        const themeToggleDesktop = document.getElementById('theme-toggle-desktop');
-        const themeIconDesktop = document.getElementById('theme-icon-desktop');
-        const themeToggleMobile = document.getElementById('theme-toggle-mobile');
-        const themeIconMobile = document.getElementById('theme-icon-mobile');
-        const html = document.documentElement;
-
-        function toggleTheme() {
-            const isDark = html.classList.toggle('dark');
-            const iconName = isDark ? 'sun' : 'moon';
-            if(themeIconDesktop) themeIconDesktop.setAttribute('data-lucide', iconName);
-            if(themeIconMobile) themeIconMobile.setAttribute('data-lucide', iconName);
-            lucide.createIcons();
-        }
-
-        if(themeToggleDesktop) themeToggleDesktop.addEventListener('click', toggleTheme);
-        if(themeToggleMobile) themeToggleMobile.addEventListener('click', toggleTheme);
-
-        // ── LOGIKA NAVBAR SAAT SCROLL ──
-        const navbar = document.getElementById('navbar');
-        window.addEventListener('scroll', () => {
-            if (window.scrollY > 40) {
-                if (html.classList.contains('dark')) {
-                    navbar.style.background = 'rgba(4, 27, 74, 0.9)';
-                    navbar.style.borderBottom = '1px solid rgba(255, 255, 255, 0.05)';
-                } else {
-                    navbar.style.background = 'rgba(255, 255, 255, 0.9)';
-                    navbar.style.borderBottom = '1px solid rgba(0, 0, 0, 0.05)';
-                }
-                navbar.style.backdropFilter = 'blur(16px)';
-            } else {
-                navbar.style.background = 'transparent';
-                navbar.style.backdropFilter = 'none';
-                navbar.style.borderBottom = 'none';
-            }
-        });
-
-        // ── LOGIKA MOBILE MENU ──
-        const menuBtn = document.getElementById('mobile-menu-btn');
-        const drawer = document.getElementById('mobile-drawer');
-        const menuIcon = document.getElementById('menu-icon');
-        let isMenuOpen = false;
-
-        menuBtn.addEventListener('click', () => {
-            isMenuOpen = !isMenuOpen;
-            if (isMenuOpen) {
-                drawer.classList.remove('hidden');
-                drawer.classList.add('flex');
-                menuIcon.setAttribute('data-lucide', 'x');
-            } else {
-                drawer.classList.add('hidden');
-                drawer.classList.remove('flex');
-                menuIcon.setAttribute('data-lucide', 'menu');
-            }
-            lucide.createIcons();
-        });
-
-        // ── LOGIKA KALKULASI HARGA ──
+        // ── LOGIKA KALKULASI HARGA TIKET ──
         function updateTotal() {
             const qtySelect = document.getElementById('ticketQuantity');
             if (!qtySelect) return;
@@ -558,6 +345,36 @@
         }
 
         document.addEventListener('DOMContentLoaded', updateTotal);
+
+        // ── SCRIPT GALERI GAYA SHOPEE ──
+        // 1. Inisialisasi Thumbnail (Gambar Kecil di Bawah)
+        var thumbSwiper = new Swiper(".thumbGallerySwiper", {
+            spaceBetween: 12,
+            slidesPerView: 4, // Menampilkan 4 kotak di HP
+            freeMode: true,
+            watchSlidesProgress: true,
+            breakpoints: {
+                640: { slidesPerView: 5 }, // 5 kotak di layar sedang
+                1024: { slidesPerView: 6 }, // 6 kotak di laptop
+            }
+        });
+
+        // 2. Inisialisasi Gambar Utama (Besar)
+        var mainSwiper = new Swiper(".mainGallerySwiper", {
+            loop: true,
+            spaceBetween: 10,
+            autoplay: {
+                delay: 4000,
+                disableOnInteraction: false,
+            },
+            navigation: {
+                nextEl: ".swiper-button-next",
+                prevEl: ".swiper-button-prev",
+            },
+            // Menghubungkan gambar besar dengan thumbnail kecil di bawahnya!
+            thumbs: {
+                swiper: thumbSwiper,
+            },
+        });
     </script>
-</body>
-</html>
+@endpush

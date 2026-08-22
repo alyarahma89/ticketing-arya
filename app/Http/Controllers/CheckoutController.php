@@ -13,6 +13,7 @@ use Illuminate\Support\Facades\Mail;
 use App\Mail\TicketMail;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Support\Facades\Log;
+use Exception;
 
 class CheckoutController extends Controller
 {
@@ -155,7 +156,10 @@ class CheckoutController extends Controller
 
             if ($transaction && $transaction->payment_status != 'paid') {
                 if (in_array($request->transaction_status, ['capture', 'settlement'])) {
-                    $transaction->update(['payment_status' => 'paid']);
+                    $transaction->update([
+                        'payment_status' => 'paid',
+                        'status' => 'completed' // atau 'success', sesuaikan dengan kebutuhan sistemmu
+                    ]);
 
                     // MESIN PENCETAK TIKET
                     if ($transaction->tickets->count() == 0) {
@@ -205,7 +209,10 @@ class CheckoutController extends Controller
 
             if ($transaction && $transaction->payment_status != 'paid') {
                 if (in_array($statusInfo->transaction_status, ['capture', 'settlement'])) {
-                    $transaction->update(['payment_status' => 'paid']);
+                    $transaction->update([
+                        'payment_status' => 'paid',
+                        'status' => 'completed'
+                    ]);
 
                     // MESIN PENCETAK TIKET
                     if ($transaction->tickets->count() == 0) {
@@ -250,9 +257,12 @@ class CheckoutController extends Controller
 
     // 6. Debugging status (Hapus jika sudah live)
     public function debugPaid($id)
-    {
-        $transaction = Transaction::with('event', 'user', 'tickets')->findOrFail($id);
-        $transaction->update(['payment_status' => 'paid']);
+        {
+            $transaction = Transaction::with('event', 'user', 'tickets')->findOrFail($id);
+            $transaction->update([
+                'payment_status' => 'paid',
+                'status' => 'completed'
+                ]);
 
         if ($transaction->tickets->count() == 0) {
             for ($i = 0; $i < $transaction->quantity; $i++) {
@@ -294,5 +304,39 @@ class CheckoutController extends Controller
 
         // 3. Tampilkan ke halaman riwayat
         return view('history', compact('ticketTransactions', 'sponsorshipTransactions'));
+    }
+
+    // ==========================================
+    // FUNGSI: Mengajukan Pengembalian Dana (Refund)
+    // ==========================================
+    public function requestRefund(Request $request, $id)
+    {
+        // 1. Validasi agar alasan dan nomor rekening wajib diisi oleh pengguna
+        $request->validate([
+            'refund_reason'  => 'required|string|max:255',
+            'refund_account' => 'required|string|max:255',
+        ]);
+
+        $user = Auth::user();
+
+        // 2. Cari transaksi berdasarkan ID dan pastikan itu milik user yang sedang login
+        $transaction = Transaction::where('id', $id)->where('user_id', $user->id)->firstOrFail();
+
+        // 3. Validasi: Refund hanya bisa diajukan jika status tiket saat ini adalah 'paid'
+        if ($transaction->payment_status !== 'paid') {
+            return redirect()->back()->with('error', 'Refund hanya dapat diajukan untuk transaksi yang sudah lunas.');
+        }
+
+        // 4. Ubah status menjadi 'refund_requested' DAN simpan alasan serta rekeningnya
+        $transaction->update([
+            'payment_status' => 'refund_requested',
+            'refund_reason'  => $request->refund_reason,
+            'refund_account' => $request->refund_account
+        ]);
+
+        // (Opsional) Di sini kamu juga bisa menambahkan kode untuk memulihkan kuota event (quota + quantity)
+        // $transaction->event->increment('quota', $transaction->quantity);
+
+        return redirect()->back()->with('success', 'Pengajuan Refund berhasil dikirim beserta detail rekening Anda. Tim kami akan segera memprosesnya.');
     }
 }

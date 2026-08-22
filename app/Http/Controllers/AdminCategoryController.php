@@ -7,12 +7,19 @@ use App\Models\Category;
 
 class AdminCategoryController extends Controller
 {
-    // Menampilkan daftar kategori
-    public function index()
+    // Menampilkan daftar kategori (Dengan Fitur Pencarian)
+    public function index(Request $request)
     {
-        // Menggunakan oldest() agar yang pertama dibuat muncul paling atas,
-        // dan yang baru ditambahkan akan muncul di paling bawah.
-        $categories = Category::oldest()->get();
+        // 1. Persiapkan query dasar
+        $query = Category::query();
+
+        // 2. Jika ada kata kunci pencarian, saring datanya
+        if ($request->has('search') && $request->search != '') {
+            $query->where('name', 'like', '%' . $request->search . '%');
+        }
+
+        // 3. Eksekusi query (oldest agar yang pertama dibuat muncul paling atas)
+        $categories = $query->oldest()->get();
 
         return view('admin.categories.index', compact('categories'));
     }
@@ -20,30 +27,36 @@ class AdminCategoryController extends Controller
     // Menyimpan kategori baru
     public function store(Request $request)
     {
+        // Menambahkan validasi untuk input gambar
         $request->validate([
             'name' => 'required|string|max:255|unique:categories,name',
+            'image' => 'nullable|url', // Memastikan gambar berupa Link/URL
         ]);
 
         Category::create([
-            'name' => strtoupper($request->name) // Memastikan nama kategori huruf besar semua
+            'name' => strtoupper($request->name), // Memastikan nama kategori huruf besar semua
+            'image' => $request->image,           // Menyimpan link gambar ke database
         ]);
 
-        return redirect()->back()->with('success', 'Kategori baru berhasil ditambahkan!');
+        return redirect()->back()->with('success', 'Kategori baru dan gambarnya berhasil ditambahkan!');
     }
 
     // Memperbarui kategori
     public function update(Request $request, $id)
     {
+        // Menambahkan validasi untuk input gambar saat edit
         $request->validate([
             'name' => 'required|string|max:255|unique:categories,name,'.$id,
+            'image' => 'nullable|url', // Memastikan gambar berupa Link/URL
         ]);
 
         $category = Category::findOrFail($id);
         $category->update([
-            'name' => strtoupper($request->name)
+            'name' => strtoupper($request->name),
+            'image' => $request->image, // Memperbarui link gambar di database
         ]);
 
-        return redirect()->back()->with('success', 'Nama kategori berhasil diubah!');
+        return redirect()->back()->with('success', 'Data kategori berhasil diperbarui!');
     }
 
     // Menghapus kategori

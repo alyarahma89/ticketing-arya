@@ -22,6 +22,7 @@ class Event extends Model
         'quota',
         'event_date',
         'youtube_link',
+        'secret_code', // <-- Menambahkan kolom secret_code
 
     ];
 
@@ -47,5 +48,11 @@ class Event extends Model
     public function category()
     {
         return $this->belongsTo(Category::class, 'category_id');
+    }
+
+    // Relasi: Satu Event bisa punya banyak foto di Galeri
+    public function galleries()
+    {
+        return $this->hasMany(Gallery::class);
     }
 }
