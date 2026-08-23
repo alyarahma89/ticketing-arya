@@ -137,7 +137,7 @@ Route::middleware(['auth'])->prefix('panitia')->name('panitia.')->group(function
     Route::get('/scanner', [PanitiaController::class, 'scanner'])->name('scanner');
 
     // Rute untuk memproses hasil scan QR Code via AJAX
-Route::post('/panitia/scanner/process', [\App\Http\Controllers\PanitiaController::class, 'processScan'])->name('panitia.scanner.process');
+    Route::post('/scanner/process', [\App\Http\Controllers\PanitiaController::class, 'processScan'])->name('panitia.scanner.process');
 });
 
 

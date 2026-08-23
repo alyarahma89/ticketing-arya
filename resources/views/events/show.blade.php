@@ -201,9 +201,10 @@
 
                             <!-- Header Panel -->
                             <div class="p-6 text-center border-b relative z-10 bg-slate-50 border-slate-200 dark:bg-white/5 dark:border-white/5 transition-colors">
-                                <h2 class="font-black text-lg tracking-widest uppercase font-montserrat">
-                                    <span class="text-gradient-main">Pesan Tiketmu</span>
-                                </h2>
+                            <h2 class="font-black text-lg tracking-widest uppercase font-montserrat">
+                                <!-- Mengganti gradasi dengan warna biru solid yang kontras -->
+                                <span class="text-[#0066FF] dark:text-[#00C2FF]">Pesan Tiketmu</span>
+                            </h2>
                             </div>
 
                             <div class="p-6 relative z-10">
