@@ -4,6 +4,9 @@
     <meta charset="UTF-8">
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
     <title>E-Ticket {{ $transaction->order_id }} | ARTIX ID</title>
+
+    <!-- ── BARIS GOOGLE FONTS DIHAPUS DARI SINI AGAR MESIN PDF TIDAK ERROR ── -->
+
     <style>
         /* Pengaturan Dasar Halaman */
         body {

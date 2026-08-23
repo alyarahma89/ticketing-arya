@@ -3,12 +3,11 @@
 <head>
     <meta charset="UTF-8">
     <title>E-Ticket ARTIX ID</title>
-    <!-- Import Font Resmi ARTIX ID -->
-    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@700;900&family=Exo+2:wght@500;700&display=swap" rel="stylesheet">
+    <!-- Tautan Google Fonts TELAH DIHAPUS agar aman di DomPDF -->
     <style>
         /* Pengaturan Dasar Email */
         body {
-            font-family: 'Exo 2', Helvetica, Arial, sans-serif;
+            font-family: Helvetica, Arial, sans-serif; /* Menggunakan font standar yang sangat aman */
             background-color: #F8FAFC;
             margin: 0;
             padding: 40px 20px;
@@ -43,7 +42,7 @@
         }
 
         .event-title {
-            font-family: 'Montserrat', Arial, sans-serif;
+            font-family: Helvetica, Arial, sans-serif;
             font-size: 26px;
             font-weight: 900;
             text-transform: uppercase;
@@ -53,7 +52,7 @@
         }
 
         .label-text {
-            font-family: 'Montserrat', Arial, sans-serif;
+            font-family: Helvetica, Arial, sans-serif;
             font-size: 10px;
             font-weight: 700;
             text-transform: uppercase;
@@ -129,15 +128,15 @@
                             <tr>
                                 <td>
                                     <span class="label-text" style="color: rgba(255,255,255,0.7); display: block;">Pemesan</span>
-                                    <span style="font-size: 16px; font-weight: 700; font-family: 'Montserrat', sans-serif;">{{ strtoupper($transaction->user->name ?? 'PENGUNJUNG') }}</span>
+                                    <span style="font-size: 16px; font-weight: 700; font-family: Helvetica, Arial, sans-serif;">{{ strtoupper($transaction->user->name ?? 'PENGUNJUNG') }}</span>
                                 </td>
                                 <td style="text-align: center;">
                                     <span class="label-text" style="color: rgba(255,255,255,0.7); display: block;">Kategori</span>
-                                    <span style="font-size: 16px; font-weight: 700; font-family: 'Montserrat', sans-serif;">{{ strtoupper($transaction->event->category->name ?? 'REGULER') }}</span>
+                                    <span style="font-size: 16px; font-weight: 700; font-family: Helvetica, Arial, sans-serif;">{{ strtoupper($transaction->event->category->name ?? 'REGULER') }}</span>
                                 </td>
                                 <td style="text-align: right;">
                                     <span class="label-text" style="color: rgba(255,255,255,0.7); display: block;">Order ID</span>
-                                    <span style="font-size: 16px; font-weight: 700; font-family: 'Montserrat', sans-serif;">#{{ $transaction->order_id }}</span>
+                                    <span style="font-size: 16px; font-weight: 700; font-family: Helvetica, Arial, sans-serif;">#{{ $transaction->order_id }}</span>
                                 </td>
                             </tr>
                         </table>
@@ -149,13 +148,13 @@
                         <!-- Panggil Logo ARTIX -->
                         <img src="{{ asset('logo_hitam.png') }}" alt="ARTIX ID" style="max-width: 100px; margin-bottom: 20px;">
 
-                        <p style="font-family: 'Montserrat', sans-serif; font-weight: 900; font-size: 18px; margin: 0 0 5px 0; color: #0F172A;">E-TICKET</p>
+                        <p style="font-family: Helvetica, Arial, sans-serif; font-weight: 900; font-size: 18px; margin: 0 0 5px 0; color: #0F172A;">E-TICKET</p>
                         <p style="font-size: 11px; font-weight: 700; color: #64748B; margin: 0 0 20px 0; text-transform: uppercase;">Tiket {{ $index + 1 }} dari {{ $transaction->quantity }}</p>
 
                         <!-- QR Code Besar Utama (Hitam Putih agar sensor alat scan cepat membaca) -->
                         <img src="https://api.qrserver.com/v1/create-qr-code/?size=140x140&data={{ $ticket->ticket_code }}&color=0F172A&bgcolor=ffffff" width="140" height="140" alt="QR Scan" style="display: block; margin: 0 auto;">
 
-                        <p style="font-family: 'Exo 2', sans-serif; font-weight: 700; font-size: 14px; letter-spacing: 2px; color: #0F172A; margin: 15px 0 0;">
+                        <p style="font-family: Helvetica, Arial, sans-serif; font-weight: 700; font-size: 14px; letter-spacing: 2px; color: #0F172A; margin: 15px 0 0;">
                             {{ $ticket->ticket_code }}
                         </p>
 
