@@ -122,7 +122,7 @@
                                     <p class="text-xs font-bold text-slate-500 dark:text-white/50">{{ $ticket->quantity }} Tiket</p>
                                 </div>
 
-                                <!-- 3. Area Tombol Aksi (Telah dibersihkan dari form Refund) -->
+                                <!-- 3. Area Tombol Aksi -->
                                 @if(in_array($ticket->payment_status, ['paid', 'success', 'settlement']))
                                     <div class="flex flex-col md:flex-row gap-2 w-full md:w-auto mt-2">
                                         <!-- Tombol Unduh -->
@@ -139,7 +139,8 @@
                                         <i data-lucide="check-circle" class="w-4 h-4"></i> Dana Dikembalikan
                                     </div>
                                 @else
-                                    <button onclick="alert('Silakan cek email Anda untuk instruksi pembayaran lebih lanjut.')" class="w-full md:w-auto text-center bg-gradient-to-r from-[#FF7A00] to-[#FF3B30] text-white px-4 py-2 rounded-xl text-sm font-bold shadow-md transition-all hover:scale-[1.02] mt-2">
+                                    <!-- ── PERBAIKAN TOMBOL BAYAR SEKARANG ── -->
+                                    <button onclick="payNow('{{ $ticket->snap_token }}')" class="w-full md:w-auto text-center bg-gradient-to-r from-[#FF7A00] to-[#FF3B30] text-white px-4 py-2 rounded-xl text-sm font-bold shadow-md transition-all hover:scale-[1.02] mt-2">
                                         Bayar Sekarang
                                     </button>
                                 @endif
@@ -254,6 +255,29 @@
             themeIcon.setAttribute('data-lucide', isDark ? 'sun' : 'moon');
             lucide.createIcons();
         });
+    </script>
+
+    <!-- ── SCRIPT MIDTRANS SNAP JS ── -->
+    <script src="https://app.sandbox.midtrans.com/snap/snap.js" data-client-key="{{ env('MIDTRANS_CLIENT_KEY') }}"></script>
+    <script>
+        function payNow(snapToken) {
+            // Memanggil fitur Snap Midtrans
+            snap.pay(snapToken, {
+                onSuccess: function(result) {
+                    alert("Pembayaran berhasil! Memuat ulang halaman...");
+                    window.location.reload();
+                },
+                onPending: function(result) {
+                    alert("Menunggu pembayaran Anda diselesaikan.");
+                },
+                onError: function(result) {
+                    alert("Pembayaran gagal. Silakan coba lagi.");
+                },
+                onClose: function() {
+                    alert("Anda menutup jendela sebelum menyelesaikan pembayaran.");
+                }
+            });
+        }
     </script>
 </body>
 </html>
