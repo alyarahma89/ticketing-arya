@@ -122,15 +122,21 @@ class PanitiaController extends Controller
             ]);
         }
 
-        // ─── TIKET VALID ───
+       // ─── TIKET VALID ───
 
-        // 4. Jika lolos semua validasi di atas, ubah status tiket menjadi "Sudah digunakan" (Hadir)
+        // 4. Ubah status tiket menjadi "Sudah digunakan" (Hadir)
         $ticket->update(['is_scanned' => true]);
 
-        // 5. Ambil nama pembeli untuk ditampilkan di layar sukses panitia
-        $namaPembeli = $ticket->transaction->user->name;
+        // 5. PERBAIKAN: Beri tahu juga tabel Transaction agar Daftar Hadir ikut ter-update!
+        if ($ticket->transaction) {
+            $ticket->transaction->update(['is_checked_in' => true]);
+        }
 
-        // 6. Kirim respon sukses ke layar HP panitia
+        // 6. Ambil nama pembeli untuk ditampilkan di layar sukses panitia
+        // Menggunakan "?? 'Peserta'" sebagai jaga-jaga jika data nama kosong
+        $namaPembeli = $ticket->transaction->user->name ?? 'Peserta';
+
+        // 7. Kirim respon sukses ke layar HP panitia
         return response()->json([
             'status' => 'success',
             'message' => 'Berhasil! Tiket atas nama ' . $namaPembeli . ' valid. Silakan masuk.'
