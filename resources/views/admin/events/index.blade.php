@@ -139,14 +139,33 @@
                             <!-- Harga & Kuota -->
                             <td class="px-6 py-4">
                                 <div class="mb-1">
-                                    @if($event->price == 0 && $event->online_price == 0)
-                                        <span class="text-emerald-500 font-black text-[15px]">Gratis</span>
+                                    <!-- Jika punya banyak paket tiket -->
+                                    @if($event->ticketPackages && $event->ticketPackages->count() > 1)
+                                        <span class="text-[10px] font-bold text-slate-400 uppercase tracking-widest block mb-0.5">{{ $event->ticketPackages->count() }} Kategori Tiket</span>
+                                        <span class="text-[#0066FF] font-black text-[15px] font-montserrat">
+                                            Mulai Rp {{ number_format($event->ticketPackages->min('price'), 0, ',', '.') }}
+                                        </span>
+
+                                    <!-- Jika hanya punya 1 paket tiket -->
+                                    @elseif($event->ticketPackages && $event->ticketPackages->count() == 1)
+                                        @if($event->ticketPackages->first()->price == 0)
+                                            <span class="text-emerald-500 font-black text-[15px]">Gratis</span>
+                                        @else
+                                            <span class="text-[#0066FF] font-black text-[15px] font-montserrat">Rp {{ number_format($event->ticketPackages->first()->price, 0, ',', '.') }}</span>
+                                        @endif
+
+                                    <!-- Jika data lama (sebelum ada sistem paket) -->
                                     @else
-                                        <span class="text-[#0066FF] font-black text-[15px] font-montserrat">Rp {{ number_format($event->price > 0 ? $event->price : $event->online_price, 0, ',', '.') }}</span>
+                                        @if($event->price == 0 && $event->online_price == 0)
+                                            <span class="text-emerald-500 font-black text-[15px]">Gratis</span>
+                                        @else
+                                            <span class="text-[#0066FF] font-black text-[15px] font-montserrat">Rp {{ number_format($event->price > 0 ? $event->price : $event->online_price, 0, ',', '.') }}</span>
+                                        @endif
                                     @endif
                                 </div>
-                                <div class="text-slate-500 text-[12px] font-medium flex items-center gap-1.5">
-                                    <i data-lucide="users" class="w-3.5 h-3.5"></i> Sisa Kuota: <strong class="text-slate-800">{{ $event->quota }}</strong>
+
+                                <div class="text-slate-500 text-[12px] font-medium flex items-center gap-1.5 mt-1">
+                                    <i data-lucide="users" class="w-3.5 h-3.5"></i> Kapasitas: <strong class="text-slate-800">{{ $event->quota }}</strong>
                                 </div>
                             </td>
 

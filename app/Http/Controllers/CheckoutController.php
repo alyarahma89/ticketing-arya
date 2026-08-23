@@ -280,7 +280,7 @@ class CheckoutController extends Controller
             Mail::to($transaction->user->email)->send(new TicketMail($transaction));
         }
 
-        return "Status LUNAS. " . $transaction->quantity . " Tiket berhasil dicetak ke database & Email dikirim!";
+        return "Status LUNAS. " . $transaction->quantity . " Tiket berhasil dicetak & Email dikirim!";
     }
 
     // ==========================================

@@ -1,10 +1,7 @@
-<!-- Memanggil File Induk (Master Layout) -->
 @extends('layouts.admin')
 
-<!-- Mengisi Judul Tab Browser -->
 @section('title', 'Edit Event')
 
-<!-- Memasukkan Isi Konten ke Tengah Halaman -->
 @section('content')
 
     <!-- ── HERO SECTION (Clean UI) ── -->
@@ -101,8 +98,10 @@
 
                         <!-- ── PILIHAN CHECKBOX TIPE EVENT ── -->
                         @php
-                            $isOffline = old('is_offline', ($event->location || $event->price > 0) ? 1 : 0);
+                            $isOffline = old('is_offline', ($event->location || $event->price > 0 || $event->ticketPackages->count() > 0) ? 1 : 0);
                             $isOnline = old('is_online', ($event->youtube_link || $event->online_price > 0) ? 1 : 0);
+
+                            if($isOffline == 0 && $isOnline == 0) $isOffline = 1;
                         @endphp
                         <div>
                             <label class="block text-[11px] font-bold text-slate-500 mb-3 uppercase tracking-widest">Tipe Penyelenggaraan (Pilih salah satu atau keduanya)</label>
@@ -159,19 +158,68 @@
                             Tiket & Kapasitas
                         </h2>
 
-                        <!-- HARGA OFFLINE -->
-                        <div id="offline-price-wrapper" class="transition-all duration-300">
-                            <label class="block text-[11px] font-bold text-slate-500 mb-2 uppercase tracking-widest">Harga Tiket Offline</label>
-                            <div class="relative">
-                                <span class="absolute inset-y-0 left-0 flex items-center pl-4 text-[#0066FF] font-black text-sm">Rp</span>
-                                <input type="number" name="price" id="price" value="{{ old('price', $event->price) }}" min="0" placeholder="0"
-                                    class="w-full bg-blue-50 focus:bg-white border border-blue-200 focus:border-[#0066FF] text-[#0066FF] text-lg font-black rounded-[12px] pl-12 pr-4 py-3 focus:outline-none focus:ring-4 focus:ring-[#0066FF]/10 transition-all duration-200">
+                        <!-- ── AREA PAKET TIKET OFFLINE (DINAMIS - EDIT MODE) ── -->
+                        <div id="offline-packages-wrapper" class="transition-all duration-300">
+                            <div class="flex items-center justify-between mb-3">
+                                <label class="block text-[11px] font-bold text-slate-500 uppercase tracking-widest">Kategori Tiket Offline</label>
+                                <button type="button" id="btn-add-package" class="flex items-center gap-1.5 px-3 py-1.5 bg-[#0066FF] text-white text-[10px] font-bold uppercase tracking-wider rounded-lg hover:bg-blue-700 transition-all shadow-md">
+                                    <i data-lucide="plus" class="w-3 h-3"></i> Tambah
+                                </button>
+                            </div>
+
+                            <div id="packages-container" class="space-y-3">
+                                @forelse($event->ticketPackages as $index => $package)
+                                    <div class="package-row flex flex-col gap-3 p-4 border border-slate-200 bg-slate-50 rounded-xl relative group transition-all duration-300">
+                                        <!-- Hidden ID supaya sistem tau ini data lama yang diupdate -->
+                                        <input type="hidden" name="packages[{{ $index }}][id]" value="{{ $package->id }}">
+
+                                        <!-- Tombol Hapus (Hanya muncul jika paket lebih dari 1) -->
+                                        @if($index > 0)
+                                        <button type="button" class="btn-remove-package absolute -top-2 -right-2 bg-red-500 text-white p-1.5 rounded-full shadow-md hover:bg-red-600 transition-colors opacity-0 group-hover:opacity-100 z-10">
+                                            <i data-lucide="x" class="w-3 h-3"></i>
+                                        </button>
+                                        @endif
+
+                                        <div class="w-full">
+                                            <label class="block text-[10px] font-bold text-slate-400 mb-1">NAMA PAKET</label>
+                                            <input type="text" name="packages[{{ $index }}][name]" value="{{ old('packages.'.$index.'.name', $package->name) }}" required placeholder="Contoh: Reguler / VIP" class="w-full text-sm font-bold border border-slate-300 rounded-lg px-3 py-2.5 focus:border-[#0066FF] focus:outline-none">
+                                        </div>
+                                        <div class="flex gap-3">
+                                            <div class="flex-1">
+                                                <label class="block text-[10px] font-bold text-slate-400 mb-1">HARGA (RP)</label>
+                                                <input type="number" name="packages[{{ $index }}][price]" value="{{ old('packages.'.$index.'.price', $package->price) }}" required min="0" placeholder="0" class="w-full text-sm font-bold border border-slate-300 rounded-lg px-3 py-2.5 focus:border-[#0066FF] focus:outline-none">
+                                            </div>
+                                            <div class="flex-1">
+                                                <label class="block text-[10px] font-bold text-slate-400 mb-1">KUOTA PAKET</label>
+                                                <input type="number" name="packages[{{ $index }}][quota]" value="{{ old('packages.'.$index.'.quota', $package->quota) }}" required min="1" placeholder="50" class="w-full text-sm font-bold border border-slate-300 rounded-lg px-3 py-2.5 focus:border-[#0066FF] focus:outline-none">
+                                            </div>
+                                        </div>
+                                    </div>
+                                @empty
+                                    <!-- Jika database lama dan event ini belum punya paket tiket sama sekali -->
+                                    <div class="package-row flex flex-col gap-3 p-4 border border-slate-200 bg-slate-50 rounded-xl relative group transition-all duration-300">
+                                        <div class="w-full">
+                                            <label class="block text-[10px] font-bold text-slate-400 mb-1">NAMA PAKET</label>
+                                            <input type="text" name="packages[0][name]" value="{{ old('packages.0.name', 'Reguler') }}" required placeholder="Contoh: Reguler / VIP" class="w-full text-sm font-bold border border-slate-300 rounded-lg px-3 py-2.5 focus:border-[#0066FF] focus:outline-none">
+                                        </div>
+                                        <div class="flex gap-3">
+                                            <div class="flex-1">
+                                                <label class="block text-[10px] font-bold text-slate-400 mb-1">HARGA (RP)</label>
+                                                <input type="number" name="packages[0][price]" value="{{ old('packages.0.price', $event->price ?? 0) }}" required min="0" placeholder="0" class="w-full text-sm font-bold border border-slate-300 rounded-lg px-3 py-2.5 focus:border-[#0066FF] focus:outline-none">
+                                            </div>
+                                            <div class="flex-1">
+                                                <label class="block text-[10px] font-bold text-slate-400 mb-1">KUOTA PAKET</label>
+                                                <input type="number" name="packages[0][quota]" value="{{ old('packages.0.quota', $event->quota ?? 50) }}" required min="1" placeholder="50" class="w-full text-sm font-bold border border-slate-300 rounded-lg px-3 py-2.5 focus:border-[#0066FF] focus:outline-none">
+                                            </div>
+                                        </div>
+                                    </div>
+                                @endforelse
                             </div>
                         </div>
 
                         <!-- HARGA ONLINE -->
-                        <div id="online-price-wrapper" class="transition-all duration-300">
-                            <label class="block text-[11px] font-bold text-[#FF3B30] mb-2 uppercase tracking-widest">Harga Tiket Online</label>
+                        <div id="online-price-wrapper" class="transition-all duration-300 border-t border-slate-100 pt-4 mt-4">
+                            <label class="block text-[11px] font-bold text-[#FF3B30] mb-2 uppercase tracking-widest">Harga Tiket Online (Livestream)</label>
                             <div class="relative">
                                 <span class="absolute inset-y-0 left-0 flex items-center pl-4 text-[#FF3B30] font-black text-sm">Rp</span>
                                 <input type="number" name="online_price" id="online_price" value="{{ old('online_price', $event->online_price) }}" min="0" placeholder="0"
@@ -179,13 +227,16 @@
                             </div>
                         </div>
 
-                        <div>
-                            <label class="block text-[11px] font-bold text-slate-500 mb-2 uppercase tracking-widest">Kuota Maksimal (Tiket)</label>
+                        <div class="border-t border-slate-100 pt-4 mt-4">
+                            <label class="block text-[11px] font-bold text-slate-500 mb-2 uppercase tracking-widest">Total Kapasitas Event Keseluruhan</label>
                             <div class="relative">
                                 <span class="absolute inset-y-0 left-0 flex items-center pl-4 text-slate-400"><i data-lucide="users" class="w-5 h-5"></i></span>
                                 <input type="number" name="quota" id="quota" value="{{ old('quota', $event->quota) }}" required min="1" placeholder="Contoh: 500"
                                     class="w-full bg-slate-50 focus:bg-white border border-slate-200 text-slate-900 text-sm font-bold rounded-[12px] pl-11 pr-4 py-3.5 focus:outline-none focus:border-[#0066FF] focus:ring-4 focus:ring-[#0066FF]/10 transition-all duration-200 placeholder:font-medium placeholder:text-slate-400">
                             </div>
+                            <span class="text-[11px] font-medium text-slate-400 mt-2 block">
+                                *Isi dengan kapasitas maksimal gedung/acara.
+                            </span>
                         </div>
                     </div>
 
@@ -196,7 +247,6 @@
                         </h2>
 
                         <div class="relative group aspect-[4/5] w-full max-w-[220px] mx-auto rounded-2xl bg-slate-50 border-2 border-dashed border-slate-300 overflow-hidden flex items-center justify-center shadow-inner transition-colors hover:border-[#0066FF]/50">
-
                             @if($event->image)
                                 <img id="badge-preview" src="{{ asset('storage/' . $event->image) }}" class="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105">
                                 <div id="hover-overlay" class="absolute inset-0 bg-[#041B4A]/70 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center backdrop-blur-sm">
@@ -226,25 +276,6 @@
                             <p class="text-[10px] text-slate-400 font-medium mt-2 text-center">Biarkan kosong jika tidak ingin mengubah poster.</p>
                         </div>
                     </div>
-
-                    <!-- KOTAK TAMBAHAN: GALERI FOTO -->
-                    <div class="bg-white border border-slate-200 rounded-[24px] shadow-sm p-6 space-y-4">
-                        <h2 class="text-base font-black text-slate-800 font-montserrat flex items-center gap-2.5">
-                            <div class="p-1.5 bg-blue-50 text-[#0066FF] rounded-lg"><i data-lucide="images" class="w-4 h-4"></i></div>
-                            Galeri Tambahan
-                        </h2>
-                        <p class="text-[11px] font-medium text-slate-500 mb-2 leading-relaxed">
-                            Unggah foto baru di sini jika Anda ingin menambahkan koleksi galeri.
-                        </p>
-
-                        <div id="gallery-preview-container" class="grid grid-cols-3 gap-3 mb-2 empty:hidden">
-                        </div>
-
-                        <div>
-                            <input type="file" name="galleries[]" id="gallery-input" accept="image/*" multiple
-                                class="w-full text-xs text-slate-500 font-medium file:mr-3 file:py-2.5 file:px-4 file:rounded-xl file:border-0 file:text-xs file:font-bold file:bg-blue-50 file:text-[#0066FF] hover:file:bg-[#0066FF] hover:file:text-white transition-all cursor-pointer border border-slate-200 rounded-[12px] p-1.5 bg-slate-50">
-                        </div>
-                    </div>
                 </div>
             </div>
 
@@ -264,7 +295,6 @@
     </div>
 @endsection
 
-<!-- ── MEMASUKKAN SCRIPT KHUSUS HALAMAN INI ── -->
 @push('scripts')
 <script>
     // --- SCRIPT 1: Preview Poster ---
@@ -292,44 +322,59 @@
         });
     }
 
-    // --- SCRIPT 2: Preview Galeri Foto ---
-    const galleryInput = document.getElementById('gallery-input');
-    const galleryPreviewContainer = document.getElementById('gallery-preview-container');
-
-    if(galleryInput) {
-        galleryInput.addEventListener('change', function() {
-            galleryPreviewContainer.innerHTML = '';
-            const files = this.files;
-
-            if(files && files.length > 0) {
-                galleryPreviewContainer.classList.remove('empty:hidden');
-                Array.from(files).forEach(file => {
-                    const reader = new FileReader();
-                    reader.addEventListener('load', function() {
-                        const imgBox = document.createElement('div');
-                        imgBox.className = 'aspect-square rounded-xl overflow-hidden border border-slate-200 shadow-sm relative group';
-                        const img = document.createElement('img');
-                        img.src = this.result;
-                        img.className = 'w-full h-full object-cover transition-transform duration-300 group-hover:scale-110';
-                        imgBox.appendChild(img);
-                        galleryPreviewContainer.appendChild(imgBox);
-                    });
-                    reader.readAsDataURL(file);
-                });
-            }
-        });
-    }
-
-    // --- SCRIPT 3: LOGIKA CHECKBOX TIPE EVENT ---
+    // --- SCRIPT 3: LOGIKA CHECKBOX TIPE EVENT & PAKET DINAMIS ---
     const checkOffline = document.getElementById('check_offline');
     const checkOnline = document.getElementById('check_online');
     const offlineVenueWrapper = document.getElementById('offline-venue-wrapper');
-    const offlinePriceWrapper = document.getElementById('offline-price-wrapper');
+    const offlinePackagesWrapper = document.getElementById('offline-packages-wrapper');
     const onlineLinkWrapper = document.getElementById('online-options');
     const onlinePriceWrapper = document.getElementById('online-price-wrapper');
     const btnSubmit = document.getElementById('btn-submit');
     const errorMsg = document.getElementById('type-error-msg');
 
+    // Fitur Tambah Paket Dinamis (Mulai dari index terakhir yang ada di database)
+    let packageIndex = {{ $event->ticketPackages->count() > 0 ? $event->ticketPackages->count() : 1 }};
+    const btnAddPackage = document.getElementById('btn-add-package');
+    const packagesContainer = document.getElementById('packages-container');
+
+    if(btnAddPackage) {
+        btnAddPackage.addEventListener('click', function() {
+            const newRow = document.createElement('div');
+            newRow.className = 'package-row flex flex-col gap-3 p-4 border border-slate-200 bg-slate-50 rounded-xl relative group transition-all duration-300';
+            newRow.innerHTML = `
+                <button type="button" class="btn-remove-package absolute -top-2 -right-2 bg-red-500 text-white p-1.5 rounded-full shadow-md hover:bg-red-600 transition-colors opacity-0 group-hover:opacity-100 z-10">
+                    <i data-lucide="x" class="w-3 h-3"></i>
+                </button>
+                <div class="w-full">
+                    <label class="block text-[10px] font-bold text-slate-400 mb-1">NAMA PAKET</label>
+                    <input type="text" name="packages[${packageIndex}][name]" required placeholder="Contoh: VVIP" class="w-full text-sm font-bold border border-slate-300 rounded-lg px-3 py-2.5 focus:border-[#0066FF] focus:outline-none">
+                </div>
+                <div class="flex gap-3">
+                    <div class="flex-1">
+                        <label class="block text-[10px] font-bold text-slate-400 mb-1">HARGA (RP)</label>
+                        <input type="number" name="packages[${packageIndex}][price]" required min="0" placeholder="0" class="w-full text-sm font-bold border border-slate-300 rounded-lg px-3 py-2.5 focus:border-[#0066FF] focus:outline-none">
+                    </div>
+                    <div class="flex-1">
+                        <label class="block text-[10px] font-bold text-slate-400 mb-1">KUOTA PAKET</label>
+                        <input type="number" name="packages[${packageIndex}][quota]" required min="1" placeholder="50" class="w-full text-sm font-bold border border-slate-300 rounded-lg px-3 py-2.5 focus:border-[#0066FF] focus:outline-none">
+                    </div>
+                </div>
+            `;
+            packagesContainer.appendChild(newRow);
+            lucide.createIcons();
+            packageIndex++;
+        });
+
+        // Fitur Hapus Paket Dinamis
+        packagesContainer.addEventListener('click', function(e) {
+            const btnRemove = e.target.closest('.btn-remove-package');
+            if(btnRemove) {
+                btnRemove.closest('.package-row').remove();
+            }
+        });
+    }
+
+    // Logika Sembunyikan Form jika Checkbox tidak dicentang
     function toggleEventTypes() {
         if (!checkOffline.checked && !checkOnline.checked) {
             errorMsg.style.display = 'block';
@@ -341,28 +386,27 @@
             btnSubmit.classList.remove('opacity-50', 'cursor-not-allowed');
         }
 
+        const packageInputs = offlinePackagesWrapper.querySelectorAll('input');
         if (checkOffline.checked) {
             offlineVenueWrapper.classList.remove('hidden');
-            offlinePriceWrapper.classList.remove('hidden');
+            offlinePackagesWrapper.classList.remove('hidden');
             document.getElementById('location').required = true;
-            document.getElementById('price').required = true;
+            packageInputs.forEach(input => input.disabled = false);
         } else {
             offlineVenueWrapper.classList.add('hidden');
-            offlinePriceWrapper.classList.add('hidden');
+            offlinePackagesWrapper.classList.add('hidden');
             document.getElementById('location').required = false;
-            document.getElementById('price').required = false;
+            packageInputs.forEach(input => input.disabled = true);
         }
 
         if (checkOnline.checked) {
             onlineLinkWrapper.classList.remove('hidden');
             onlinePriceWrapper.classList.remove('hidden');
             document.getElementById('youtube_link').required = true;
-            document.getElementById('online_price').required = true;
         } else {
             onlineLinkWrapper.classList.add('hidden');
             onlinePriceWrapper.classList.add('hidden');
             document.getElementById('youtube_link').required = false;
-            document.getElementById('online_price').required = false;
         }
     }
 

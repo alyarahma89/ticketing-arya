@@ -100,9 +100,32 @@
                         <i data-lucide="calendar" class="w-3.5 h-3.5 text-orange-500 dark:text-white/40"></i> {{ date('d M Y', strtotime($event->event_date)) }}
                     </div>
 
+                    <!-- ── PERBAIKAN HARGA DINAMIS DI SINI ── -->
                     <div class="mt-auto flex items-center justify-between">
-                        <span class="font-black text-xl font-montserrat text-gradient-blue dark:text-gradient-orange">Rp {{ number_format($event->price, 0, ',', '.') }}</span>
-                        <a href="{{ url('/event/' . $event->id) }}" class="px-5 py-2.5 text-xs font-bold text-white rounded-xl transition-all hover:scale-105 shadow-md" style="background: linear-gradient(135deg, #0066FF, #00C2FF);">Beli Tiket</a>
+                        <div class="flex flex-col">
+                            <!-- Jika punya banyak paket tiket -->
+                            @if($event->ticketPackages && $event->ticketPackages->count() > 1)
+                                <span class="text-[10px] font-bold text-slate-400 dark:text-white/40 uppercase tracking-widest mb-0.5">Mulai Dari</span>
+                                <span class="font-black text-xl font-montserrat text-gradient-blue dark:text-gradient-orange">Rp {{ number_format($event->ticketPackages->min('price'), 0, ',', '.') }}</span>
+
+                            <!-- Jika hanya punya 1 paket tiket -->
+                            @elseif($event->ticketPackages && $event->ticketPackages->count() == 1)
+                                @if($event->ticketPackages->first()->price == 0)
+                                    <span class="font-black text-xl font-montserrat text-emerald-500">Gratis</span>
+                                @else
+                                    <span class="font-black text-xl font-montserrat text-gradient-blue dark:text-gradient-orange">Rp {{ number_format($event->ticketPackages->first()->price, 0, ',', '.') }}</span>
+                                @endif
+
+                            <!-- Jika data lama (sebelum ada sistem paket) -->
+                            @else
+                                @if($event->price == 0 && $event->online_price == 0)
+                                    <span class="font-black text-xl font-montserrat text-emerald-500">Gratis</span>
+                                @else
+                                    <span class="font-black text-xl font-montserrat text-gradient-blue dark:text-gradient-orange">Rp {{ number_format($event->price > 0 ? $event->price : $event->online_price, 0, ',', '.') }}</span>
+                                @endif
+                            @endif
+                        </div>
+                        <a href="{{ url('/event/' . $event->id) }}" class="px-5 py-2.5 text-xs font-bold text-white rounded-xl transition-all hover:scale-105 shadow-md shrink-0" style="background: linear-gradient(135deg, #0066FF, #00C2FF);">Beli Tiket</a>
                     </div>
                 </div>
                 @empty

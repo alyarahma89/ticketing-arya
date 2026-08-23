@@ -1,13 +1,10 @@
-<!-- Memanggil File Induk (Master Layout) -->
 @extends('layouts.admin')
 
-<!-- Mengisi Judul Tab Browser -->
 @section('title', 'Tambah Event Baru')
 
-<!-- Memasukkan Isi Konten ke Tengah Halaman -->
 @section('content')
 
-    <!-- ── HERO SECTION (Clean UI) ── -->
+    <!-- ── HERO SECTION ── -->
     <div class="pt-10 pb-6 px-8 relative">
         <div class="max-w-6xl w-full mx-auto relative z-10">
             <a href="{{ route('admin.events.index') }}" class="inline-flex items-center gap-2 text-sm font-bold text-slate-500 hover:text-[#0066FF] transition-colors group mb-6 w-max">
@@ -138,7 +135,7 @@
                             <span class="text-[11px] font-medium text-slate-400 mt-2 block">*Kolom ini muncul karena Anda mencentang opsi penyelenggaraan Online.</span>
                         </div>
 
-                        <!-- ── FIELD BARU: KODE RAHASIA PANITIA ── -->
+                        <!-- KODE RAHASIA PANITIA -->
                         <div class="border-t border-slate-100 pt-6 mt-6">
                             <label class="block text-[11px] font-bold text-[#A100FF] mb-2 uppercase tracking-widest flex items-center gap-1.5">
                                 <i data-lucide="key" class="w-4 h-4"></i> Kode Rahasia Rekrutmen Panitia
@@ -168,19 +165,41 @@
                             Tiket & Kapasitas
                         </h2>
 
-                        <!-- HARGA OFFLINE -->
-                        <div id="offline-price-wrapper" class="transition-all duration-300">
-                            <label class="block text-[11px] font-bold text-slate-500 mb-2 uppercase tracking-widest">Harga Tiket Offline</label>
-                            <div class="relative">
-                                <span class="absolute inset-y-0 left-0 flex items-center pl-4 text-[#0066FF] font-black text-sm">Rp</span>
-                                <input type="number" name="price" id="price" value="{{ old('price', 0) }}" required min="0" placeholder="0"
-                                    class="w-full bg-blue-50 focus:bg-white border border-blue-200 focus:border-[#0066FF] text-[#0066FF] text-lg font-black rounded-[12px] pl-12 pr-4 py-3 focus:outline-none focus:ring-4 focus:ring-[#0066FF]/10 transition-all duration-200">
+                        <!-- ── AREA PAKET TIKET OFFLINE (DINAMIS) ── -->
+                        <div id="offline-packages-wrapper" class="transition-all duration-300">
+                            <div class="flex items-center justify-between mb-3">
+                                <label class="block text-[11px] font-bold text-slate-500 uppercase tracking-widest">Kategori Tiket Offline</label>
+                                <button type="button" id="btn-add-package" class="flex items-center gap-1.5 px-3 py-1.5 bg-[#0066FF] text-white text-[10px] font-bold uppercase tracking-wider rounded-lg hover:bg-blue-700 transition-all shadow-md">
+                                    <i data-lucide="plus" class="w-3 h-3"></i> Tambah Paket
+                                </button>
+                            </div>
+
+                            <div id="packages-container" class="space-y-3">
+                                <!-- Baris Paket Pertama (Default / Wajib) -->
+
+                                <!-- Baris Paket Pertama (Default / Wajib) -->
+                                <div class="package-row flex flex-col gap-3 p-4 border border-slate-200 bg-slate-50 rounded-xl relative group">
+                                    <div class="w-full">
+                                        <label class="block text-[10px] font-bold text-slate-400 mb-1">NAMA PAKET</label>
+                                        <input type="text" name="packages[0][name]" required placeholder="Contoh: Reguler / VIP" class="w-full text-sm font-bold border border-slate-300 rounded-lg px-3 py-2.5 focus:border-[#0066FF] focus:outline-none">
+                                    </div>
+                                    <div class="flex gap-3">
+                                        <div class="flex-1">
+                                            <label class="block text-[10px] font-bold text-slate-400 mb-1">HARGA (RP)</label>
+                                            <input type="number" name="packages[0][price]" required min="0" placeholder="0" class="w-full text-sm font-bold border border-slate-300 rounded-lg px-3 py-2.5 focus:border-[#0066FF] focus:outline-none">
+                                        </div>
+                                        <div class="flex-1">
+                                            <label class="block text-[10px] font-bold text-slate-400 mb-1">KUOTA PAKET</label>
+                                            <input type="number" name="packages[0][quota]" required min="1" placeholder="50" class="w-full text-sm font-bold border border-slate-300 rounded-lg px-3 py-2.5 focus:border-[#0066FF] focus:outline-none">
+                                        </div>
+                                    </div>
+                                </div>
                             </div>
                         </div>
 
                         <!-- HARGA ONLINE -->
-                        <div id="online-price-wrapper" class="hidden transition-all duration-300">
-                            <label class="block text-[11px] font-bold text-[#FF3B30] mb-2 uppercase tracking-widest">Harga Tiket Online</label>
+                        <div id="online-price-wrapper" class="hidden transition-all duration-300 border-t border-slate-100 pt-4 mt-4">
+                            <label class="block text-[11px] font-bold text-[#FF3B30] mb-2 uppercase tracking-widest">Harga Tiket Online (Livestream)</label>
                             <div class="relative">
                                 <span class="absolute inset-y-0 left-0 flex items-center pl-4 text-[#FF3B30] font-black text-sm">Rp</span>
                                 <input type="number" name="online_price" id="online_price" value="{{ old('online_price', 0) }}" min="0" placeholder="0"
@@ -188,13 +207,16 @@
                             </div>
                         </div>
 
-                        <div>
-                            <label class="block text-[11px] font-bold text-slate-500 mb-2 uppercase tracking-widest">Kuota Maksimal (Tiket)</label>
+                        <div class="border-t border-slate-100 pt-4 mt-4">
+                            <label class="block text-[11px] font-bold text-slate-500 mb-2 uppercase tracking-widest">Total Kapasitas Event Keseluruhan</label>
                             <div class="relative">
                                 <span class="absolute inset-y-0 left-0 flex items-center pl-4 text-slate-400"><i data-lucide="users" class="w-5 h-5"></i></span>
                                 <input type="number" name="quota" id="quota" value="{{ old('quota') }}" required min="1" placeholder="Contoh: 500"
                                     class="w-full bg-slate-50 focus:bg-white border border-slate-200 text-slate-900 text-sm font-bold rounded-[12px] pl-11 pr-4 py-3.5 focus:outline-none focus:border-[#0066FF] focus:ring-4 focus:ring-[#0066FF]/10 transition-all duration-200 placeholder:font-medium placeholder:text-slate-400">
                             </div>
+                            <span class="text-[11px] font-medium text-slate-400 mt-2 block">
+                                *Isi dengan kapasitas maksimal gedung/acara. Total ini yang akan dikurangi saat ada pembelian berhasil.
+                            </span>
                         </div>
                     </div>
 
@@ -259,7 +281,6 @@
     </div>
 @endsection
 
-<!-- ── MEMASUKKAN SCRIPT KHUSUS HALAMAN INI ── -->
 @push('scripts')
 <script>
     // --- SCRIPT 1: Preview Poster ---
@@ -323,16 +344,63 @@
         });
     }
 
-    // --- SCRIPT 3: LOGIKA CHECKBOX TIPE EVENT ---
+    // --- SCRIPT 3: LOGIKA CHECKBOX TIPE EVENT & PAKET DINAMIS ---
     const checkOffline = document.getElementById('check_offline');
     const checkOnline = document.getElementById('check_online');
     const offlineVenueWrapper = document.getElementById('offline-venue-wrapper');
-    const offlinePriceWrapper = document.getElementById('offline-price-wrapper');
+    const offlinePackagesWrapper = document.getElementById('offline-packages-wrapper');
     const onlineLinkWrapper = document.getElementById('online-options');
     const onlinePriceWrapper = document.getElementById('online-price-wrapper');
     const btnSubmit = document.getElementById('btn-submit');
     const errorMsg = document.getElementById('type-error-msg');
 
+   
+    // Fitur Tambah Paket Dinamis
+    let packageIndex = 1; // (Catatan: di edit.blade.php nilainya menggunakan PHP $event->ticketPackages->count())
+    const btnAddPackage = document.getElementById('btn-add-package');
+    const packagesContainer = document.getElementById('packages-container');
+
+    if(btnAddPackage) {
+        btnAddPackage.addEventListener('click', function() {
+            const newRow = document.createElement('div');
+
+            // ── PERBAIKAN DI SINI: sm:flex-row sudah dihapus agar selalu menumpuk rapi ──
+            newRow.className = 'package-row flex flex-col gap-3 p-4 border border-slate-200 bg-slate-50 rounded-xl relative group transition-all duration-300';
+
+            newRow.innerHTML = `
+                <button type="button" class="btn-remove-package absolute -top-2 -right-2 bg-red-500 text-white p-1.5 rounded-full shadow-md hover:bg-red-600 transition-colors opacity-0 group-hover:opacity-100 z-10">
+                    <i data-lucide="x" class="w-3 h-3"></i>
+                </button>
+                <div class="w-full">
+                    <label class="block text-[10px] font-bold text-slate-400 mb-1">NAMA PAKET</label>
+                    <input type="text" name="packages[${packageIndex}][name]" required placeholder="Contoh: VVIP" class="w-full text-sm font-bold border border-slate-300 rounded-lg px-3 py-2.5 focus:border-[#0066FF] focus:outline-none">
+                </div>
+                <div class="flex gap-3">
+                    <div class="flex-1">
+                        <label class="block text-[10px] font-bold text-slate-400 mb-1">HARGA (RP)</label>
+                        <input type="number" name="packages[${packageIndex}][price]" required min="0" placeholder="0" class="w-full text-sm font-bold border border-slate-300 rounded-lg px-3 py-2.5 focus:border-[#0066FF] focus:outline-none">
+                    </div>
+                    <div class="flex-1">
+                        <label class="block text-[10px] font-bold text-slate-400 mb-1">KUOTA PAKET</label>
+                        <input type="number" name="packages[${packageIndex}][quota]" required min="1" placeholder="50" class="w-full text-sm font-bold border border-slate-300 rounded-lg px-3 py-2.5 focus:border-[#0066FF] focus:outline-none">
+                    </div>
+                </div>
+            `;
+            packagesContainer.appendChild(newRow);
+            lucide.createIcons();
+            packageIndex++;
+        });
+
+        // Fitur Hapus Paket Dinamis
+        packagesContainer.addEventListener('click', function(e) {
+            const btnRemove = e.target.closest('.btn-remove-package');
+            if(btnRemove) {
+                btnRemove.closest('.package-row').remove();
+            }
+        });
+    }
+
+    // Logika Sembunyikan Form jika Checkbox tidak dicentang
     function toggleEventTypes() {
         if (!checkOffline.checked && !checkOnline.checked) {
             errorMsg.style.display = 'block';
@@ -344,18 +412,18 @@
             btnSubmit.classList.remove('opacity-50', 'cursor-not-allowed');
         }
 
+        // Matikan input paket jika event bukan offline
+        const packageInputs = offlinePackagesWrapper.querySelectorAll('input');
         if (checkOffline.checked) {
             offlineVenueWrapper.classList.remove('hidden');
-            offlinePriceWrapper.classList.remove('hidden');
+            offlinePackagesWrapper.classList.remove('hidden');
             document.getElementById('location').required = true;
-            document.getElementById('price').required = true;
+            packageInputs.forEach(input => input.disabled = false);
         } else {
             offlineVenueWrapper.classList.add('hidden');
-            offlinePriceWrapper.classList.add('hidden');
+            offlinePackagesWrapper.classList.add('hidden');
             document.getElementById('location').required = false;
-            document.getElementById('location').value = '';
-            document.getElementById('price').required = false;
-            document.getElementById('price').value = 0;
+            packageInputs.forEach(input => input.disabled = true);
         }
 
         if (checkOnline.checked) {
@@ -367,9 +435,7 @@
             onlineLinkWrapper.classList.add('hidden');
             onlinePriceWrapper.classList.add('hidden');
             document.getElementById('youtube_link').required = false;
-            document.getElementById('youtube_link').value = '';
             document.getElementById('online_price').required = false;
-            document.getElementById('online_price').value = 0;
         }
     }
 

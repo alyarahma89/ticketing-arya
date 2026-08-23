@@ -55,4 +55,10 @@ class Event extends Model
     {
         return $this->hasMany(Gallery::class);
     }
+
+    // Relasi: Satu Event bisa MEMILIKI BANYAK Paket Tiket
+    public function ticketPackages()
+    {
+        return $this->hasMany(TicketPackage::class);
+    }
 }

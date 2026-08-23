@@ -157,17 +157,29 @@ class AdminEventController extends Controller
             'category_id' => 'required|exists:categories,id',
             'location' => 'nullable|string|max:255',
             'event_date' => 'required|date',
-            'price' => 'nullable|numeric|min:0',
             'online_price' => 'nullable|numeric|min:0',
-            'quota' => 'required|numeric|min:1',
+            'quota' => 'required|numeric|min:1', // Total kapasitas seluruh gedung/acara
             'description' => 'required|string',
             'image' => 'nullable|image|mimes:jpeg,png,jpg|max:2048',
             'youtube_link' => 'nullable|url|max:255',
             'galleries.*' => 'nullable|image|mimes:jpeg,png,jpg|max:2048',
-            'secret_code' => 'nullable|string|max:255', // <-- INI YANG BARU KITA TAMBAHKAN
+            'secret_code' => 'nullable|string|max:255',
+
+            // ── VALIDASI KHUSUS PAKET TIKET DINAMIS ──
+            'packages' => 'nullable|array',
+            'packages.*.name' => 'required_with:packages|string|max:255',
+            'packages.*.price' => 'required_with:packages|numeric|min:0',
+            'packages.*.quota' => 'required_with:packages|numeric|min:1',
         ]);
 
         $validated['user_id'] = Auth::id();
+
+        // Ambil harga dari paket pertama sebagai harga dasar (untuk ditampilkan di beranda)
+        if ($request->has('packages') && count($request->packages) > 0) {
+            $validated['price'] = $request->packages[0]['price'];
+        } else {
+            $validated['price'] = 0;
+        }
 
         if (!$request->has('is_offline')) {
             $validated['location'] = null;
@@ -183,8 +195,20 @@ class AdminEventController extends Controller
             $validated['image'] = $request->file('image')->store('event-posters', 'public');
         }
 
-        // Karena 'secret_code' sudah divalidasi, ia akan otomatis ikut tersimpan di sini
+        // Simpan Data Acara (Event)
         $event = Event::create($validated);
+
+        // ── SIMPAN SETIAP PAKET TIKET KE TABEL BARU ──
+        if ($request->has('packages') && $request->has('is_offline')) {
+            foreach ($request->packages as $package) {
+                \App\Models\TicketPackage::create([
+                    'event_id' => $event->id,
+                    'name' => $package['name'],
+                    'price' => $package['price'],
+                    'quota' => $package['quota'],
+                ]);
+            }
+        }
 
         if ($request->hasFile('galleries')) {
             foreach ($request->file('galleries') as $file) {
@@ -196,7 +220,7 @@ class AdminEventController extends Controller
             }
         }
 
-        return redirect()->route('admin.events.index')->with('success', 'Event baru berhasil ditambahkan!');
+        return redirect()->route('admin.events.index')->with('success', 'Event baru beserta pilihan paket tiket berhasil ditambahkan!');
     }
 
     // ==========================================
