@@ -230,8 +230,14 @@ class CheckoutController extends Controller
                         'description' => 'Pendapatan dari event: ' . ($transaction->event->name ?? 'Event')
                     ]);
 
+                    // ─── KIRIM EMAIL DENGAN PELINDUNG (Aman untuk Production) ───
                     if ($transaction->user && $transaction->user->email) {
-                        Mail::to($transaction->user->email)->send(new TicketMail($transaction));
+                        try {
+                            Mail::to($transaction->user->email)->send(new TicketMail($transaction));
+                        } catch (\Exception $e) {
+                            // Jika email gagal, catat diam-diam di background agar web tidak crash
+                            \Illuminate\Support\Facades\Log::error("Gagal kirim email: " . $e->getMessage());
+                        }
                     }
                 }
             }
