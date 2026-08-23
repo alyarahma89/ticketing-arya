@@ -156,4 +156,18 @@ Route::middleware(['auth', 'role:eo'])->prefix('eo')->group(function () {
 Route::post('/midtrans-callback', [CheckoutController::class, 'callback']);
 Route::get('/midtrans/finish', [CheckoutController::class, 'finish'])->name('midtrans.finish');
 
+// =========================================================
+// RUTE DEBUGGING SEMENTARA (Hapus jika email sudah lancar)
+// =========================================================
+Route::get('/test-email/{id}', function($id) {
+    // Cari data transaksi berdasarkan ID
+    $transaction = \App\Models\Transaction::with(['event', 'user', 'tickets'])->findOrFail($id);
+    
+    // Paksa kirim email
+    \Illuminate\Support\Facades\Mail::to($transaction->user->email)->send(new \App\Mail\TicketMail($transaction));
+    
+    // Pesan sukses jika tidak ada error
+    return "Sukses Kirim Email untuk Transaksi #" . $transaction->order_id . "! Silakan cek inbox/spam.";
+});
+
 require __DIR__.'/auth.php';

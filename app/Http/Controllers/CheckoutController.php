@@ -158,7 +158,7 @@ class CheckoutController extends Controller
                 if (in_array($request->transaction_status, ['capture', 'settlement'])) {
                     $transaction->update([
                         'payment_status' => 'paid',
-                        'status' => 'completed' // atau 'success', sesuaikan dengan kebutuhan sistemmu
+                        'status' => 'completed'
                     ]);
 
                     // MESIN PENCETAK TIKET
@@ -179,13 +179,11 @@ class CheckoutController extends Controller
                         'description' => 'Pendapatan dari event: ' . ($transaction->event->name ?? 'Event')
                     ]);
 
+                    // ─── PERBAIKAN DI SINI: Lepas try-catch ───
                     if ($transaction->user && $transaction->user->email) {
-                        try {
-                            Mail::to($transaction->user->email)->send(new TicketMail($transaction));
-                        } catch (\Exception $e) {
-                            Log::error("Gagal kirim email: " . $e->getMessage());
-                        }
+                        Mail::to($transaction->user->email)->send(new TicketMail($transaction));
                     }
+
                 } elseif (in_array($request->transaction_status, ['deny', 'expire', 'cancel'])) {
                     $transaction->update(['payment_status' => 'failed']);
                 }
