@@ -96,46 +96,42 @@
                     <div class="flex items-center gap-2 text-xs font-bold mb-2 text-slate-500 dark:text-white/40">
                         <i data-lucide="map-pin" class="w-3.5 h-3.5 text-blue-500 dark:text-white/40"></i> {{ $event->location ?? 'Lokasi Belum Ditentukan' }}
                     </div>
-                    <div class="flex items-center gap-2 text-xs font-bold mb-4 pb-4 border-b text-slate-500 border-slate-100 dark:text-white/40 dark:border-white/10">
+                    <div class="flex items-center gap-2 text-xs font-bold mb-4 pb-4 text-slate-500 dark:text-white/40">
                         <i data-lucide="calendar" class="w-3.5 h-3.5 text-orange-500 dark:text-white/40"></i> {{ date('d M Y', strtotime($event->event_date)) }}
                     </div>
 
-                    
-                    <!-- ── PERBAIKAN HARGA DINAMIS DI SINI ── -->
-                    <div class="mt-auto flex items-center justify-between">
-                        <div class="flex flex-col">
-                            @php
-                                // Mengambil harga dari kolom database milikmu
-                                $hargaOffline = $event->price ?? 0;
-                                $hargaOnline = $event->online_price ?? 0;
+                    <!-- ── DAFTAR PAKET TIKET (Gaya Sponsorship) ── -->
+                    <div class="mt-auto pt-4 border-t border-slate-100 dark:border-white/10">
 
-                                // Mencari harga termurah dan termahal
-                                $hargaTermurah = min($hargaOffline, $hargaOnline);
-                                $hargaTermahal = max($hargaOffline, $hargaOnline);
-                            @endphp
+                        <!-- Rincian Paket Harga -->
+                        <div class="flex flex-col gap-2 mb-4">
+                            <!-- Paket Offline -->
+                            <div class="flex justify-between items-center px-3 py-2.5 rounded-xl bg-slate-50 border border-slate-100 dark:bg-white/5 dark:border-white/10 transition-colors hover:bg-blue-50 dark:hover:bg-[#0066FF15]">
+                                <span class="text-xs font-bold text-slate-500 dark:text-white/60 flex items-center gap-1.5">
+                                    <i data-lucide="ticket" class="w-3.5 h-3.5"></i> Tiket Offline
+                                </span>
+                                <span class="text-sm font-black text-[#0066FF] dark:text-[#00C2FF]">
+                                    {{ ($event->price > 0) ? 'Rp ' . number_format($event->price, 0, ',', '.') : 'Gratis' }}
+                                </span>
+                            </div>
 
-                            @if($hargaTermahal == 0)
-                                <!-- 1. Jika Keduanya Gratis -->
-                                <span class="font-black text-xl font-montserrat text-emerald-500">Gratis</span>
-
-                            @elseif($hargaOffline != $hargaOnline)
-                                <!-- 2. Jika Harga Offline & Online Berbeda (Munculkan 'Mulai Dari') -->
-                                <span class="text-[10px] font-bold text-slate-400 dark:text-white/40 uppercase tracking-widest mb-0.5">Mulai Dari</span>
-
-                                @if($hargaTermurah == 0)
-                                    <span class="font-black text-xl font-montserrat text-emerald-500">Gratis</span>
-                                @else
-                                    <span class="font-black text-xl font-montserrat text-[#0066FF] dark:text-[#00C2FF]">Rp {{ number_format($hargaTermurah, 0, ',', '.') }}</span>
-                                @endif
-
-                            @else
-                                <!-- 3. Jika Harga Offline & Online Sama -->
-                                <span class="font-black text-xl font-montserrat text-[#0066FF] dark:text-[#00C2FF]">Rp {{ number_format($hargaOffline, 0, ',', '.') }}</span>
-                            @endif
+                            <!-- Paket Online -->
+                            <div class="flex justify-between items-center px-3 py-2.5 rounded-xl bg-slate-50 border border-slate-100 dark:bg-white/5 dark:border-white/10 transition-colors hover:bg-orange-50 dark:hover:bg-[#FF7A0015]">
+                                <span class="text-xs font-bold text-slate-500 dark:text-white/60 flex items-center gap-1.5">
+                                    <i data-lucide="monitor-play" class="w-3.5 h-3.5"></i> Tiket Online
+                                </span>
+                                <span class="text-sm font-black text-orange-500">
+                                    {{ ($event->online_price > 0) ? 'Rp ' . number_format($event->online_price, 0, ',', '.') : 'Gratis' }}
+                                </span>
+                            </div>
                         </div>
 
-                        <a href="{{ url('/event/' . $event->id) }}" class="px-5 py-2.5 text-xs font-bold text-white rounded-xl transition-all hover:scale-105 shadow-md shrink-0" style="background: linear-gradient(135deg, #0066FF, #00C2FF);">Beli Tiket</a>
+                        <!-- Tombol Beli Full-Width -->
+                        <a href="{{ url('/event/' . $event->id) }}" class="w-full text-center block px-4 py-3 text-sm font-bold text-white rounded-xl transition-all shadow-md hover:shadow-lg hover:-translate-y-0.5" style="background: linear-gradient(135deg, #0066FF, #00C2FF);">
+                            Pilih Paket Tiket
+                        </a>
                     </div>
+
                 </div>
                 @empty
                 <div class="col-span-1 md:col-span-2 lg:col-span-3 text-center py-16 rounded-3xl border border-dashed bg-slate-50 border-slate-300 dark:bg-transparent dark:border-white/20">
