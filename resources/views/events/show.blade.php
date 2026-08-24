@@ -202,7 +202,6 @@
                             <!-- Header Panel -->
                             <div class="p-6 text-center border-b relative z-10 bg-slate-50 border-slate-200 dark:bg-white/5 dark:border-white/5 transition-colors">
                             <h2 class="font-black text-lg tracking-widest uppercase font-montserrat">
-                                <!-- Mengganti gradasi dengan warna biru solid yang kontras -->
                                 <span class="text-[#0066FF] dark:text-[#00C2FF]">Pesan Tiketmu</span>
                             </h2>
                             </div>
@@ -211,47 +210,47 @@
                                 <form action="/checkout/{{ $event->id }}" method="POST">
                                     @csrf
 
-                                    <!-- KUSTOMISASI KARTU PILIHAN TIKET -->
+                                    <!-- KUSTOMISASI KARTU PILIHAN TIKET (DINAMIS DARI DATABASE) -->
                                     <div class="mb-6">
                                         <label class="block text-[11px] font-bold uppercase tracking-widest mb-3 text-slate-400 dark:text-white/50">Pilih Kategori Akses</label>
                                         <div class="flex flex-col gap-4">
 
-                                            <!-- Pilihan Offline -->
-                                            <label class="ticket-card relative p-5 rounded-2xl cursor-pointer flex flex-col xl:flex-row xl:items-center justify-between gap-4 overflow-hidden">
-                                                <div class="flex items-center gap-4 relative z-10">
-                                                    <!-- Custom Radio Circle -->
-                                                    <div class="w-5 h-5 rounded-full border-2 custom-radio flex items-center justify-center shrink-0 transition-colors">
-                                                        <div class="w-2.5 h-2.5 rounded-full bg-[#0066FF] dark:bg-[#00C2FF] radio-dot"></div>
+                                            @if($event->ticketPackages && $event->ticketPackages->count() > 0)
+                                                <!-- Jika ada paket tiket (VIP, Reguler, dll) dari Admin -->
+                                                @foreach($event->ticketPackages as $index => $paket)
+                                                    <label class="ticket-card relative p-5 rounded-2xl cursor-pointer flex flex-col xl:flex-row xl:items-center justify-between gap-4 overflow-hidden">
+                                                        <div class="flex items-center gap-4 relative z-10">
+                                                            <div class="w-5 h-5 rounded-full border-2 custom-radio flex items-center justify-center shrink-0 transition-colors">
+                                                                <div class="w-2.5 h-2.5 rounded-full bg-[#0066FF] dark:bg-[#00C2FF] radio-dot"></div>
+                                                            </div>
+                                                            <input type="radio" name="ticket_package_id" value="{{ $paket->id }}" class="hidden" {{ $index == 0 ? 'checked' : '' }} onchange="updateTotal()">
+                                                            <div>
+                                                                <span class="font-bold text-base block font-['Montserrat'] mb-0.5 text-slate-800 dark:text-white">{{ strtoupper($paket->name) }}</span>
+                                                                <span class="text-[11px] font-bold text-slate-500 dark:text-white/50 dark:font-medium">Paket Tiket Tersedia</span>
+                                                            </div>
+                                                        </div>
+                                                        <span class="font-black text-xl text-gradient-ticket relative z-10 xl:text-right" data-price="{{ $paket->price }}">
+                                                            {{ $paket->price == 0 ? 'Gratis' : 'Rp ' . number_format($paket->price, 0, ',', '.') }}
+                                                        </span>
+                                                    </label>
+                                                @endforeach
+                                            @else
+                                                <!-- Jika EO belum buat paket, tampilkan mode default (Offline) -->
+                                                <label class="ticket-card relative p-5 rounded-2xl cursor-pointer flex flex-col xl:flex-row xl:items-center justify-between gap-4 overflow-hidden">
+                                                    <div class="flex items-center gap-4 relative z-10">
+                                                        <div class="w-5 h-5 rounded-full border-2 custom-radio flex items-center justify-center shrink-0 transition-colors">
+                                                            <div class="w-2.5 h-2.5 rounded-full bg-[#0066FF] dark:bg-[#00C2FF] radio-dot"></div>
+                                                        </div>
+                                                        <input type="radio" name="ticket_type" value="offline" class="hidden" checked onchange="updateTotal()">
+                                                        <div>
+                                                            <span class="font-bold text-base block font-['Montserrat'] mb-0.5 text-slate-800 dark:text-white">Tiket Offline</span>
+                                                            <span class="text-[11px] font-bold text-slate-500 dark:text-white/50 dark:font-medium">Acara Langsung di Tempat</span>
+                                                        </div>
                                                     </div>
-                                                    <input type="radio" name="ticket_type" value="offline" class="hidden" checked onchange="updateTotal()">
-                                                    <div>
-                                                        <span class="font-bold text-base block font-['Montserrat'] mb-0.5 text-slate-800 dark:text-white">Tiket Offline</span>
-                                                        <span class="text-[11px] font-bold text-slate-500 dark:text-white/50 dark:font-medium">Acara Langsung di Tempat</span>
-                                                    </div>
-                                                </div>
-                                                <span class="font-black text-xl text-gradient-ticket relative z-10 xl:text-right" data-price="{{ $event->price }}">
-                                                    {{ $event->price == 0 ? 'Gratis' : 'Rp ' . number_format($event->price, 0, ',', '.') }}
-                                                </span>
-                                            </label>
-
-                                            <!-- Pilihan Online (Jika Tersedia) -->
-                                            @if($event->online_price > 0 && !empty($event->youtube_link))
-                                            <label class="ticket-card relative p-5 rounded-2xl cursor-pointer flex flex-col xl:flex-row xl:items-center justify-between gap-4 overflow-hidden">
-                                                <div class="flex items-center gap-4 relative z-10">
-                                                    <!-- Custom Radio Circle -->
-                                                    <div class="w-5 h-5 rounded-full border-2 custom-radio flex items-center justify-center shrink-0 transition-colors">
-                                                        <div class="w-2.5 h-2.5 rounded-full bg-[#0066FF] dark:bg-[#00C2FF] radio-dot"></div>
-                                                    </div>
-                                                    <input type="radio" name="ticket_type" value="online" class="hidden" onchange="updateTotal()">
-                                                    <div>
-                                                        <span class="font-bold text-base block font-['Montserrat'] mb-0.5 text-slate-800 dark:text-white">🌐 Tiket Livestream</span>
-                                                        <span class="text-[11px] font-bold text-slate-500 dark:text-white/50 dark:font-medium">Akses siaran (Virtual)</span>
-                                                    </div>
-                                                </div>
-                                                <span class="font-black text-xl text-gradient-ticket relative z-10 xl:text-right" data-price="{{ $event->online_price }}">
-                                                    {{ $event->online_price == 0 ? 'Gratis' : 'Rp ' . number_format($event->online_price, 0, ',', '.') }}
-                                                </span>
-                                            </label>
+                                                    <span class="font-black text-xl text-gradient-ticket relative z-10 xl:text-right" data-price="{{ $event->price }}">
+                                                        {{ $event->price == 0 ? 'Gratis' : 'Rp ' . number_format($event->price, 0, ',', '.') }}
+                                                    </span>
+                                                </label>
                                             @endif
 
                                         </div>
@@ -329,7 +328,8 @@
             if (!qtySelect) return;
             const qty = parseInt(qtySelect.value);
 
-            const selectedRadio = document.querySelector('input[name="ticket_type"]:checked');
+            // ── PERBAIKAN: Deteksi semua tipe radio button ──
+            const selectedRadio = document.querySelector('input[type="radio"]:checked');
             if (!selectedRadio) return;
 
             const priceSpan = selectedRadio.closest('label').querySelector('[data-price]');
@@ -348,19 +348,17 @@
         document.addEventListener('DOMContentLoaded', updateTotal);
 
         // ── SCRIPT GALERI GAYA SHOPEE ──
-        // 1. Inisialisasi Thumbnail (Gambar Kecil di Bawah)
         var thumbSwiper = new Swiper(".thumbGallerySwiper", {
             spaceBetween: 12,
-            slidesPerView: 4, // Menampilkan 4 kotak di HP
+            slidesPerView: 4,
             freeMode: true,
             watchSlidesProgress: true,
             breakpoints: {
-                640: { slidesPerView: 5 }, // 5 kotak di layar sedang
-                1024: { slidesPerView: 6 }, // 6 kotak di laptop
+                640: { slidesPerView: 5 },
+                1024: { slidesPerView: 6 },
             }
         });
 
-        // 2. Inisialisasi Gambar Utama (Besar)
         var mainSwiper = new Swiper(".mainGallerySwiper", {
             loop: true,
             spaceBetween: 10,
@@ -372,7 +370,6 @@
                 nextEl: ".swiper-button-next",
                 prevEl: ".swiper-button-prev",
             },
-            // Menghubungkan gambar besar dengan thumbnail kecil di bawahnya!
             thumbs: {
                 swiper: thumbSwiper,
             },

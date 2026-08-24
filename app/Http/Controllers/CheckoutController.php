@@ -20,18 +20,18 @@ class CheckoutController extends Controller
     // 1. Memproses Checkout awal
     public function processCheckout(Request $request, $eventId)
     {
-        // Tambahkan validasi ticket_type
+        // ─── PERBAIKAN: Validasi mendukung ID Paket Tiket atau Tipe Lama ───
         $request->validate([
             'quantity' => 'required|integer|min:1',
-            'ticket_type' => 'required|in:offline,online'
+            'ticket_type' => 'nullable|in:offline,online',
+            'ticket_package_id' => 'nullable' // Menerima ID paket dari halaman detail
         ]);
 
         $user = Auth::user();
         $jumlahBeli = $request->input('quantity');
-        $tipeTiket = $request->input('ticket_type');
-        $maksimalTiket = 5; // Disesuaikan dengan form HTML kamu (Maks 5)
+        $maksimalTiket = 5;
 
-        return DB::transaction(function () use ($eventId, $user, $jumlahBeli, $tipeTiket, $maksimalTiket) {
+        return DB::transaction(function () use ($request, $eventId, $user, $jumlahBeli, $maksimalTiket) {
             $event = Event::where('id', $eventId)->lockForUpdate()->firstOrFail();
 
             $tiketSudahDibeli = Transaction::where('user_id', $user->id)
@@ -50,13 +50,27 @@ class CheckoutController extends Controller
             // Kurangi kuota event
             $event->decrement('quota', $jumlahBeli);
 
-            // PENENTUAN HARGA BERDASARKAN TIPE TIKET
+            // ─── PERBAIKAN: PENENTUAN HARGA BERDASARKAN PAKET TIKET ───
             $hargaSatuan = 0;
-            if ($tipeTiket === 'offline') {
-                $hargaSatuan = $event->price;
+            $tipeTiketDisimpan = 'offline';
+
+            if ($request->filled('ticket_package_id')) {
+                // Jika event menggunakan sistem Paket (VIP, Reguler, dll)
+                $paket = $event->ticketPackages()->where('id', $request->ticket_package_id)->first();
+                if ($paket) {
+                    $hargaSatuan = $paket->price;
+                    $tipeTiketDisimpan = $paket->name; // Simpan nama paket (cth: VIP) ke riwayat
+                }
             } else {
-                // Pastikan kolom 'online_price' ada di database, jika null maka Gratis (0)
-                $hargaSatuan = $event->online_price ?? 0;
+                // Fallback: Jika event masih menggunakan sistem lama (Offline/Online)
+                $tipeTiket = $request->input('ticket_type', 'offline');
+                $tipeTiketDisimpan = $tipeTiket;
+
+                if ($tipeTiket === 'offline') {
+                    $hargaSatuan = $event->price;
+                } else {
+                    $hargaSatuan = $event->online_price ?? 0;
+                }
             }
 
             $totalHarga = $hargaSatuan * $jumlahBeli;
@@ -69,7 +83,7 @@ class CheckoutController extends Controller
                 'event_id' => $event->id,
                 'order_id' => 'TRX-' . strtoupper(Str::random(10)),
                 'quantity' => $jumlahBeli,
-                'ticket_type' => $tipeTiket, // Simpan tipe tiket ke database
+                'ticket_type' => $tipeTiketDisimpan, // Menyimpan nama paket tiket
                 'total_amount' => $totalHarga,
                 'payment_status' => $statusPembayaran
             ]);
@@ -114,7 +128,6 @@ class CheckoutController extends Controller
             abort(403, 'Maaf, Anda tidak memiliki akses.');
         }
 
-        // Cegah error Midtrans jika tiket sudah lunas/gratis
         if ($transaction->payment_status === 'paid') {
             return redirect()->route('transaction.history')->with('success', 'Transaksi ini sudah lunas.');
         }
@@ -161,7 +174,6 @@ class CheckoutController extends Controller
                         'status' => 'completed'
                     ]);
 
-                    // MESIN PENCETAK TIKET
                     if ($transaction->tickets->count() == 0) {
                         for ($i = 0; $i < $transaction->quantity; $i++) {
                             \App\Models\Ticket::create([
@@ -179,11 +191,13 @@ class CheckoutController extends Controller
                         'description' => 'Pendapatan dari event: ' . ($transaction->event->name ?? 'Event')
                     ]);
 
-                    // ─── PERBAIKAN DI SINI: Lepas try-catch ───
                     if ($transaction->user && $transaction->user->email) {
-                        Mail::to($transaction->user->email)->send(new TicketMail($transaction));
+                        try {
+                            Mail::to($transaction->user->email)->send(new TicketMail($transaction));
+                        } catch (\Exception $e) {
+                            Log::error("Gagal kirim email: " . $e->getMessage());
+                        }
                     }
-
                 } elseif (in_array($request->transaction_status, ['deny', 'expire', 'cancel'])) {
                     $transaction->update(['payment_status' => 'failed']);
                 }
@@ -212,7 +226,6 @@ class CheckoutController extends Controller
                         'status' => 'completed'
                     ]);
 
-                    // MESIN PENCETAK TIKET
                     if ($transaction->tickets->count() == 0) {
                         for ($i = 0; $i < $transaction->quantity; $i++) {
                             \App\Models\Ticket::create([
@@ -230,13 +243,11 @@ class CheckoutController extends Controller
                         'description' => 'Pendapatan dari event: ' . ($transaction->event->name ?? 'Event')
                     ]);
 
-                    // ─── KIRIM EMAIL DENGAN PELINDUNG (Aman untuk Production) ───
                     if ($transaction->user && $transaction->user->email) {
                         try {
                             Mail::to($transaction->user->email)->send(new TicketMail($transaction));
                         } catch (\Exception $e) {
-                            // Jika email gagal, catat diam-diam di background agar web tidak crash
-                            \Illuminate\Support\Facades\Log::error("Gagal kirim email: " . $e->getMessage());
+                            Log::error("Gagal kirim email: " . $e->getMessage());
                         }
                     }
                 }
@@ -261,12 +272,12 @@ class CheckoutController extends Controller
 
     // 6. Debugging status (Hapus jika sudah live)
     public function debugPaid($id)
-        {
-            $transaction = Transaction::with('event', 'user', 'tickets')->findOrFail($id);
-            $transaction->update([
-                'payment_status' => 'paid',
-                'status' => 'completed'
-                ]);
+    {
+        $transaction = Transaction::with('event', 'user', 'tickets')->findOrFail($id);
+        $transaction->update([
+            'payment_status' => 'paid',
+            'status' => 'completed'
+        ]);
 
         if ($transaction->tickets->count() == 0) {
             for ($i = 0; $i < $transaction->quantity; $i++) {
@@ -281,7 +292,11 @@ class CheckoutController extends Controller
         $transaction = Transaction::with('event', 'user', 'tickets')->findOrFail($id);
 
         if ($transaction->user && $transaction->user->email) {
-            Mail::to($transaction->user->email)->send(new TicketMail($transaction));
+            try {
+                Mail::to($transaction->user->email)->send(new TicketMail($transaction));
+            } catch (\Exception $e) {
+                Log::error("Gagal kirim email: " . $e->getMessage());
+            }
         }
 
         return "Status LUNAS. " . $transaction->quantity . " Tiket berhasil dicetak & Email dikirim!";
@@ -294,19 +309,16 @@ class CheckoutController extends Controller
     {
         $userId = \Illuminate\Support\Facades\Auth::id();
 
-        // 1. Ambil riwayat pembelian tiket
         $ticketTransactions = \App\Models\Transaction::with('event')
             ->where('user_id', $userId)
             ->latest()
             ->get();
 
-        // 2. Ambil riwayat pengajuan sponsorship
         $sponsorshipTransactions = \App\Models\SponsorshipTransaction::with('sponsorship.event')
             ->where('user_id', $userId)
             ->latest()
             ->get();
 
-        // 3. Tampilkan ke halaman riwayat
         return view('history', compact('ticketTransactions', 'sponsorshipTransactions'));
     }
 
@@ -315,31 +327,23 @@ class CheckoutController extends Controller
     // ==========================================
     public function requestRefund(Request $request, $id)
     {
-        // 1. Validasi agar alasan dan nomor rekening wajib diisi oleh pengguna
         $request->validate([
             'refund_reason'  => 'required|string|max:255',
             'refund_account' => 'required|string|max:255',
         ]);
 
         $user = Auth::user();
-
-        // 2. Cari transaksi berdasarkan ID dan pastikan itu milik user yang sedang login
         $transaction = Transaction::where('id', $id)->where('user_id', $user->id)->firstOrFail();
 
-        // 3. Validasi: Refund hanya bisa diajukan jika status tiket saat ini adalah 'paid'
         if ($transaction->payment_status !== 'paid') {
             return redirect()->back()->with('error', 'Refund hanya dapat diajukan untuk transaksi yang sudah lunas.');
         }
 
-        // 4. Ubah status menjadi 'refund_requested' DAN simpan alasan serta rekeningnya
         $transaction->update([
             'payment_status' => 'refund_requested',
             'refund_reason'  => $request->refund_reason,
             'refund_account' => $request->refund_account
         ]);
-
-        // (Opsional) Di sini kamu juga bisa menambahkan kode untuk memulihkan kuota event (quota + quantity)
-        // $transaction->event->increment('quota', $transaction->quantity);
 
         return redirect()->back()->with('success', 'Pengajuan Refund berhasil dikirim beserta detail rekening Anda. Tim kami akan segera memprosesnya.');
     }

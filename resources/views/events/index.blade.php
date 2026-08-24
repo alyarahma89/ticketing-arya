@@ -105,7 +105,7 @@
 
                         <!-- Rincian Paket Harga -->
                         <div class="flex flex-col gap-2 mb-4">
-                            <!-- Paket Offline -->
+                            <!-- Paket Offline (Selalu Muncul) -->
                             <div class="flex justify-between items-center px-3 py-2.5 rounded-xl bg-slate-50 border border-slate-100 dark:bg-white/5 dark:border-white/10 transition-colors hover:bg-blue-50 dark:hover:bg-[#0066FF15]">
                                 <span class="text-xs font-bold text-slate-500 dark:text-white/60 flex items-center gap-1.5">
                                     <i data-lucide="ticket" class="w-3.5 h-3.5"></i> Tiket Offline
@@ -115,15 +115,17 @@
                                 </span>
                             </div>
 
-                            <!-- Paket Online -->
+                            <!-- Paket Online (Hanya Muncul Jika Harga > 0) -->
+                            @if($event->online_price > 0)
                             <div class="flex justify-between items-center px-3 py-2.5 rounded-xl bg-slate-50 border border-slate-100 dark:bg-white/5 dark:border-white/10 transition-colors hover:bg-orange-50 dark:hover:bg-[#FF7A0015]">
                                 <span class="text-xs font-bold text-slate-500 dark:text-white/60 flex items-center gap-1.5">
                                     <i data-lucide="monitor-play" class="w-3.5 h-3.5"></i> Tiket Online
                                 </span>
                                 <span class="text-sm font-black text-orange-500">
-                                    {{ ($event->online_price > 0) ? 'Rp ' . number_format($event->online_price, 0, ',', '.') : 'Gratis' }}
+                                    Rp {{ number_format($event->online_price, 0, ',', '.') }}
                                 </span>
                             </div>
+                            @endif
                         </div>
 
                         <!-- Tombol Beli Full-Width -->
