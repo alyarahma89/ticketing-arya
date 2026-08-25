@@ -100,37 +100,66 @@
                         <i data-lucide="calendar" class="w-3.5 h-3.5 text-orange-500 dark:text-white/40"></i> {{ date('d M Y', strtotime($event->event_date)) }}
                     </div>
 
-                    <!-- ── DAFTAR PAKET TIKET (Gaya Sponsorship) ── -->
-                    <div class="mt-auto pt-4 border-t border-slate-100 dark:border-white/10">
+                    <!-- ── DAFTAR PAKET TIKET (Gaya Modern & Terang) ── -->
+                    <div class="mt-auto pt-5 border-t border-slate-100 dark:border-white/10">
 
                         <!-- Rincian Paket Harga -->
-                        <div class="flex flex-col gap-2 mb-4">
-                            <!-- Paket Offline (Selalu Muncul) -->
-                            <div class="flex justify-between items-center px-3 py-2.5 rounded-xl bg-slate-50 border border-slate-100 dark:bg-white/5 dark:border-white/10 transition-colors hover:bg-blue-50 dark:hover:bg-[#0066FF15]">
-                                <span class="text-xs font-bold text-slate-500 dark:text-white/60 flex items-center gap-1.5">
-                                    <i data-lucide="ticket" class="w-3.5 h-3.5"></i> Tiket Offline
-                                </span>
-                                <span class="text-sm font-black text-[#0066FF] dark:text-[#00C2FF]">
-                                    {{ ($event->price > 0) ? 'Rp ' . number_format($event->price, 0, ',', '.') : 'Gratis' }}
-                                </span>
+                        <div class="flex flex-col gap-3 mb-5">
+
+                            <!-- Paket Offline (Akses Venue) -->
+                            <div class="relative overflow-hidden group/ticket p-3.5 rounded-2xl bg-white border border-blue-100 shadow-[0_4px_20px_-4px_rgba(0,102,255,0.08)] hover:shadow-[0_8px_30px_-4px_rgba(0,102,255,0.15)] transition-all dark:bg-[#0A1A3A]/60 dark:border-[#0066FF30] dark:hover:border-[#0066FF60]">
+                                <!-- Elemen Dekoratif -->
+                                <div class="absolute top-0 right-0 w-24 h-24 bg-gradient-to-br from-blue-100 to-transparent rounded-full -mr-8 -mt-8 opacity-50 dark:from-[#0066FF20]"></div>
+
+                                <div class="relative z-10 flex items-center justify-between">
+                                    <div class="flex items-center gap-3">
+                                        <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-[#0066FF] to-[#00C2FF] text-white flex items-center justify-center shadow-lg shadow-blue-500/30 shrink-0">
+                                            <i data-lucide="ticket" class="w-5 h-5"></i>
+                                        </div>
+                                        <div>
+                                            <span class="block text-[9px] font-black tracking-widest text-slate-400 dark:text-white/40 uppercase mb-0.5">Akses Venue</span>
+                                            <span class="block text-sm font-bold text-slate-800 dark:text-white transition-colors">Tiket Masuk</span>
+                                        </div>
+                                    </div>
+                                    <div class="text-right">
+                                        <span class="block text-lg font-black font-montserrat text-[#0066FF] dark:text-[#00C2FF]">
+                                            {{ ($event->price > 0) ? 'Rp ' . number_format($event->price, 0, ',', '.') : 'Gratis' }}
+                                        </span>
+                                    </div>
+                                </div>
                             </div>
 
-                            <!-- Paket Online (Hanya Muncul Jika Harga > 0) -->
+                            <!-- Paket Online (Akses Virtual) - Muncul Jika Ada -->
                             @if($event->online_price > 0)
-                            <div class="flex justify-between items-center px-3 py-2.5 rounded-xl bg-slate-50 border border-slate-100 dark:bg-white/5 dark:border-white/10 transition-colors hover:bg-orange-50 dark:hover:bg-[#FF7A0015]">
-                                <span class="text-xs font-bold text-slate-500 dark:text-white/60 flex items-center gap-1.5">
-                                    <i data-lucide="monitor-play" class="w-3.5 h-3.5"></i> Tiket Online
-                                </span>
-                                <span class="text-sm font-black text-orange-500">
-                                    Rp {{ number_format($event->online_price, 0, ',', '.') }}
-                                </span>
+                            <div class="relative overflow-hidden group/ticket p-3.5 rounded-2xl bg-white border border-orange-100 shadow-[0_4px_20px_-4px_rgba(255,122,0,0.08)] hover:shadow-[0_8px_30px_-4px_rgba(255,122,0,0.15)] transition-all dark:bg-[#1A1010]/60 dark:border-[#FF7A0030] dark:hover:border-[#FF7A0060]">
+                                <div class="absolute top-0 right-0 w-24 h-24 bg-gradient-to-br from-orange-100 to-transparent rounded-full -mr-8 -mt-8 opacity-50 dark:from-[#FF7A0020]"></div>
+
+                                <div class="relative z-10 flex items-center justify-between">
+                                    <div class="flex items-center gap-3">
+                                        <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-[#FF7A00] to-[#FF3B30] text-white flex items-center justify-center shadow-lg shadow-orange-500/30 shrink-0">
+                                            <i data-lucide="radio" class="w-5 h-5"></i>
+                                        </div>
+                                        <div>
+                                            <span class="block text-[9px] font-black tracking-widest text-slate-400 dark:text-white/40 uppercase mb-0.5">Akses Virtual</span>
+                                            <span class="block text-sm font-bold text-slate-800 dark:text-white transition-colors">Livestream</span>
+                                        </div>
+                                    </div>
+                                    <div class="text-right">
+                                        <span class="block text-lg font-black font-montserrat text-orange-500 dark:text-[#FF7A00]">
+                                            Rp {{ number_format($event->online_price, 0, ',', '.') }}
+                                        </span>
+                                    </div>
+                                </div>
                             </div>
                             @endif
+
                         </div>
 
                         <!-- Tombol Beli Full-Width -->
-                        <a href="{{ url('/event/' . $event->id) }}" class="w-full text-center block px-4 py-3 text-sm font-bold text-white rounded-xl transition-all shadow-md hover:shadow-lg hover:-translate-y-0.5" style="background: linear-gradient(135deg, #0066FF, #00C2FF);">
-                            Pilih Paket Tiket
+                        <a href="{{ url('/event/' . $event->id) }}" class="group/btn relative w-full flex items-center justify-center gap-2 px-4 py-3.5 text-sm font-bold text-white rounded-xl overflow-hidden transition-all shadow-lg hover:shadow-blue-500/40 hover:-translate-y-1">
+                            <div class="absolute inset-0 w-full h-full bg-gradient-to-r from-[#0066FF] to-[#00C2FF] transition-transform duration-300 group-hover/btn:scale-110"></div>
+                            <span class="relative z-10 font-montserrat">Pesan Tiket Sekarang</span>
+                            <i data-lucide="arrow-right" class="w-4 h-4 relative z-10 transition-transform group-hover/btn:translate-x-1"></i>
                         </a>
                     </div>
 
