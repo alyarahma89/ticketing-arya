@@ -46,6 +46,8 @@ Route::get('/event/{id}/sponsorship', [App\Http\Controllers\AdminEventController
 Route::middleware('auth')->group(function () {
     Route::post('/checkout/{id}', [CheckoutController::class, 'processCheckout'])->name('checkout.process');
     Route::get('/transaction/{id}', [CheckoutController::class, 'show'])->name('transaction.show');
+    Route::get('/transaction/{id}/check-status', [CheckoutController::class, 'checkStatus'])->name('transaction.check_status');
+    Route::post('/transaction/{id}/cancel', [CheckoutController::class, 'cancelTransaction'])->name('transaction.cancel');
     Route::get('/history', [CheckoutController::class, 'history'])->name('transaction.history');
     Route::get('/download-ticket/{id}', [CheckoutController::class, 'downloadTicket'])->name('ticket.download');
     Route::get('/debug-paid/{id}', [CheckoutController::class, 'debugPaid']);
@@ -153,7 +155,15 @@ Route::middleware(['auth', 'role:eo'])->prefix('eo')->group(function () {
 // =========================================================
 // INTEGRASI PAYMENT GATEWAY MIDTRANS
 // =========================================================
-Route::post('/midtrans-callback', [CheckoutController::class, 'callback']);
+Route::match(['get', 'post'], '/midtrans-callback', function (\Illuminate\Http\Request $request) {
+    if ($request->isMethod('get')) {
+        if ($request->has('order_id')) {
+            return app(\App\Http\Controllers\CheckoutController::class)->finish($request);
+        }
+        return redirect()->route('transaction.history');
+    }
+    return app(\App\Http\Controllers\CheckoutController::class)->callback($request);
+});
 Route::get('/midtrans/finish', [CheckoutController::class, 'finish'])->name('midtrans.finish');
 
 

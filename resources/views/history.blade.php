@@ -68,6 +68,28 @@
             </p>
         </div>
 
+        <!-- ── NOTIFIKASI FLASH MESSAGE ── -->
+        @if (session('success'))
+            <div class="flex items-center gap-3 bg-emerald-50 dark:bg-emerald-500/10 border border-emerald-200 dark:border-emerald-500/20 text-emerald-700 dark:text-emerald-400 p-4 rounded-2xl mb-6 shadow-sm">
+                <i data-lucide="check-circle" class="w-5 h-5 shrink-0"></i>
+                <p class="font-bold text-sm">{{ session('success') }}</p>
+            </div>
+        @endif
+
+        @if (session('error'))
+            <div class="flex items-center gap-3 bg-red-50 dark:bg-red-500/10 border border-red-200 dark:border-red-500/20 text-red-700 dark:text-red-400 p-4 rounded-2xl mb-6 shadow-sm">
+                <i data-lucide="alert-circle" class="w-5 h-5 shrink-0"></i>
+                <p class="font-bold text-sm">{{ session('error') }}</p>
+            </div>
+        @endif
+
+        @if (session('info'))
+            <div class="flex items-center gap-3 bg-blue-50 dark:bg-blue-500/10 border border-blue-200 dark:border-blue-500/20 text-[#0066FF] dark:text-[#00C2FF] p-4 rounded-2xl mb-6 shadow-sm">
+                <i data-lucide="info" class="w-5 h-5 shrink-0"></i>
+                <p class="font-bold text-sm">{{ session('info') }}</p>
+            </div>
+        @endif
+
         <!-- ── SISTEM TAB ── -->
         <div class="bg-white dark:bg-white/5 border border-slate-200 dark:border-white/10 rounded-[24px] shadow-sm overflow-hidden">
 
@@ -91,7 +113,8 @@
                             <!-- Garis Status Samping -->
                             <div class="absolute left-0 top-0 bottom-0 w-1.5
                                 {{ in_array($ticket->payment_status, ['paid', 'success', 'settlement']) ? 'bg-[#0066FF]' :
-                                  ($ticket->payment_status === 'refunded' ? 'bg-slate-400' : 'bg-orange-500') }}">
+                                  ($ticket->payment_status === 'refunded' ? 'bg-slate-400' :
+                                  (in_array($ticket->payment_status, ['failed', 'cancel', 'cancelled', 'expire']) ? 'bg-red-500' : 'bg-orange-500')) }}">
                             </div>
 
                             <div class="flex-grow pl-2">
@@ -105,6 +128,8 @@
                                         <span class="bg-orange-50 text-orange-600 dark:bg-[#FF7A0020] dark:text-[#FFB000] px-2 py-0.5 rounded text-[10px] font-bold uppercase">Refund Diproses</span>
                                     @elseif($ticket->payment_status === 'refunded')
                                         <span class="bg-slate-100 text-slate-500 dark:bg-white/10 dark:text-white/50 px-2 py-0.5 rounded text-[10px] font-bold uppercase">Dikembalikan</span>
+                                    @elseif(in_array($ticket->payment_status, ['failed', 'cancel', 'cancelled', 'expire']))
+                                        <span class="bg-red-50 text-red-600 dark:bg-red-500/20 dark:text-red-400 px-2 py-0.5 rounded text-[10px] font-bold uppercase">Dibatalkan</span>
                                     @else
                                         <span class="bg-orange-50 text-orange-600 dark:bg-[#FF7A0020] dark:text-[#FFB000] px-2 py-0.5 rounded text-[10px] font-bold uppercase">Menunggu Pembayaran</span>
                                     @endif
@@ -138,11 +163,31 @@
                                     <div class="w-full md:w-auto mt-2 text-center bg-slate-100 border border-slate-200 text-slate-500 dark:bg-white/5 dark:border-white/10 dark:text-white/40 px-4 py-2 rounded-xl text-sm font-bold flex items-center justify-center gap-2">
                                         <i data-lucide="check-circle" class="w-4 h-4"></i> Dana Dikembalikan
                                     </div>
+                                @elseif(in_array($ticket->payment_status, ['failed', 'cancel', 'cancelled', 'expire']))
+                                    <div class="w-full md:w-auto mt-2 text-center bg-red-50 border border-red-200 text-red-600 dark:bg-red-500/10 dark:border-red-500/30 dark:text-red-400 px-4 py-2 rounded-xl text-sm font-bold flex items-center justify-center gap-2">
+                                        <i data-lucide="x-circle" class="w-4 h-4"></i> Pesanan Dibatalkan
+                                    </div>
                                 @else
-                                    <!-- ── PERBAIKAN TOMBOL BAYAR SEKARANG ── -->
-                                    <button onclick="payNow('{{ $ticket->snap_token }}')" class="w-full md:w-auto text-center bg-gradient-to-r from-[#FF7A00] to-[#FF3B30] text-white px-4 py-2 rounded-xl text-sm font-bold shadow-md transition-all hover:scale-[1.02] mt-2">
-                                        Bayar Sekarang
-                                    </button>
+                                    <!-- ── TOMBOL AKSI MENUNGGU PEMBAYARAN ── -->
+                                    <div class="flex flex-wrap items-center gap-2 w-full md:w-auto mt-2">
+                                        <!-- Tombol Cek Status Pembayaran (Sync Midtrans) -->
+                                        <a href="{{ route('transaction.check_status', $ticket->id) }}" class="flex-1 md:flex-none text-center bg-blue-50 hover:bg-blue-100 border border-blue-200 text-[#0066FF] dark:bg-blue-500/10 dark:border-blue-500/30 dark:text-[#00C2FF] px-3.5 py-2 rounded-xl text-xs font-bold transition-all flex items-center justify-center gap-1.5 shadow-sm" title="Periksa status ke Midtrans jika sudah bayar di HP / Simulator">
+                                            <i data-lucide="refresh-cw" class="w-3.5 h-3.5"></i> Cek Status
+                                        </a>
+
+                                        <!-- Tombol Bayar Sekarang (Buka Invoice) -->
+                                        <a href="{{ route('transaction.show', $ticket->id) }}" class="flex-1 md:flex-none text-center bg-gradient-to-r from-[#0066FF] to-[#00C2FF] text-white px-3.5 py-2 rounded-xl text-xs font-bold shadow-sm transition-all hover:scale-[1.02] flex items-center justify-center gap-1.5">
+                                            <i data-lucide="credit-card" class="w-3.5 h-3.5"></i> Bayar
+                                        </a>
+
+                                        <!-- Tombol Batalkan Pesanan -->
+                                        <form action="{{ route('transaction.cancel', $ticket->id) }}" method="POST" onsubmit="return confirm('Apakah Anda yakin ingin membatalkan pesanan tiket ini? Kuota tiket akan dikembalikan.');" class="inline">
+                                            @csrf
+                                            <button type="submit" class="w-full sm:w-auto text-center bg-slate-100 hover:bg-red-50 text-slate-500 hover:text-red-600 border border-slate-200 dark:bg-white/5 dark:border-white/10 dark:hover:border-red-500/30 dark:hover:text-red-400 px-3 py-2 rounded-xl text-xs font-bold transition-all flex items-center justify-center gap-1" title="Batalkan pesanan dan kembalikan kuota">
+                                                <i data-lucide="x" class="w-3.5 h-3.5"></i> Batal
+                                            </button>
+                                        </form>
+                                    </div>
                                 @endif
                                 <!-- Akhir Area Tombol Aksi -->
 
@@ -255,29 +300,6 @@
             themeIcon.setAttribute('data-lucide', isDark ? 'sun' : 'moon');
             lucide.createIcons();
         });
-    </script>
-
-    <!-- ── SCRIPT MIDTRANS SNAP JS ── -->
-    <script src="https://app.sandbox.midtrans.com/snap/snap.js" data-client-key="{{ env('MIDTRANS_CLIENT_KEY') }}"></script>
-    <script>
-        function payNow(snapToken) {
-            // Memanggil fitur Snap Midtrans
-            snap.pay(snapToken, {
-                onSuccess: function(result) {
-                    alert("Pembayaran berhasil! Memuat ulang halaman...");
-                    window.location.reload();
-                },
-                onPending: function(result) {
-                    alert("Menunggu pembayaran Anda diselesaikan.");
-                },
-                onError: function(result) {
-                    alert("Pembayaran gagal. Silakan coba lagi.");
-                },
-                onClose: function() {
-                    alert("Anda menutup jendela sebelum menyelesaikan pembayaran.");
-                }
-            });
-        }
     </script>
 </body>
 </html>

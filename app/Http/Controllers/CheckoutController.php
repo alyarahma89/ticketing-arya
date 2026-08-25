@@ -158,104 +158,174 @@ class CheckoutController extends Controller
         return view('transactions.show', compact('transaction', 'snapToken'));
     }
 
-    // 3. Callback dari Midtrans
+    /**
+     * Helper privat untuk memproses transaksi yang sudah lunas:
+     * - Mengubah status transaksi menjadi paid & completed
+     * - Membuat tiket fisik/QR jika belum ada
+     * - Mencatat pendapatan (revenue)
+     * - Mengirim email konfirmasi tiket
+     */
+    private function markAsPaid(Transaction $transaction)
+    {
+        if ($transaction->payment_status !== 'paid') {
+            $transaction->update([
+                'payment_status' => 'paid',
+                'status' => 'completed'
+            ]);
+
+            if ($transaction->tickets->count() == 0) {
+                for ($i = 0; $i < $transaction->quantity; $i++) {
+                    \App\Models\Ticket::create([
+                        'transaction_id' => $transaction->id,
+                        'ticket_code' => $transaction->order_id . '-' . strtoupper(Str::random(4)),
+                        'is_scanned' => false,
+                    ]);
+                }
+            }
+
+            $transaction->load('tickets');
+
+            Revenue::firstOrCreate(['order_id' => $transaction->order_id], [
+                'amount' => $transaction->total_amount,
+                'description' => 'Pendapatan dari event: ' . ($transaction->event->name ?? 'Event')
+            ]);
+
+            if ($transaction->user && $transaction->user->email) {
+                try {
+                    Mail::to($transaction->user->email)->send(new TicketMail($transaction));
+                } catch (\Exception $e) {
+                    Log::error("Gagal kirim email: " . $e->getMessage());
+                }
+            }
+        }
+    }
+
+    // 3. Callback dari Midtrans (Webhook Server-to-Server)
     public function callback(Request $request)
     {
-        $serverKey = env('MIDTRANS_SERVER_KEY');
+        $serverKey = config('midtrans.server_key') ?: env('MIDTRANS_SERVER_KEY');
         $hashed = hash("sha512", $request->order_id . $request->status_code . $request->gross_amount . $serverKey);
 
         if ($hashed == $request->signature_key) {
             $transaction = Transaction::with(['event', 'user', 'tickets'])->where('order_id', $request->order_id)->first();
 
-            if ($transaction && $transaction->payment_status != 'paid') {
+            if ($transaction) {
                 if (in_array($request->transaction_status, ['capture', 'settlement'])) {
-                    $transaction->update([
-                        'payment_status' => 'paid',
-                        'status' => 'completed'
-                    ]);
-
-                    if ($transaction->tickets->count() == 0) {
-                        for ($i = 0; $i < $transaction->quantity; $i++) {
-                            \App\Models\Ticket::create([
-                                'transaction_id' => $transaction->id,
-                                'ticket_code' => $transaction->order_id . '-' . strtoupper(\Illuminate\Support\Str::random(4)),
-                                'is_scanned' => false,
-                            ]);
-                        }
-                    }
-
-                    $transaction->load('tickets');
-
-                    Revenue::firstOrCreate(['order_id' => $transaction->order_id], [
-                        'amount' => $transaction->total_amount,
-                        'description' => 'Pendapatan dari event: ' . ($transaction->event->name ?? 'Event')
-                    ]);
-
-                    if ($transaction->user && $transaction->user->email) {
-                        try {
-                            Mail::to($transaction->user->email)->send(new TicketMail($transaction));
-                        } catch (\Exception $e) {
-                            Log::error("Gagal kirim email: " . $e->getMessage());
-                        }
-                    }
+                    $this->markAsPaid($transaction);
                 } elseif (in_array($request->transaction_status, ['deny', 'expire', 'cancel'])) {
-                    $transaction->update(['payment_status' => 'failed']);
+                    if ($transaction->payment_status === 'pending') {
+                        $transaction->update(['payment_status' => 'failed']);
+                        if ($transaction->event) {
+                            $transaction->event->increment('quota', $transaction->quantity);
+                        }
+                    }
                 }
             }
         }
         return response()->json(['message' => 'OK']);
     }
 
-    // 4. Cek Status saat kembali dari Midtrans (Berjalan saat testing di Lokal)
+    // 4. Cek Status saat kembali dari Midtrans Snap Redirect
     public function finish(Request $request)
     {
         $orderId = $request->order_id;
         if (!$orderId) return redirect()->route('transaction.history')->with('error', 'Transaksi tidak ditemukan.');
 
-        \Midtrans\Config::$serverKey = env('MIDTRANS_SERVER_KEY');
-        \Midtrans\Config::$isProduction = false;
+        \Midtrans\Config::$serverKey = config('midtrans.server_key') ?: env('MIDTRANS_SERVER_KEY');
+        \Midtrans\Config::$isProduction = config('midtrans.is_production', false);
 
         try {
             $statusInfo = \Midtrans\Transaction::status($orderId);
+            $trxStatus = is_object($statusInfo) ? ($statusInfo->transaction_status ?? '') : ($statusInfo['transaction_status'] ?? '');
             $transaction = Transaction::with(['event', 'user', 'tickets'])->where('order_id', $orderId)->first();
 
-            if ($transaction && $transaction->payment_status != 'paid') {
-                if (in_array($statusInfo->transaction_status, ['capture', 'settlement'])) {
-                    $transaction->update([
-                        'payment_status' => 'paid',
-                        'status' => 'completed'
-                    ]);
-
-                    if ($transaction->tickets->count() == 0) {
-                        for ($i = 0; $i < $transaction->quantity; $i++) {
-                            \App\Models\Ticket::create([
-                                'transaction_id' => $transaction->id,
-                                'ticket_code' => $transaction->order_id . '-' . strtoupper(\Illuminate\Support\Str::random(4)),
-                                'is_scanned' => false,
-                            ]);
+            if ($transaction) {
+                if (in_array($trxStatus, ['capture', 'settlement'])) {
+                    $this->markAsPaid($transaction);
+                    return redirect()->route('transaction.history')->with('success', 'Pembayaran berhasil dikonfirmasi dan Tiket telah dikirim!');
+                } elseif (in_array($trxStatus, ['deny', 'expire', 'cancel'])) {
+                    if ($transaction->payment_status === 'pending') {
+                        $transaction->update(['payment_status' => 'failed']);
+                        if ($transaction->event) {
+                            $transaction->event->increment('quota', $transaction->quantity);
                         }
                     }
-
-                    $transaction->load('tickets');
-
-                    Revenue::firstOrCreate(['order_id' => $orderId], [
-                        'amount' => $transaction->total_amount,
-                        'description' => 'Pendapatan dari event: ' . ($transaction->event->name ?? 'Event')
-                    ]);
-
-                    if ($transaction->user && $transaction->user->email) {
-                        try {
-                            Mail::to($transaction->user->email)->send(new TicketMail($transaction));
-                        } catch (\Exception $e) {
-                            Log::error("Gagal kirim email: " . $e->getMessage());
-                        }
-                    }
+                    return redirect()->route('transaction.history')->with('error', 'Status pembayaran di Midtrans: ' . strtoupper($trxStatus) . '. Pesanan dibatalkan.');
                 }
             }
-            return redirect()->route('transaction.history')->with('success', 'Pembayaran berhasil dikonfirmasi dan Tiket telah dikirim!');
+            return redirect()->route('transaction.history')->with('info', 'Pembayaran masih berstatus pending. Harap selesaikan pembayaran.');
         } catch (\Exception $e) {
-            return redirect()->route('transaction.history')->with('error', 'Gagal update status.');
+            return redirect()->route('transaction.history')->with('info', 'Pesanan Anda tersimpan. Silakan periksa status berkala di riwayat.');
         }
+    }
+
+    // 4b. Cek Status Manual dari Riwayat atau Invoice (Sangat berguna saat di HP/Simulator)
+    public function checkStatus($id)
+    {
+        $transaction = Transaction::with(['event', 'user', 'tickets'])
+            ->where('id', $id)
+            ->where('user_id', Auth::id())
+            ->firstOrFail();
+
+        // Jika sudah lunas, langsung info
+        if ($transaction->payment_status === 'paid') {
+            return redirect()->route('transaction.history')->with('success', 'Transaksi ini sudah lunas.');
+        }
+
+        \Midtrans\Config::$serverKey = config('midtrans.server_key') ?: env('MIDTRANS_SERVER_KEY');
+        \Midtrans\Config::$isProduction = config('midtrans.is_production', false);
+
+        try {
+            $statusInfo = \Midtrans\Transaction::status($transaction->order_id);
+            $trxStatus = is_object($statusInfo) ? ($statusInfo->transaction_status ?? '') : ($statusInfo['transaction_status'] ?? '');
+
+            if (in_array($trxStatus, ['capture', 'settlement'])) {
+                $this->markAsPaid($transaction);
+                return redirect()->route('transaction.history')->with('success', 'Status terverifikasi! Pembayaran BERHASIL (LUNAS) & E-tiket telah diterbitkan.');
+            } elseif (in_array($trxStatus, ['deny', 'expire', 'cancel'])) {
+                $transaction->update(['payment_status' => 'failed']);
+                if ($transaction->event) {
+                    $transaction->event->increment('quota', $transaction->quantity);
+                }
+                return redirect()->route('transaction.history')->with('error', 'Status pembayaran di Midtrans: ' . strtoupper($trxStatus) . '. Pesanan tiket otomatis dibatalkan.');
+            } else {
+                return redirect()->route('transaction.history')->with('info', 'Status pembayaran di Midtrans: MENUNGGU PEMBAYARAN (Pending). Silakan selesaikan pembayaran Anda.');
+            }
+        } catch (\Exception $e) {
+            Log::error("Midtrans checkStatus error: " . $e->getMessage());
+            return redirect()->route('transaction.history')->with('error', 'Belum ada transaksi pembayaran yang terdaftar di Midtrans untuk pesanan ini. Silakan klik "Bayar" terlebih dahulu.');
+        }
+    }
+
+    // 4c. Batalkan Pesanan Tiket (Mengembalikan Kuota Event)
+    public function cancelTransaction($id)
+    {
+        $transaction = Transaction::with('event')
+            ->where('id', $id)
+            ->where('user_id', Auth::id())
+            ->firstOrFail();
+
+        if ($transaction->payment_status !== 'pending') {
+            return redirect()->back()->with('error', 'Hanya transaksi yang berstatus Menunggu Pembayaran yang dapat dibatalkan.');
+        }
+
+        // Coba batalkan di Midtrans (jika sudah teregister)
+        \Midtrans\Config::$serverKey = config('midtrans.server_key') ?: env('MIDTRANS_SERVER_KEY');
+        \Midtrans\Config::$isProduction = config('midtrans.is_production', false);
+        try {
+            \Midtrans\Transaction::cancel($transaction->order_id);
+        } catch (\Exception $e) {
+            // Abaikan jika order belum terdaftar di server Midtrans
+        }
+
+        $transaction->update(['payment_status' => 'failed']);
+
+        // Kembalikan kuota event agar tiket dapat dibeli pengguna lain
+        if ($transaction->event) {
+            $transaction->event->increment('quota', $transaction->quantity);
+        }
+
+        return redirect()->route('transaction.history')->with('success', 'Pesanan berhasil dibatalkan. Kuota tiket event telah dikembalikan.');
     }
 
     // 5. Download PDF
