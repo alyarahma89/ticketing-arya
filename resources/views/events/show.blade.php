@@ -214,15 +214,48 @@
 
                                             @if($event->ticketPackages && $event->ticketPackages->count() > 0)
                                                 <!-- MODE DINAMIS: Paket Tiket (VIP, Reguler, dll) -->
+                                                @php
+                                                    $firstAvailableChecked = false;
+                                                @endphp
                                                 @foreach($event->ticketPackages as $index => $paket)
-                                                    <label class="ticket-label p-4 rounded-2xl cursor-pointer flex flex-col gap-3 relative">
+                                                    @php
+                                                        $isAvailable = $paket->quota > 0;
+                                                        $shouldCheck = false;
+                                                        if ($isAvailable && !$firstAvailableChecked) {
+                                                            $shouldCheck = true;
+                                                            $firstAvailableChecked = true;
+                                                        }
+                                                    @endphp
+                                                    <label class="ticket-label p-4 rounded-2xl cursor-pointer flex flex-col gap-3 relative transition-all {{ !$isAvailable ? 'opacity-50 cursor-not-allowed bg-slate-100/60 dark:bg-white/5' : '' }}">
                                                         <div class="flex items-start gap-4">
                                                             <div class="w-5 h-5 rounded-full border-2 radio-ring flex shrink-0 mt-0.5"></div>
-                                                            <input type="radio" name="ticket_package_id" value="{{ $paket->id }}" class="hidden" {{ $index == 0 ? 'checked' : '' }} onchange="updateTotal()">
+                                                            <input type="radio" name="ticket_package_id" value="{{ $paket->id }}" class="hidden" {{ $shouldCheck ? 'checked' : '' }} {{ !$isAvailable ? 'disabled' : '' }} onchange="updateTotal()" data-quota="{{ $paket->quota }}" data-name="{{ $paket->name }}">
 
                                                             <div class="flex-1">
-                                                                <span class="font-bold text-base block font-montserrat mb-1 text-slate-800 dark:text-white">{{ strtoupper($paket->name) }}</span>
-                                                                <span class="text-xs font-medium text-slate-500 dark:text-white/50 block mb-2">Kategori Tiket Spesial</span>
+                                                                <div class="flex items-center justify-between gap-2 mb-1">
+                                                                    <span class="font-bold text-base block font-montserrat text-slate-800 dark:text-white">{{ strtoupper($paket->name) }}</span>
+                                                                    @if($isAvailable)
+                                                                        <span class="text-[11px] font-bold px-2.5 py-0.5 rounded-full bg-blue-50 text-[#0066FF] dark:bg-blue-500/20 dark:text-[#00C2FF]">
+                                                                            Sisa {{ $paket->quota }} Tiket
+                                                                        </span>
+                                                                    @else
+                                                                        <span class="text-[11px] font-bold px-2.5 py-0.5 rounded-full bg-red-50 text-red-600 dark:bg-red-500/20 dark:text-red-400">
+                                                                            Habis (Sold Out)
+                                                                        </span>
+                                                                    @endif
+                                                                </div>
+
+                                                                @if($paket->description)
+                                                                    <span class="text-xs font-medium text-slate-500 dark:text-white/50 block mb-2">{{ $paket->description }}</span>
+                                                                @elseif(stripos($paket->name, 'vip') !== false || stripos($paket->name, 'vvip') !== false)
+                                                                    <span class="text-xs font-medium text-slate-500 dark:text-white/50 block mb-2">Akses area premium VIP & fasilitas eksklusif</span>
+                                                                @elseif(stripos($paket->name, 'reguler') !== false || stripos($paket->name, 'regular') !== false || stripos($paket->name, 'festival') !== false)
+                                                                    <span class="text-xs font-medium text-slate-500 dark:text-white/50 block mb-2">Akses masuk area festival & seating reguler</span>
+                                                                @elseif(stripos($paket->name, 'early') !== false || stripos($paket->name, 'presale') !== false)
+                                                                    <span class="text-xs font-medium text-slate-500 dark:text-white/50 block mb-2">Penawaran tiket presale dengan kuota terbatas</span>
+                                                                @else
+                                                                    <span class="text-xs font-medium text-slate-500 dark:text-white/50 block mb-2">Kategori Tiket {{ $paket->name }}</span>
+                                                                @endif
 
                                                                 <span class="font-black text-lg text-gradient-primary inline-block" data-price="{{ $paket->price }}">
                                                                     {{ $paket->price == 0 ? 'Gratis' : 'Rp ' . number_format($paket->price, 0, ',', '.') }}
@@ -236,10 +269,15 @@
                                                 <label class="ticket-label p-4 rounded-2xl cursor-pointer flex flex-col gap-3 relative">
                                                     <div class="flex items-start gap-4">
                                                         <div class="w-5 h-5 rounded-full border-2 radio-ring flex shrink-0 mt-0.5"></div>
-                                                        <input type="radio" name="ticket_type" value="offline" class="hidden" checked onchange="updateTotal()">
+                                                        <input type="radio" name="ticket_type" value="offline" class="hidden" checked onchange="updateTotal()" data-quota="{{ $event->quota }}" data-name="Akses Venue">
 
                                                         <div class="flex-1">
-                                                            <span class="font-bold text-base block font-montserrat mb-1 text-slate-800 dark:text-white">Akses Venue</span>
+                                                            <div class="flex items-center justify-between gap-2 mb-1">
+                                                                <span class="font-bold text-base block font-montserrat text-slate-800 dark:text-white">Akses Venue</span>
+                                                                <span class="text-[11px] font-bold px-2.5 py-0.5 rounded-full bg-blue-50 text-[#0066FF] dark:bg-blue-500/20 dark:text-[#00C2FF]">
+                                                                    Sisa {{ $event->quota }} Tiket
+                                                                </span>
+                                                            </div>
                                                             <span class="text-xs font-medium text-slate-500 dark:text-white/50 block mb-2">Hadir langsung di lokasi acara</span>
 
                                                             <span class="font-black text-lg text-gradient-primary inline-block" data-price="{{ $event->price }}">
@@ -254,7 +292,7 @@
                                                     <label class="ticket-label p-4 rounded-2xl cursor-pointer flex flex-col gap-3 relative mt-1">
                                                         <div class="flex items-start gap-4">
                                                             <div class="w-5 h-5 rounded-full border-2 radio-ring flex shrink-0 mt-0.5"></div>
-                                                            <input type="radio" name="ticket_type" value="online" class="hidden" onchange="updateTotal()">
+                                                            <input type="radio" name="ticket_type" value="online" class="hidden" onchange="updateTotal()" data-quota="{{ $event->quota }}" data-name="Akses Virtual">
 
                                                             <div class="flex-1">
                                                                 <span class="font-bold text-base block font-montserrat mb-1 text-slate-800 dark:text-white">Akses Virtual</span>
@@ -276,7 +314,7 @@
                                     <div class="bg-slate-50 dark:bg-white/5 border border-slate-200 dark:border-white/10 rounded-2xl p-4 mb-6 transition-colors">
                                         <div class="flex items-center justify-between mb-4 pb-4 border-b border-slate-200 dark:border-white/10">
                                             <span class="text-xs font-bold uppercase tracking-widest text-slate-500 dark:text-white/60">Sisa Tiket</span>
-                                            <span class="px-3 py-1.5 rounded-lg text-xs font-bold text-blue-700 bg-blue-100 dark:bg-[#0066FF]/20 dark:text-[#00C2FF]">
+                                            <span id="quotaDisplayBadge" class="px-3 py-1.5 rounded-lg text-xs font-bold text-blue-700 bg-blue-100 dark:bg-[#0066FF]/20 dark:text-[#00C2FF]">
                                                 Tersedia {{ $event->quota }} Kuota
                                             </span>
                                         </div>
@@ -339,19 +377,53 @@
     <script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
 
     <script>
-        // ── LOGIKA KALKULASI HARGA TIKET ──
+        // ── LOGIKA KALKULASI HARGA TIKET & UPDATE KUOTA PAKET DINAMIS ──
         function updateTotal() {
             const qtySelect = document.getElementById('ticketQuantity');
             if (!qtySelect) return;
-            const qty = parseInt(qtySelect.value);
 
-            // Deteksi semua tipe radio button
-            const selectedRadio = document.querySelector('input[type="radio"]:checked');
+            // Deteksi radio button yang aktif dan tidak disabled
+            const selectedRadio = document.querySelector('input[type="radio"]:checked:not(:disabled)') || document.querySelector('input[type="radio"]:not(:disabled)');
             if (!selectedRadio) return;
 
-            const priceSpan = selectedRadio.closest('label').querySelector('[data-price]');
-            const price = parseInt(priceSpan.getAttribute('data-price'));
+            if (!selectedRadio.checked) {
+                selectedRadio.checked = true;
+            }
 
+            const priceSpan = selectedRadio.closest('label').querySelector('[data-price]');
+            const price = parseInt(priceSpan.getAttribute('data-price')) || 0;
+
+            // Update Sisa Kuota Dinamis di Kotak Ringkasan
+            const quotaBadge = document.getElementById('quotaDisplayBadge');
+            if (quotaBadge && selectedRadio.hasAttribute('data-quota')) {
+                const quota = parseInt(selectedRadio.getAttribute('data-quota'));
+                const pkgName = selectedRadio.getAttribute('data-name') || 'Paket';
+
+                if (quota > 0) {
+                    quotaBadge.innerText = `Sisa ${quota} Tiket (${pkgName})`;
+                    quotaBadge.className = "px-3 py-1.5 rounded-lg text-xs font-bold text-blue-700 bg-blue-100 dark:bg-[#0066FF]/20 dark:text-[#00C2FF]";
+                } else {
+                    quotaBadge.innerText = `Habis / Sold Out (${pkgName})`;
+                    quotaBadge.className = "px-3 py-1.5 rounded-lg text-xs font-bold text-red-700 bg-red-100 dark:bg-red-500/20 dark:text-red-400";
+                }
+
+                // Batasi jumlah maksimal quantity sesuai sisa kuota paket (maks 5 tiket)
+                const maxAllowed = Math.min(5, Math.max(1, quota));
+                const currentVal = parseInt(qtySelect.value) || 1;
+                
+                qtySelect.innerHTML = '';
+                for (let i = 1; i <= maxAllowed; i++) {
+                    const opt = document.createElement('option');
+                    opt.value = i;
+                    opt.innerText = `${i} Tiket`;
+                    if (i === currentVal || (currentVal > maxAllowed && i === maxAllowed)) {
+                        opt.selected = true;
+                    }
+                    qtySelect.appendChild(opt);
+                }
+            }
+
+            const qty = parseInt(qtySelect.value) || 1;
             const displayEl = document.getElementById('totalPriceDisplay');
             if (price === 0) {
                 displayEl.innerText = 'Gratis';

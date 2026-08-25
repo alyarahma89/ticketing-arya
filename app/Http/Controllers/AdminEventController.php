@@ -206,6 +206,7 @@ class AdminEventController extends Controller
                     'name' => $package['name'],
                     'price' => $package['price'],
                     'quota' => $package['quota'],
+                    'description' => $package['description'] ?? null,
                 ]);
             }
         }
@@ -275,6 +276,36 @@ class AdminEventController extends Controller
 
         // Karena 'secret_code' sudah divalidasi, ia akan otomatis ikut diperbarui di sini
         $event->update($validated);
+
+        // ── SINKRONISASI PAKET TIKET (EDIT MODE) ──
+        if ($request->has('packages') && $request->has('is_offline')) {
+            $existingPackageIds = [];
+            foreach ($request->packages as $package) {
+                if (isset($package['id']) && !empty($package['id'])) {
+                    $pkg = \App\Models\TicketPackage::where('event_id', $event->id)->where('id', $package['id'])->first();
+                    if ($pkg) {
+                        $pkg->update([
+                            'name' => $package['name'],
+                            'price' => $package['price'],
+                            'quota' => $package['quota'],
+                            'description' => $package['description'] ?? null,
+                        ]);
+                        $existingPackageIds[] = $pkg->id;
+                    }
+                } else {
+                    $newPkg = \App\Models\TicketPackage::create([
+                        'event_id' => $event->id,
+                        'name' => $package['name'],
+                        'price' => $package['price'],
+                        'quota' => $package['quota'],
+                        'description' => $package['description'] ?? null,
+                    ]);
+                    $existingPackageIds[] = $newPkg->id;
+                }
+            }
+            // Hapus paket yang dibuang oleh user di form
+            \App\Models\TicketPackage::where('event_id', $event->id)->whereNotIn('id', $existingPackageIds)->delete();
+        }
 
         if ($request->hasFile('galleries')) {
             foreach ($request->file('galleries') as $file) {

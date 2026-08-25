@@ -43,26 +43,32 @@ class CheckoutController extends Controller
                 return redirect()->back()->with('error', "Gagal! Maksimal $maksimalTiket tiket per user.");
             }
 
-            if ($event->quota < $jumlahBeli) {
-                return redirect()->back()->with('error', 'Maaf, kuota tiket tidak mencukupi.');
-            }
-
-            // Kurangi kuota event
-            $event->decrement('quota', $jumlahBeli);
-
-            // ─── PERBAIKAN: PENENTUAN HARGA BERDASARKAN PAKET TIKET ───
+            // ─── PERBAIKAN: VALIDASI & PENGURANGAN KUOTA BERDASARKAN PAKET TIKET ───
             $hargaSatuan = 0;
             $tipeTiketDisimpan = 'offline';
 
             if ($request->filled('ticket_package_id')) {
                 // Jika event menggunakan sistem Paket (VIP, Reguler, dll)
-                $paket = $event->ticketPackages()->where('id', $request->ticket_package_id)->first();
-                if ($paket) {
-                    $hargaSatuan = $paket->price;
-                    $tipeTiketDisimpan = $paket->name; // Simpan nama paket (cth: VIP) ke riwayat
+                $paket = $event->ticketPackages()->where('id', $request->ticket_package_id)->lockForUpdate()->first();
+                if (!$paket) {
+                    return redirect()->back()->with('error', 'Paket tiket yang dipilih tidak ditemukan.');
                 }
+
+                if ($paket->quota < $jumlahBeli) {
+                    return redirect()->back()->with('error', "Maaf, kuota untuk paket {$paket->name} tidak mencukupi (sisa {$paket->quota} tiket).");
+                }
+
+                // Kurangi kuota paket spesifik
+                $paket->decrement('quota', $jumlahBeli);
+
+                $hargaSatuan = $paket->price;
+                $tipeTiketDisimpan = $paket->name; // Simpan nama paket (cth: VIP) ke riwayat
             } else {
                 // Fallback: Jika event masih menggunakan sistem lama (Offline/Online)
+                if ($event->quota < $jumlahBeli) {
+                    return redirect()->back()->with('error', 'Maaf, kuota tiket tidak mencukupi.');
+                }
+
                 $tipeTiket = $request->input('ticket_type', 'offline');
                 $tipeTiketDisimpan = $tipeTiket;
 
@@ -72,6 +78,9 @@ class CheckoutController extends Controller
                     $hargaSatuan = $event->online_price ?? 0;
                 }
             }
+
+            // Kurangi kuota total event
+            $event->decrement('quota', $jumlahBeli);
 
             $totalHarga = $hargaSatuan * $jumlahBeli;
 
@@ -286,6 +295,10 @@ class CheckoutController extends Controller
                 $transaction->update(['payment_status' => 'failed']);
                 if ($transaction->event) {
                     $transaction->event->increment('quota', $transaction->quantity);
+                    $pkg = $transaction->event->ticketPackages()->where('name', $transaction->ticket_type)->first();
+                    if ($pkg) {
+                        $pkg->increment('quota', $transaction->quantity);
+                    }
                 }
                 return redirect()->route('transaction.history')->with('error', 'Status pembayaran di Midtrans: ' . strtoupper($trxStatus) . '. Pesanan tiket otomatis dibatalkan.');
             } else {
@@ -320,9 +333,13 @@ class CheckoutController extends Controller
 
         $transaction->update(['payment_status' => 'failed']);
 
-        // Kembalikan kuota event agar tiket dapat dibeli pengguna lain
+        // Kembalikan kuota event & kuota paket tiket spesifik agar tiket dapat dibeli pengguna lain
         if ($transaction->event) {
             $transaction->event->increment('quota', $transaction->quantity);
+            $pkg = $transaction->event->ticketPackages()->where('name', $transaction->ticket_type)->first();
+            if ($pkg) {
+                $pkg->increment('quota', $transaction->quantity);
+            }
         }
 
         return redirect()->route('transaction.history')->with('success', 'Pesanan berhasil dibatalkan. Kuota tiket event telah dikembalikan.');

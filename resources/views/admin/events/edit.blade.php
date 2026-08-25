@@ -184,6 +184,10 @@
                                             <label class="block text-[10px] font-bold text-slate-400 mb-1">NAMA PAKET</label>
                                             <input type="text" name="packages[{{ $index }}][name]" value="{{ old('packages.'.$index.'.name', $package->name) }}" required placeholder="Contoh: Reguler / VIP" class="w-full text-sm font-bold border border-slate-300 rounded-lg px-3 py-2.5 focus:border-[#0066FF] focus:outline-none">
                                         </div>
+                                        <div class="w-full">
+                                            <label class="block text-[10px] font-bold text-slate-400 mb-1">FASILITAS / DESKRIPSI PAKET (OPSIONAL)</label>
+                                            <input type="text" name="packages[{{ $index }}][description]" value="{{ old('packages.'.$index.'.description', $package->description) }}" placeholder="Contoh: Free Drink, Baris Depan, Akses Eksklusif" class="w-full text-xs font-semibold border border-slate-300 rounded-lg px-3 py-2 focus:border-[#0066FF] focus:outline-none">
+                                        </div>
                                         <div class="flex gap-3">
                                             <div class="flex-1">
                                                 <label class="block text-[10px] font-bold text-slate-400 mb-1">HARGA (RP)</label>
@@ -201,6 +205,10 @@
                                         <div class="w-full">
                                             <label class="block text-[10px] font-bold text-slate-400 mb-1">NAMA PAKET</label>
                                             <input type="text" name="packages[0][name]" value="{{ old('packages.0.name', 'Reguler') }}" required placeholder="Contoh: Reguler / VIP" class="w-full text-sm font-bold border border-slate-300 rounded-lg px-3 py-2.5 focus:border-[#0066FF] focus:outline-none">
+                                        </div>
+                                        <div class="w-full">
+                                            <label class="block text-[10px] font-bold text-slate-400 mb-1">FASILITAS / DESKRIPSI PAKET (OPSIONAL)</label>
+                                            <input type="text" name="packages[0][description]" value="" placeholder="Contoh: Free Drink, Baris Depan, Akses Eksklusif" class="w-full text-xs font-semibold border border-slate-300 rounded-lg px-3 py-2 focus:border-[#0066FF] focus:outline-none">
                                         </div>
                                         <div class="flex gap-3">
                                             <div class="flex-1">
@@ -348,6 +356,10 @@
                 <div class="w-full">
                     <label class="block text-[10px] font-bold text-slate-400 mb-1">NAMA PAKET</label>
                     <input type="text" name="packages[${packageIndex}][name]" required placeholder="Contoh: VVIP" class="w-full text-sm font-bold border border-slate-300 rounded-lg px-3 py-2.5 focus:border-[#0066FF] focus:outline-none">
+                </div>
+                <div class="w-full">
+                    <label class="block text-[10px] font-bold text-slate-400 mb-1">FASILITAS / DESKRIPSI PAKET (OPSIONAL)</label>
+                    <input type="text" name="packages[${packageIndex}][description]" placeholder="Contoh: Free Drink, Baris Depan, Akses Eksklusif" class="w-full text-xs font-semibold border border-slate-300 rounded-lg px-3 py-2 focus:border-[#0066FF] focus:outline-none">
                 </div>
                 <div class="flex gap-3">
                     <div class="flex-1">

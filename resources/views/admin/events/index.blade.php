@@ -164,8 +164,19 @@
                                     @endif
                                 </div>
 
-                                <div class="text-slate-500 text-[12px] font-medium flex items-center gap-1.5 mt-1">
-                                    <i data-lucide="users" class="w-3.5 h-3.5"></i> Kapasitas: <strong class="text-slate-800">{{ $event->quota }}</strong>
+                                <div class="text-slate-500 text-[12px] font-medium flex flex-col gap-1 mt-1">
+                                    <div class="flex items-center gap-1.5">
+                                        <i data-lucide="users" class="w-3.5 h-3.5"></i> Total Kuota: <strong class="text-slate-800">{{ $event->quota }}</strong>
+                                    </div>
+                                    @if($event->ticketPackages && $event->ticketPackages->count() > 0)
+                                        <div class="text-[10px] text-slate-400 font-bold flex flex-wrap gap-1 mt-0.5">
+                                            @foreach($event->ticketPackages as $pkg)
+                                                <span class="bg-slate-100 text-slate-600 px-1.5 py-0.5 rounded border border-slate-200">
+                                                    {{ $pkg->name }}: {{ $pkg->quota }}
+                                                </span>
+                                            @endforeach
+                                        </div>
+                                    @endif
                                 </div>
                             </td>
 
