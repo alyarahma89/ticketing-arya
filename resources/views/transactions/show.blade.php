@@ -136,26 +136,10 @@
                             </div>
 
                             <!-- Area Tombol Aksi -->
-                            @if($transaction->payment_status == 'pending')
-                                @if(!empty($snapToken))
-                                    <button id="pay-button" class="w-full flex items-center justify-center gap-2 py-4 font-bold text-white rounded-xl transition-all hover:scale-105 shadow-md shadow-blue-500/30" style="background: linear-gradient(135deg, #0066FF, #00C2FF);">
-                                        <i data-lucide="credit-card" class="w-5 h-5"></i> Bayar Sekarang
-                                    </button>
-                                @endif
-
-                                <!-- Tombol Cek Status Manual (Berguna jika sudah bayar di HP / Simulator) -->
-                                <a href="{{ route('transaction.check_status', $transaction->id) }}" class="w-full flex items-center justify-center gap-2 py-3 mt-3 font-bold text-[#0066FF] bg-blue-50 hover:bg-blue-100 dark:bg-blue-500/10 dark:hover:bg-blue-500/20 border border-blue-200 dark:border-blue-500/30 rounded-xl transition-all text-sm shadow-sm">
-                                    <i data-lucide="refresh-cw" class="w-4 h-4"></i> Cek Status Pembayaran
-                                </a>
-
-                                <!-- Tombol Batalkan Pesanan -->
-                                <form action="{{ route('transaction.cancel', $transaction->id) }}" method="POST" onsubmit="return confirm('Apakah Anda yakin ingin membatalkan pesanan tiket ini? Kuota tiket akan dikembalikan.');" class="mt-2">
-                                    @csrf
-                                    <button type="submit" class="w-full flex items-center justify-center gap-2 py-2.5 font-bold text-slate-500 hover:text-red-600 bg-slate-100 hover:bg-red-50 dark:bg-white/5 dark:hover:bg-red-500/10 border border-slate-200 dark:border-white/10 dark:hover:border-red-500/30 rounded-xl transition-all text-xs">
-                                        <i data-lucide="x-circle" class="w-4 h-4"></i> Batalkan Pesanan Ini
-                                    </button>
-                                </form>
-
+                            @if($transaction->payment_status == 'pending' && !empty($snapToken))
+                                <button id="pay-button" class="w-full flex items-center justify-center gap-2 py-4 font-bold text-white rounded-xl transition-all hover:scale-105 shadow-md shadow-blue-500/30" style="background: linear-gradient(135deg, #0066FF, #00C2FF);">
+                                    <i data-lucide="credit-card" class="w-5 h-5"></i> Bayar Sekarang
+                                </button>
                                 <p class="text-center text-xs font-medium text-slate-400 dark:text-white/30 mt-4 flex items-center justify-center gap-1.5">
                                     <i data-lucide="shield-check" class="w-4 h-4"></i> Transaksi aman oleh Midtrans
                                 </p>
