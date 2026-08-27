@@ -238,7 +238,7 @@
     </section>
 
     <!-- ── INFOGRAFIS FITUR ────────────────────────────────── -->
-    <section class="py-28 transition-colors bg-[#F8FAFC] dark:bg-[#030F2E]">
+    <section id="features" class="py-28 transition-colors bg-[#F8FAFC] dark:bg-[#030F2E]">
         <div class="max-w-7xl mx-auto px-6">
             <div class="text-center mb-16">
                 <div class="inline-flex items-center gap-1.5 px-4 py-1.5 rounded-full text-xs font-bold tracking-widest border mb-6 bg-blue-50 border-blue-200 text-blue-600 dark:bg-[#0066FF18] dark:border-[#0066FF45] dark:text-[#00C2FF]">
@@ -326,7 +326,7 @@
     </section>
 
     <!-- ── HOW IT WORKS ────────────────────────────────── -->
-    <section class="py-28 transition-colors border-t bg-white border-slate-200 dark:bg-gradient-to-br dark:from-[#041B4A] dark:to-[#060E28] dark:border-transparent relative overflow-hidden">
+    <section id="how-it-works" class="py-28 transition-colors border-t bg-white border-slate-200 dark:bg-gradient-to-br dark:from-[#041B4A] dark:to-[#060E28] dark:border-transparent relative overflow-hidden">
         <div class="absolute top-0 right-0 w-96 h-96 rounded-full pointer-events-none hidden dark:block" style="background: #0066FF; opacity: 0.07; filter: blur(90px);"></div>
         <div class="max-w-7xl mx-auto px-6 relative z-10">
             <div class="grid lg:grid-cols-2 gap-16 items-center">
@@ -426,11 +426,11 @@
                 Bergabung dengan ribuan event organizer yang sudah menggunakan ARTIX ID. Mulai gratis, upgrade kapan saja.
             </p>
             <div class="flex flex-col sm:flex-row gap-4 justify-center">
-                <a href="#" class="group inline-flex items-center justify-center gap-2 px-8 py-4 font-bold text-white rounded-xl transition-all hover:scale-105 shadow-xl hover:shadow-2xl font-montserrat dark:shadow-[0_0_50px_rgba(0,102,255,0.6)]" style="background: linear-gradient(135deg, #0066FF, #00C2FF);">
+                <a href="{{ route('register') }}" class="group inline-flex items-center justify-center gap-2 px-8 py-4 font-bold text-white rounded-xl transition-all hover:scale-105 shadow-xl hover:shadow-2xl font-montserrat dark:shadow-[0_0_50px_rgba(0,102,255,0.6)]" style="background: linear-gradient(135deg, #0066FF, #00C2FF);">
                     Daftar Gratis Sekarang <i data-lucide="arrow-right" class="w-4 h-4 group-hover:translate-x-1 transition-transform"></i>
                 </a>
-                <a href="#" class="inline-flex items-center justify-center gap-2 px-8 py-4 font-bold rounded-xl border transition-all text-slate-700 bg-white border-slate-300 hover:bg-slate-50 hover:shadow-md dark:bg-transparent dark:text-white dark:border-white/20 dark:hover:bg-white/5 dark:shadow-none">
-                    Hubungi Sekarang
+                <a href="https://wa.me/6282160762279?text=Halo%20Admin%20ARTIX%20ID,%20saya%20ingin%20konsultasi%20seputar%20penyelenggaraan%20event" target="_blank" rel="noopener noreferrer" class="inline-flex items-center justify-center gap-2 px-8 py-4 font-bold rounded-xl border transition-all text-slate-700 bg-white border-slate-300 hover:bg-slate-50 hover:shadow-md dark:bg-transparent dark:text-white dark:border-white/20 dark:hover:bg-white/5 dark:shadow-none">
+                    <i data-lucide="message-circle" class="w-5 h-5 text-emerald-500"></i> Hubungi Sekarang
                 </a>
             </div>
             <div class="flex flex-wrap items-center justify-center gap-6 mt-10">
