@@ -92,6 +92,7 @@ Route::middleware(['auth', 'role:admin,eo'])->prefix('admin')->name('admin.')->g
     Route::get('/events/{id}/edit', [AdminEventController::class, 'edit'])->name('events.edit');
     Route::put('/events/{id}', [AdminEventController::class, 'update'])->name('events.update');
     Route::delete('/events/{id}', [AdminEventController::class, 'destroy'])->name('events.destroy');
+    Route::delete('/events/gallery/{id}', [AdminEventController::class, 'deleteGallery'])->name('events.gallery.destroy');
 
     // Manajemen Transaksi & Refund
     Route::get('/transactions', [AdminTransactionController::class, 'index'])->name('transactions.index');

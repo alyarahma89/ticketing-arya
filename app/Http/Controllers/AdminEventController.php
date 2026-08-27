@@ -229,7 +229,7 @@ class AdminEventController extends Controller
     // ==========================================
     public function edit($id)
     {
-        $event = Event::findOrFail($id);
+        $event = Event::with(['ticketPackages', 'galleries'])->findOrFail($id);
         $categories = Category::all();
 
         return view('admin.events.edit', compact('event', 'categories'));
@@ -321,14 +321,50 @@ class AdminEventController extends Controller
     }
 
     // ==========================================
+    // FUNGSI MENGHAPUS FOTO GALERI SATUAN
+    // ==========================================
+    public function deleteGallery($id)
+    {
+        $gallery = \App\Models\Gallery::with('event')->findOrFail($id);
+        $user = Auth::user();
+
+        // Keamanan: Pastikan jika EO, foto milik event yang dibuatnya
+        if ($user->role === 'eo' && $gallery->event && $gallery->event->user_id !== $user->id) {
+            abort(403, 'Anda tidak memiliki akses untuk menghapus foto galeri ini.');
+        }
+
+        if ($gallery->image && Storage::disk('public')->exists($gallery->image)) {
+            Storage::disk('public')->delete($gallery->image);
+        }
+
+        $gallery->delete();
+
+        if (request()->ajax() || request()->wantsJson()) {
+            return response()->json([
+                'success' => true,
+                'message' => 'Foto galeri berhasil dihapus!'
+            ]);
+        }
+
+        return redirect()->back()->with('success', 'Foto galeri berhasil dihapus!');
+    }
+
+    // ==========================================
     // FUNGSI MENGHAPUS EVENT (DESTROY)
     // ==========================================
     public function destroy($id)
     {
-        $event = Event::findOrFail($id);
+        $event = Event::with('galleries')->findOrFail($id);
 
         if ($event->image && Storage::disk('public')->exists($event->image)) {
             Storage::disk('public')->delete($event->image);
+        }
+
+        foreach ($event->galleries as $gallery) {
+            if ($gallery->image && Storage::disk('public')->exists($gallery->image)) {
+                Storage::disk('public')->delete($gallery->image);
+            }
+            $gallery->delete();
         }
 
         $event->delete();

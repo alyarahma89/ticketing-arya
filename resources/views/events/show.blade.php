@@ -136,8 +136,29 @@
                     <div class="p-8 rounded-3xl border relative overflow-hidden bg-white border-slate-200 dark:bg-white/5 dark:border-white/10 transition-colors shadow-sm">
                         <div class="absolute top-0 right-0 w-64 h-64 bg-[#0066FF] rounded-full blur-[100px] opacity-5 dark:opacity-10 pointer-events-none"></div>
 
-                        <div class="inline-block px-4 py-1.5 text-xs font-bold rounded-full tracking-wider mb-5 bg-blue-50 border-blue-200 text-blue-600 dark:bg-[#0066FF18] dark:border-[#0066FF45] dark:text-[#00C2FF] font-montserrat transition-colors">
-                            {{ strtoupper($event->category->name ?? $event->category ?? 'UMUM') }}
+                        @php
+                            $hasOffline = ($event->location || $event->price > 0 || ($event->ticketPackages && $event->ticketPackages->count() > 0));
+                            $hasOnline = ($event->youtube_link || ($event->online_price !== null && $event->online_price > 0));
+                        @endphp
+
+                        <div class="flex items-center flex-wrap gap-2 mb-5">
+                            <div class="inline-block px-4 py-1.5 text-xs font-bold rounded-full tracking-wider bg-blue-50 border-blue-200 text-blue-600 dark:bg-[#0066FF18] dark:border-[#0066FF45] dark:text-[#00C2FF] font-montserrat transition-colors">
+                                {{ strtoupper($event->category->name ?? $event->category ?? 'UMUM') }}
+                            </div>
+
+                            @if($hasOffline && $hasOnline)
+                                <div class="inline-flex items-center gap-1.5 px-3 py-1 text-xs font-bold rounded-full bg-purple-50 border border-purple-200 text-purple-600 dark:bg-purple-500/10 dark:border-purple-500/30 dark:text-purple-400 font-montserrat">
+                                    <i data-lucide="layers" class="w-3.5 h-3.5"></i> HYBRID (VENUE & ONLINE)
+                                </div>
+                            @elseif($hasOnline)
+                                <div class="inline-flex items-center gap-1.5 px-3 py-1 text-xs font-bold rounded-full bg-red-50 border border-red-200 text-red-600 dark:bg-red-500/10 dark:border-red-500/30 dark:text-red-400 font-montserrat">
+                                    <i data-lucide="video" class="w-3.5 h-3.5"></i> ONLINE LIVESTREAM
+                                </div>
+                            @else
+                                <div class="inline-flex items-center gap-1.5 px-3 py-1 text-xs font-bold rounded-full bg-emerald-50 border border-emerald-200 text-emerald-600 dark:bg-emerald-500/10 dark:border-emerald-500/30 dark:text-emerald-400 font-montserrat">
+                                    <i data-lucide="map-pin" class="w-3.5 h-3.5"></i> OFFLINE VENUE
+                                </div>
+                            @endif
                         </div>
 
                         <h1 class="text-3xl md:text-5xl font-black mb-8 leading-tight font-montserrat text-slate-900 dark:text-white">{{ $event->name }}</h1>
@@ -155,11 +176,11 @@
                             </div>
                             <div class="flex items-center gap-4">
                                 <div class="w-12 h-12 rounded-xl flex items-center justify-center shrink-0 bg-gradient-to-br from-[#0066FF] to-[#00C2FF] text-white shadow-md">
-                                    <i data-lucide="map-pin" class="w-6 h-6"></i>
+                                    <i data-lucide="{{ $event->location ? 'map-pin' : 'video' }}" class="w-6 h-6"></i>
                                 </div>
                                 <div>
-                                    <span class="text-[11px] block mb-1 uppercase tracking-wider font-bold text-slate-400 dark:text-white/40">Titik Kumpul</span>
-                                    <span class="font-bold text-sm text-slate-700 dark:text-white">{{ $event->location }}</span>
+                                    <span class="text-[11px] block mb-1 uppercase tracking-wider font-bold text-slate-400 dark:text-white/40">Titik Kumpul / Format</span>
+                                    <span class="font-bold text-sm text-slate-700 dark:text-white">{{ $event->location ?? 'Online / Livestream via YouTube' }}</span>
                                 </div>
                             </div>
                         </div>
@@ -204,6 +225,10 @@
                                 <form action="/checkout/{{ $event->id }}" method="POST">
                                     @csrf
 
+                                    <!-- Hidden input untuk sinkronisasi nilai ke Controller -->
+                                    <input type="hidden" name="ticket_package_id" id="hidden_ticket_package_id" value="">
+                                    <input type="hidden" name="ticket_type" id="hidden_ticket_type" value="offline">
+
                                     <!-- ── KARTU PILIHAN TIKET (MODERN) ── -->
                                     <div class="mb-6">
                                         <div class="flex items-center justify-between mb-4">
@@ -212,11 +237,14 @@
 
                                         <div class="flex flex-col gap-3">
 
-                                            @if($event->ticketPackages && $event->ticketPackages->count() > 0)
-                                                <!-- MODE DINAMIS: Paket Tiket (VIP, Reguler, dll) -->
-                                                @php
-                                                    $firstAvailableChecked = false;
-                                                @endphp
+                                            @php
+                                                $firstAvailableChecked = false;
+                                                $hasPackages = $event->ticketPackages && $event->ticketPackages->count() > 0;
+                                                $showOnlineTicket = ($event->youtube_link || ($event->online_price !== null && $event->online_price > 0) || (!$event->location && !$hasPackages));
+                                            @endphp
+
+                                            {{-- 1. OPSI PAKET TIKET OFFLINE (JIKA ADA) --}}
+                                            @if($hasPackages)
                                                 @foreach($event->ticketPackages as $index => $paket)
                                                     @php
                                                         $isAvailable = $paket->quota > 0;
@@ -229,7 +257,14 @@
                                                     <label class="ticket-label p-4 rounded-2xl cursor-pointer flex flex-col gap-3 relative transition-all {{ !$isAvailable ? 'opacity-50 cursor-not-allowed bg-slate-100/60 dark:bg-white/5' : '' }}">
                                                         <div class="flex items-start gap-4">
                                                             <div class="w-5 h-5 rounded-full border-2 radio-ring flex shrink-0 mt-0.5"></div>
-                                                            <input type="radio" name="ticket_package_id" value="{{ $paket->id }}" class="hidden" {{ $shouldCheck ? 'checked' : '' }} {{ !$isAvailable ? 'disabled' : '' }} onchange="updateTotal()" data-quota="{{ $paket->quota }}" data-name="{{ $paket->name }}">
+                                                            <input type="radio" name="ticket_choice_radio" value="pkg_{{ $paket->id }}" class="hidden"
+                                                                {{ $shouldCheck ? 'checked' : '' }} {{ !$isAvailable ? 'disabled' : '' }}
+                                                                onchange="updateTotal()"
+                                                                data-kind="package"
+                                                                data-package-id="{{ $paket->id }}"
+                                                                data-quota="{{ $paket->quota }}"
+                                                                data-name="{{ $paket->name }}"
+                                                                data-price="{{ $paket->price }}">
 
                                                             <div class="flex-1">
                                                                 <div class="flex items-center justify-between gap-2 mb-1">
@@ -264,19 +299,40 @@
                                                         </div>
                                                     </label>
                                                 @endforeach
-                                            @else
-                                                <!-- MODE DEFAULT: Akses Venue (Offline) -->
-                                                <label class="ticket-label p-4 rounded-2xl cursor-pointer flex flex-col gap-3 relative">
+                                            @elseif($event->location || $event->price > 0)
+                                                {{-- 2. OPSI AKSES VENUE DEFAULT (JIKA EVENT OFFLINE TANPA PAKET) --}}
+                                                @php
+                                                    $isAvailable = $event->quota > 0;
+                                                    $shouldCheck = false;
+                                                    if ($isAvailable && !$firstAvailableChecked) {
+                                                        $shouldCheck = true;
+                                                        $firstAvailableChecked = true;
+                                                    }
+                                                @endphp
+                                                <label class="ticket-label p-4 rounded-2xl cursor-pointer flex flex-col gap-3 relative transition-all {{ !$isAvailable ? 'opacity-50 cursor-not-allowed bg-slate-100/60 dark:bg-white/5' : '' }}">
                                                     <div class="flex items-start gap-4">
                                                         <div class="w-5 h-5 rounded-full border-2 radio-ring flex shrink-0 mt-0.5"></div>
-                                                        <input type="radio" name="ticket_type" value="offline" class="hidden" checked onchange="updateTotal()" data-quota="{{ $event->quota }}" data-name="Akses Venue">
+                                                        <input type="radio" name="ticket_choice_radio" value="offline" class="hidden"
+                                                            {{ $shouldCheck ? 'checked' : '' }} {{ !$isAvailable ? 'disabled' : '' }}
+                                                            onchange="updateTotal()"
+                                                            data-kind="offline"
+                                                            data-package-id=""
+                                                            data-quota="{{ $event->quota }}"
+                                                            data-name="Akses Venue"
+                                                            data-price="{{ $event->price }}">
 
                                                         <div class="flex-1">
                                                             <div class="flex items-center justify-between gap-2 mb-1">
                                                                 <span class="font-bold text-base block font-montserrat text-slate-800 dark:text-white">Akses Venue</span>
-                                                                <span class="text-[11px] font-bold px-2.5 py-0.5 rounded-full bg-blue-50 text-[#0066FF] dark:bg-blue-500/20 dark:text-[#00C2FF]">
-                                                                    Sisa {{ $event->quota }} Tiket
-                                                                </span>
+                                                                @if($isAvailable)
+                                                                    <span class="text-[11px] font-bold px-2.5 py-0.5 rounded-full bg-blue-50 text-[#0066FF] dark:bg-blue-500/20 dark:text-[#00C2FF]">
+                                                                        Sisa {{ $event->quota }} Tiket
+                                                                    </span>
+                                                                @else
+                                                                    <span class="text-[11px] font-bold px-2.5 py-0.5 rounded-full bg-red-50 text-red-600 dark:bg-red-500/20 dark:text-red-400">
+                                                                        Habis (Sold Out)
+                                                                    </span>
+                                                                @endif
                                                             </div>
                                                             <span class="text-xs font-medium text-slate-500 dark:text-white/50 block mb-2">Hadir langsung di lokasi acara</span>
 
@@ -286,25 +342,52 @@
                                                         </div>
                                                     </div>
                                                 </label>
+                                            @endif
 
-                                                <!-- MODE DEFAULT: Akses Virtual (Online) -->
-                                                @if($event->online_price > 0)
-                                                    <label class="ticket-label p-4 rounded-2xl cursor-pointer flex flex-col gap-3 relative mt-1">
-                                                        <div class="flex items-start gap-4">
-                                                            <div class="w-5 h-5 rounded-full border-2 radio-ring flex shrink-0 mt-0.5"></div>
-                                                            <input type="radio" name="ticket_type" value="online" class="hidden" onchange="updateTotal()" data-quota="{{ $event->quota }}" data-name="Akses Virtual">
+                                            {{-- 3. OPSI TIKET LIVESTREAM / VIRTUAL (ONLINE) --}}
+                                            @if($showOnlineTicket)
+                                                @php
+                                                    $isOnlineAvailable = $event->quota > 0;
+                                                    $shouldCheckOnline = false;
+                                                    if ($isOnlineAvailable && !$firstAvailableChecked) {
+                                                        $shouldCheckOnline = true;
+                                                        $firstAvailableChecked = true;
+                                                    }
+                                                    $onlinePrice = $event->online_price ?? 0;
+                                                @endphp
+                                                <label class="ticket-label p-4 rounded-2xl cursor-pointer flex flex-col gap-3 relative transition-all {{ !$isOnlineAvailable ? 'opacity-50 cursor-not-allowed bg-slate-100/60 dark:bg-white/5' : '' }}">
+                                                    <div class="flex items-start gap-4">
+                                                        <div class="w-5 h-5 rounded-full border-2 radio-ring flex shrink-0 mt-0.5"></div>
+                                                        <input type="radio" name="ticket_choice_radio" value="online" class="hidden"
+                                                            {{ $shouldCheckOnline ? 'checked' : '' }} {{ !$isOnlineAvailable ? 'disabled' : '' }}
+                                                            onchange="updateTotal()"
+                                                            data-kind="online"
+                                                            data-package-id=""
+                                                            data-quota="{{ $event->quota }}"
+                                                            data-name="Akses Virtual (Livestream)"
+                                                            
+                                                            data-price="{{ $onlinePrice }}">
 
-                                                            <div class="flex-1">
-                                                                <span class="font-bold text-base block font-montserrat mb-1 text-slate-800 dark:text-white">Akses Virtual</span>
-                                                                <span class="text-xs font-medium text-slate-500 dark:text-white/50 block mb-2">Saksikan secara langsung (Livestream)</span>
-
-                                                                <span class="font-black text-lg text-gradient-primary inline-block" data-price="{{ $event->online_price }}">
-                                                                    Rp {{ number_format($event->online_price, 0, ',', '.') }}
+                                                        <div class="flex-1">
+                                                            <div class="flex items-center justify-between gap-2 mb-1">
+                                                                <span class="font-bold text-base block font-montserrat text-slate-800 dark:text-white flex items-center gap-1.5">
+                                                                    <span class="inline-flex items-center justify-center w-5 h-5 rounded-full bg-red-100 text-red-600 dark:bg-red-500/20 dark:text-red-400">
+                                                                        <i data-lucide="video" class="w-3 h-3"></i>
+                                                                    </span>
+                                                                    AKSES VIRTUAL
+                                                                </span>
+                                                                <span class="text-[11px] font-bold px-2.5 py-0.5 rounded-full bg-red-50 text-red-600 dark:bg-red-500/20 dark:text-red-400">
+                                                                    Livestream YouTube
                                                                 </span>
                                                             </div>
+                                                            <span class="text-xs font-medium text-slate-500 dark:text-white/50 block mb-2">Saksikan siaran langsung (Livestream) via tautan resmi</span>
+
+                                                            <span class="font-black text-lg text-gradient-primary inline-block" data-price="{{ $onlinePrice }}">
+                                                                {{ $onlinePrice == 0 ? 'Gratis' : 'Rp ' . number_format($onlinePrice, 0, ',', '.') }}
+                                                            </span>
                                                         </div>
-                                                    </label>
-                                                @endif
+                                                    </div>
+                                                </label>
                                             @endif
 
                                         </div>
@@ -383,21 +466,29 @@
             if (!qtySelect) return;
 
             // Deteksi radio button yang aktif dan tidak disabled
-            const selectedRadio = document.querySelector('input[type="radio"]:checked:not(:disabled)') || document.querySelector('input[type="radio"]:not(:disabled)');
+            const selectedRadio = document.querySelector('input[name="ticket_choice_radio"]:checked:not(:disabled)') || document.querySelector('input[name="ticket_choice_radio"]:not(:disabled)');
             if (!selectedRadio) return;
 
             if (!selectedRadio.checked) {
                 selectedRadio.checked = true;
             }
 
-            const priceSpan = selectedRadio.closest('label').querySelector('[data-price]');
-            const price = parseInt(priceSpan.getAttribute('data-price')) || 0;
+            // Update hidden inputs untuk dikirim ke backend CheckoutController
+            const kind = selectedRadio.getAttribute('data-kind');
+            const packageId = selectedRadio.getAttribute('data-package-id') || '';
+            const hiddenPkgId = document.getElementById('hidden_ticket_package_id');
+            const hiddenType = document.getElementById('hidden_ticket_type');
+
+            if (hiddenPkgId) hiddenPkgId.value = packageId;
+            if (hiddenType) hiddenType.value = (kind === 'online') ? 'online' : 'offline';
+
+            const price = parseInt(selectedRadio.getAttribute('data-price')) || 0;
 
             // Update Sisa Kuota Dinamis di Kotak Ringkasan
             const quotaBadge = document.getElementById('quotaDisplayBadge');
             if (quotaBadge && selectedRadio.hasAttribute('data-quota')) {
                 const quota = parseInt(selectedRadio.getAttribute('data-quota'));
-                const pkgName = selectedRadio.getAttribute('data-name') || 'Paket';
+                const pkgName = selectedRadio.getAttribute('data-name') || 'Tiket';
 
                 if (quota > 0) {
                     quotaBadge.innerText = `Sisa ${quota} Tiket (${pkgName})`;

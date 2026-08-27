@@ -135,7 +135,29 @@
                                     @endif
                                 </div>
                                 <h3 class="font-black text-lg font-montserrat text-slate-800 dark:text-white">{{ $ticket->event->name ?? 'Event Terhapus' }}</h3>
-                                <p class="text-sm font-medium text-slate-500 dark:text-white/60 flex items-center gap-1.5 mt-1">
+                                
+                                @php
+                                    $matchedPackage = null;
+                                    if ($ticket->ticketPackage) {
+                                        $matchedPackage = $ticket->ticketPackage;
+                                    } elseif ($ticket->event && $ticket->event->ticketPackages) {
+                                        $matchedPackage = $ticket->event->ticketPackages->where('name', $ticket->ticket_type)->first();
+                                    }
+                                    $isOnline = (strtolower($ticket->ticket_type) === 'online' || stripos($ticket->ticket_type, 'livestream') !== false);
+                                    $packageTitle = $matchedPackage ? $matchedPackage->name : ($isOnline ? 'Akses Virtual (Livestream)' : ($ticket->ticket_type ?: 'Reguler'));
+                                @endphp
+                                <div class="flex items-center flex-wrap gap-2 mt-2">
+                                    <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs font-black bg-blue-50 text-[#0066FF] dark:bg-[#0066FF20] dark:text-[#00C2FF] border border-blue-100 dark:border-blue-500/20 uppercase">
+                                        <i data-lucide="tag" class="w-3 h-3"></i> {{ $packageTitle }}
+                                    </span>
+                                    @if($matchedPackage && $matchedPackage->description)
+                                        <span class="text-xs font-semibold text-slate-500 dark:text-white/50 flex items-center gap-1">
+                                            <i data-lucide="sparkles" class="w-3 h-3 text-amber-500"></i> {{ $matchedPackage->description }}
+                                        </span>
+                                    @endif
+                                </div>
+
+                                <p class="text-sm font-medium text-slate-500 dark:text-white/60 flex items-center gap-1.5 mt-2">
                                     <i data-lucide="clock" class="w-3.5 h-3.5"></i> Dibeli pada {{ $ticket->created_at->format('d M Y, H:i') }}
                                 </p>
                             </div>
@@ -149,7 +171,17 @@
 
                                 <!-- 3. Area Tombol Aksi -->
                                 @if(in_array($ticket->payment_status, ['paid', 'success', 'settlement']))
-                                    <div class="flex flex-col md:flex-row gap-2 w-full md:w-auto mt-2">
+                                    @php
+                                        $isOnlineTicket = (strtolower($ticket->ticket_type) === 'online' || stripos($ticket->ticket_type, 'livestream') !== false || stripos($ticket->ticket_type, 'online') !== false);
+                                    @endphp
+                                    <div class="flex flex-col sm:flex-row flex-wrap gap-2 w-full md:w-auto mt-2">
+                                        @if($isOnlineTicket && !empty($ticket->event->youtube_link))
+                                            <!-- Tombol Nonton Livestream -->
+                                            <a href="{{ $ticket->event->youtube_link }}" target="_blank" class="flex-1 md:flex-none text-center bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-xl text-sm font-bold transition-all shadow-md shadow-red-500/20 flex items-center justify-center gap-2">
+                                                <i data-lucide="video" class="w-4 h-4"></i> Tonton Livestream
+                                            </a>
+                                        @endif
+
                                         <!-- Tombol Unduh -->
                                         <a href="{{ route('ticket.download', $ticket->id) }}" class="flex-1 md:flex-none text-center bg-slate-100 hover:bg-slate-200 dark:bg-white/10 dark:hover:bg-white/20 text-slate-700 dark:text-white px-4 py-2 rounded-xl text-sm font-bold transition-colors flex items-center justify-center gap-2">
                                             <i data-lucide="download" class="w-4 h-4"></i> Unduh E-Tiket

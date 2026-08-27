@@ -63,9 +63,41 @@
                             🎫 {{ $transaction->event->category->name ?? 'Tiket Event' }}
                         </div>
 
-                        <h2 class="font-montserrat font-black text-3xl md:text-4xl text-slate-900 dark:text-white mb-8 leading-tight">
+                        <h2 class="font-montserrat font-black text-3xl md:text-4xl text-slate-900 dark:text-white mb-6 leading-tight">
                             {{ $transaction->event->name }}
                         </h2>
+
+                        @php
+                            $matchedPackage = null;
+                            if ($transaction->ticketPackage) {
+                                $matchedPackage = $transaction->ticketPackage;
+                            } elseif ($transaction->event && $transaction->event->ticketPackages) {
+                                $matchedPackage = $transaction->event->ticketPackages->where('name', $transaction->ticket_type)->first();
+                            }
+                            $isOnlineTicket = (strtolower($transaction->ticket_type) === 'online' || stripos($transaction->ticket_type, 'livestream') !== false || stripos($transaction->ticket_type, 'online') !== false);
+                            $packageTitle = $matchedPackage ? $matchedPackage->name : ($isOnlineTicket ? 'Akses Virtual (Livestream)' : ($transaction->ticket_type ?: 'Reguler'));
+                        @endphp
+
+                        <!-- Box Detail Paket Tiket -->
+                        <div class="bg-slate-50 dark:bg-[#020C1F] border border-blue-100 dark:border-blue-500/20 border-l-4 border-l-[#0066FF] rounded-2xl p-5 mb-6">
+                            <div class="flex items-center justify-between flex-wrap gap-2">
+                                <div>
+                                    <span class="text-[10px] font-bold uppercase tracking-wider text-slate-400 dark:text-white/40">Paket & Kategori Tiket</span>
+                                    <h4 class="font-black text-lg text-[#0066FF] dark:text-[#00C2FF] font-montserrat uppercase mt-0.5">
+                                        ⭐ {{ $packageTitle }}
+                                    </h4>
+                                </div>
+                                <span class="text-xs font-bold px-3 py-1 rounded-full bg-blue-50 text-[#0066FF] dark:bg-[#0066FF20] dark:text-[#00C2FF]">
+                                    {{ $transaction->quantity }} Tiket
+                                </span>
+                            </div>
+                            @if($matchedPackage && $matchedPackage->description)
+                                <p class="text-xs font-semibold text-slate-600 dark:text-white/70 mt-2 flex items-center gap-1.5 pt-2 border-t border-slate-200 dark:border-white/10">
+                                    <i data-lucide="sparkles" class="w-4 h-4 text-amber-500 shrink-0"></i>
+                                    <span><strong>Fasilitas:</strong> {{ $matchedPackage->description }}</span>
+                                </p>
+                            @endif
+                        </div>
 
                         <!-- Grid Info Waktu & Lokasi -->
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -88,9 +120,11 @@
                                     <i data-lucide="map-pin" class="w-6 h-6"></i>
                                 </div>
                                 <div>
-                                    <p class="text-xs font-bold text-slate-500 dark:text-white/40 mb-1">Lokasi Acara</p>
+                                    <p class="text-xs font-bold text-slate-500 dark:text-white/40 mb-1">
+                                        {{ $isOnlineTicket ? 'Format / Akses Acara' : 'Lokasi Acara' }}
+                                    </p>
                                     <p class="font-bold text-sm text-slate-900 dark:text-white line-clamp-2">
-                                        {{ $transaction->event->location }}
+                                        {{ $isOnlineTicket ? 'Online via YouTube Livestream' : $transaction->event->location }}
                                     </p>
                                 </div>
                             </div>
@@ -146,6 +180,13 @@
 
                             @elseif(in_array($transaction->payment_status, ['paid', 'success', 'settlement']))
                                 <div class="flex flex-col gap-3">
+                                    @if($isOnlineTicket && !empty($transaction->event->youtube_link))
+                                        <!-- Tombol Tonton Livestream -->
+                                        <a href="{{ $transaction->event->youtube_link }}" target="_blank" class="w-full flex items-center justify-center gap-2 py-4 font-bold text-white rounded-xl transition-all hover:scale-105 shadow-md bg-red-600 hover:bg-red-700 shadow-red-500/25">
+                                            <i data-lucide="video" class="w-5 h-5"></i> Tonton Livestream (YouTube)
+                                        </a>
+                                    @endif
+
                                     <!-- Tombol Unduh -->
                                     <a href="{{ route('ticket.download', $transaction->id) }}" class="w-full flex items-center justify-center gap-2 py-4 font-bold text-white rounded-xl transition-all hover:scale-105 shadow-md bg-emerald-500 hover:bg-emerald-600">
                                         <i data-lucide="download" class="w-5 h-5"></i> Download Tiket (PDF)
@@ -160,7 +201,7 @@
                                     </form>
                                 </div>
                                 <p class="text-center text-xs font-medium text-slate-400 dark:text-white/30 mt-4">
-                                    Cetak atau tunjukkan PDF ini saat masuk area event.
+                                    {{ $isOnlineTicket ? 'Gunakan link streaming di atas untuk menonton siaran langsung.' : 'Cetak atau tunjukkan PDF ini saat masuk area event.' }}
                                 </p>
 
                             @elseif($transaction->payment_status == 'refund_requested')

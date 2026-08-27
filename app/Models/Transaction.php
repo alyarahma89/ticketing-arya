@@ -29,4 +29,10 @@ class Transaction extends Model
     {
         return $this->hasMany(Ticket::class);
     }
+
+    // Relasi: Transaksi ini memilih Paket Tiket apa (jika ada)
+    public function ticketPackage()
+    {
+        return $this->belongsTo(TicketPackage::class, 'ticket_package_id');
+    }
 }

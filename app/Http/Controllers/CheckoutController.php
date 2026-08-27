@@ -131,7 +131,7 @@ class CheckoutController extends Controller
     // 2. Menampilkan halaman Invoice / Pembayaran
     public function show($id)
     {
-        $transaction = Transaction::with('event')->findOrFail($id);
+        $transaction = Transaction::with(['event.category', 'event.ticketPackages', 'user'])->findOrFail($id);
 
         if ($transaction->user_id !== Auth::id()) {
             abort(403, 'Maaf, Anda tidak memiliki akses.');
@@ -348,7 +348,7 @@ class CheckoutController extends Controller
     // 5. Download PDF
     public function downloadTicket($id)
     {
-        $transaction = Transaction::with(['event', 'user'])->findOrFail($id);
+        $transaction = Transaction::with(['event.category', 'event.ticketPackages', 'user', 'tickets'])->findOrFail($id);
         if ($transaction->user_id !== Auth::id() || $transaction->payment_status !== 'paid') {
             abort(403, 'Akses ditolak.');
         }
@@ -360,7 +360,7 @@ class CheckoutController extends Controller
     // 6. Debugging status (Hapus jika sudah live)
     public function debugPaid($id)
     {
-        $transaction = Transaction::with('event', 'user', 'tickets')->findOrFail($id);
+        $transaction = Transaction::with(['event.category', 'event.ticketPackages', 'user', 'tickets'])->findOrFail($id);
         $transaction->update([
             'payment_status' => 'paid',
             'status' => 'completed'
@@ -370,33 +370,37 @@ class CheckoutController extends Controller
             for ($i = 0; $i < $transaction->quantity; $i++) {
                 \App\Models\Ticket::create([
                     'transaction_id' => $transaction->id,
-                    'ticket_code' => $transaction->order_id . '-' . strtoupper(\Illuminate\Support\Str::random(4)),
+                    'ticket_code' => $transaction->order_id . '-' . strtoupper(Str::random(4)),
                     'is_scanned' => false,
                 ]);
             }
         }
 
-        $transaction = Transaction::with('event', 'user', 'tickets')->findOrFail($id);
+        $transaction->load('tickets');
 
+        Revenue::firstOrCreate(['order_id' => $transaction->order_id], [
+            'amount' => $transaction->total_amount,
+            'description' => 'Pendapatan dari event: ' . ($transaction->event->name ?? 'Event')
+        ]);
+
+        // Kirim email tiket
         if ($transaction->user && $transaction->user->email) {
             try {
                 Mail::to($transaction->user->email)->send(new TicketMail($transaction));
             } catch (\Exception $e) {
-                Log::error("Gagal kirim email: " . $e->getMessage());
+                Log::error("Gagal kirim email tiket debug: " . $e->getMessage());
             }
         }
 
-        return "Status LUNAS. " . $transaction->quantity . " Tiket berhasil dicetak & Email dikirim!";
+        return redirect()->route('transaction.history')->with('success', 'Transaksi berhasil diubah menjadi LUNAS untuk pengujian.');
     }
 
-    // ==========================================
-    // FUNGSI UNTUK MELIHAT RIWAYAT PESANAN (TIKET & SPONSOR)
-    // ==========================================
+    // 7. Riwayat Pemesanan Tiket Pengguna
     public function history()
     {
         $userId = \Illuminate\Support\Facades\Auth::id();
 
-        $ticketTransactions = \App\Models\Transaction::with('event')
+        $ticketTransactions = \App\Models\Transaction::with(['event.category', 'event.ticketPackages'])
             ->where('user_id', $userId)
             ->latest()
             ->get();

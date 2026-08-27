@@ -144,6 +144,22 @@
                             </div>
                             <span class="text-[11px] font-medium text-slate-400 mt-2 block">*Kolom ini muncul karena Anda mencentang opsi penyelenggaraan Online.</span>
                         </div>
+
+                        <!-- KODE RAHASIA PANITIA -->
+                        <div class="border-t border-slate-100 pt-6 mt-6">
+                            <label class="block text-[11px] font-bold text-[#A100FF] mb-2 uppercase tracking-widest flex items-center gap-1.5">
+                                <i data-lucide="key" class="w-4 h-4"></i> Kode Rahasia Rekrutmen Panitia
+                            </label>
+                            <div class="relative">
+                                <span class="absolute inset-y-0 left-0 flex items-center pl-4 text-purple-400"><i data-lucide="lock" class="w-5 h-5"></i></span>
+                                <input type="text" name="secret_code" value="{{ old('secret_code', $event->secret_code) }}" placeholder="Contoh: PANITIA_ARTIX_2026"
+                                    class="w-full bg-purple-50 focus:bg-white border border-purple-200 focus:border-[#A100FF] text-slate-900 text-sm font-bold rounded-[12px] pl-11 pr-4 py-3.5 focus:outline-none focus:ring-4 focus:ring-[#A100FF]/10 transition-all duration-200 placeholder:font-medium placeholder:text-purple-300">
+                            </div>
+                            <span class="text-[11px] font-medium text-slate-400 mt-2 block leading-relaxed">
+                                *Opsional. Berikan kode unik ini kepada calon panitia/staff Anda agar mereka bisa mendaftar secara mandiri dan otomatis terhubung sebagai panitia di event ini.
+                            </span>
+                        </div>
+
                     </div>
                 </div>
 
@@ -248,6 +264,7 @@
                         </div>
                     </div>
 
+                    <!-- ── POSTER PROMOSI ── -->
                     <div class="bg-white border border-slate-200 rounded-[24px] shadow-sm p-6 space-y-4">
                         <h2 class="text-base font-black text-slate-800 font-montserrat flex items-center gap-2.5">
                             <div class="p-1.5 bg-purple-50 text-[#A100FF] rounded-lg"><i data-lucide="image" class="w-4 h-4"></i></div>
@@ -282,6 +299,60 @@
                             <input type="file" name="image" id="badge-input" accept="image/*"
                                 class="w-full text-xs text-slate-500 font-medium file:mr-3 file:py-2.5 file:px-4 file:rounded-xl file:border-0 file:text-xs file:font-bold file:bg-blue-50 file:text-[#0066FF] hover:file:bg-[#0066FF] hover:file:text-white transition-all cursor-pointer border border-slate-200 rounded-[12px] p-1.5 bg-slate-50">
                             <p class="text-[10px] text-slate-400 font-medium mt-2 text-center">Biarkan kosong jika tidak ingin mengubah poster.</p>
+                        </div>
+                    </div>
+
+                    <!-- ── KOTAK GALERI FOTO EVENT ── -->
+                    <div class="bg-white border border-slate-200 rounded-[24px] shadow-sm p-6 space-y-4">
+                        <div class="flex items-center justify-between">
+                            <h2 class="text-base font-black text-slate-800 font-montserrat flex items-center gap-2.5">
+                                <div class="p-1.5 bg-blue-50 text-[#0066FF] rounded-lg"><i data-lucide="images" class="w-4 h-4"></i></div>
+                                Galeri Tambahan
+                            </h2>
+                            @if($event->galleries && $event->galleries->count() > 0)
+                                <span class="text-[11px] font-bold px-2.5 py-0.5 rounded-full bg-blue-50 text-[#0066FF]" id="gallery-count-badge">
+                                    {{ $event->galleries->count() }} Foto
+                                </span>
+                            @endif
+                        </div>
+                        <p class="text-[11px] font-medium text-slate-500 mb-2 leading-relaxed">
+                            Kelola foto galeri yang sudah ada atau unggah foto tambahan untuk carousel di halaman detail acara.
+                        </p>
+
+                        <!-- Foto Galeri Yang Sudah Ada -->
+                        @if($event->galleries && $event->galleries->count() > 0)
+                            <div class="space-y-2" id="existing-galleries-section">
+                                <label class="block text-[10px] font-bold text-slate-400 uppercase tracking-widest">Foto Tersimpan (Klik 🗑️ untuk hapus)</label>
+                                <div class="grid grid-cols-3 gap-2.5" id="existing-galleries-container">
+                                    @foreach($event->galleries as $gallery)
+                                        <div class="aspect-square rounded-xl overflow-hidden border border-slate-200 shadow-sm relative group bg-slate-100 transition-all duration-300" id="gallery-item-{{ $gallery->id }}">
+                                            <img src="{{ asset('storage/' . $gallery->image) }}" class="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105">
+                                            
+                                            <!-- Overlay Tombol Hapus -->
+                                            <div class="absolute inset-0 bg-slate-900/60 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-2 backdrop-blur-[2px]">
+                                                <button type="button" onclick="deleteExistingGallery({{ $gallery->id }}, '{{ route('admin.events.gallery.destroy', $gallery->id) }}')" 
+                                                    class="p-2 rounded-lg bg-red-500 hover:bg-red-600 text-white shadow-lg transition-transform hover:scale-110 active:scale-95" 
+                                                    title="Hapus Foto Galeri Ini">
+                                                    <i data-lucide="trash-2" class="w-4 h-4"></i>
+                                                </button>
+                                            </div>
+                                        </div>
+                                    @endforeach
+                                </div>
+                            </div>
+                        @endif
+
+                        <!-- Container Preview Foto Baru Yang Dipilih -->
+                        <div class="space-y-2">
+                            <div id="new-gallery-preview-container" class="grid grid-cols-3 gap-2.5 mb-2 empty:hidden"></div>
+                        </div>
+
+                        <!-- Input File Upload Baru -->
+                        <div>
+                            <label class="block text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1.5">+ Tambah Foto Galeri Baru</label>
+                            <input type="file" name="galleries[]" id="gallery-input" accept="image/*" multiple
+                                class="w-full text-xs text-slate-500 font-medium file:mr-3 file:py-2.5 file:px-4 file:rounded-xl file:border-0 file:text-xs file:font-bold file:bg-blue-50 file:text-[#0066FF] hover:file:bg-[#0066FF] hover:file:text-white transition-all cursor-pointer border border-slate-200 rounded-[12px] p-1.5 bg-slate-50">
+                            <p class="text-[10px] text-slate-400 font-medium mt-1.5">Bisa pilih beberapa foto sekaligus (Format JPG, PNG maks 2MB).</p>
                         </div>
                     </div>
                 </div>
@@ -330,7 +401,74 @@
         });
     }
 
-    // --- SCRIPT 3: LOGIKA CHECKBOX TIPE EVENT & PAKET DINAMIS ---
+    // --- SCRIPT 2: Preview Galeri Foto Baru ---
+    const galleryInput = document.getElementById('gallery-input');
+    const newGalleryPreviewContainer = document.getElementById('new-gallery-preview-container');
+
+    if(galleryInput) {
+        galleryInput.addEventListener('change', function() {
+            newGalleryPreviewContainer.innerHTML = '';
+            const files = this.files;
+
+            if(files && files.length > 0) {
+                newGalleryPreviewContainer.classList.remove('empty:hidden');
+                Array.from(files).forEach(file => {
+                    const reader = new FileReader();
+                    reader.addEventListener('load', function() {
+                        const imgBox = document.createElement('div');
+                        imgBox.className = 'aspect-square rounded-xl overflow-hidden border border-blue-300 shadow-sm relative group bg-slate-100';
+                        const img = document.createElement('img');
+                        img.src = this.result;
+                        img.className = 'w-full h-full object-cover transition-transform duration-300 group-hover:scale-110';
+                        imgBox.appendChild(img);
+                        newGalleryPreviewContainer.appendChild(imgBox);
+                    });
+                    reader.readAsDataURL(file);
+                });
+            }
+        });
+    }
+
+    // --- SCRIPT 3: Hapus Foto Galeri yang Sudah Ada via AJAX ---
+    async function deleteExistingGallery(galleryId, deleteUrl) {
+        if(!confirm('Apakah Anda yakin ingin menghapus foto galeri ini? Foto akan langsung dihapus dari sistem.')) {
+            return;
+        }
+
+        try {
+            const response = await fetch(deleteUrl, {
+                method: 'DELETE',
+                headers: {
+                    'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                    'Accept': 'application/json',
+                    'X-Requested-With': 'XMLHttpRequest'
+                }
+            });
+
+            const data = await response.json();
+            if(data.success) {
+                const item = document.getElementById(`gallery-item-${galleryId}`);
+                if(item) {
+                    item.style.transform = 'scale(0.8)';
+                    item.style.opacity = '0';
+                    setTimeout(() => {
+                        item.remove();
+                        const remaining = document.querySelectorAll('#existing-galleries-container > div');
+                        const badge = document.getElementById('gallery-count-badge');
+                        if(badge) {
+                            badge.innerText = `${remaining.length} Foto`;
+                        }
+                    }, 250);
+                }
+            } else {
+                alert(data.message || 'Gagal menghapus foto galeri.');
+            }
+        } catch(err) {
+            window.location.reload();
+        }
+    }
+
+    // --- SCRIPT 4: LOGIKA CHECKBOX TIPE EVENT & PAKET DINAMIS ---
     const checkOffline = document.getElementById('check_offline');
     const checkOnline = document.getElementById('check_online');
     const offlineVenueWrapper = document.getElementById('offline-venue-wrapper');
