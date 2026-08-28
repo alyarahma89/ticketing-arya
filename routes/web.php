@@ -49,8 +49,10 @@ Route::middleware('auth')->group(function () {
     Route::get('/transaction/{id}/check-status', [CheckoutController::class, 'checkStatus'])->name('transaction.check_status');
     Route::post('/transaction/{id}/cancel', [CheckoutController::class, 'cancelTransaction'])->name('transaction.cancel');
     Route::get('/history', [CheckoutController::class, 'history'])->name('transaction.history');
-    Route::get('/download-ticket/{id}', [CheckoutController::class, 'downloadTicket'])->name('ticket.download');
-    Route::get('/debug-paid/{id}', [CheckoutController::class, 'debugPaid']);
+    // Rute testing status bayar (Hanya aktif di mode pengembangan/local)
+    if (app()->environment('local')) {
+        Route::get('/debug-paid/{id}', [CheckoutController::class, 'debugPaid'])->name('debug.paid');
+    }
 
     // Profil User
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
@@ -134,8 +136,8 @@ Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('admin.')->grou
 });
 
 
-// Rute khusus untuk Panitia
-Route::middleware(['auth'])->prefix('panitia')->name('panitia.')->group(function () {
+// Rute khusus untuk Panitia, EO, dan Admin
+Route::middleware(['auth', 'role:admin,eo,panitia'])->prefix('panitia')->name('panitia.')->group(function () {
     Route::get('/dashboard', [PanitiaController::class, 'index'])->name('dashboard');
     Route::get('/scanner', [PanitiaController::class, 'scanner'])->name('scanner');
 

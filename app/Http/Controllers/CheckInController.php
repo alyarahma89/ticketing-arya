@@ -29,7 +29,18 @@ class CheckInController extends Controller
             return response()->json(['success' => false, 'message' => 'Tiket ini belum dibayar lunas!']);
         }
 
-        // 5. Validasi 3: Apakah tiket sudah di-scan sebelumnya?
+        // 5. Validasi 3: Keamanan Event (Pastikan tiket sesuai dengan event EO / Panitia)
+        $user = \Illuminate\Support\Facades\Auth::user();
+        if ($user) {
+            if ($user->role === 'eo' && $transaction->event && $transaction->event->user_id !== $user->id) {
+                return response()->json(['success' => false, 'message' => 'Akses ditolak: Tiket ini bukan untuk event yang Anda kelola!']);
+            }
+            if ($user->role === 'panitia' && $user->event_id && $transaction->event_id !== $user->event_id) {
+                return response()->json(['success' => false, 'message' => 'Akses ditolak: Tiket ini bukan untuk event yang ditugaskan kepada Anda!']);
+            }
+        }
+
+        // 6. Validasi 4: Apakah tiket sudah di-scan sebelumnya?
         if ($transaction->is_checked_in) {
             return response()->json(['success' => false, 'message' => 'Tiket sudah digunakan sebelumnya!']);
         }

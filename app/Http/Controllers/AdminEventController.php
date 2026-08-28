@@ -230,6 +230,13 @@ class AdminEventController extends Controller
     public function edit($id)
     {
         $event = Event::with(['ticketPackages', 'galleries'])->findOrFail($id);
+        $user = Auth::user();
+
+        // Keamanan IDOR: Cegah EO mengedit event milik EO lain
+        if ($user->role === 'eo' && $event->user_id !== $user->id) {
+            abort(403, 'Akses ditolak: Anda hanya dapat mengelola event milik Anda sendiri.');
+        }
+
         $categories = Category::all();
 
         return view('admin.events.edit', compact('event', 'categories'));
@@ -241,6 +248,12 @@ class AdminEventController extends Controller
     public function update(Request $request, $id)
     {
         $event = Event::findOrFail($id);
+        $user = Auth::user();
+
+        // Keamanan IDOR: Cegah EO memperbarui event milik EO lain
+        if ($user->role === 'eo' && $event->user_id !== $user->id) {
+            abort(403, 'Akses ditolak: Anda hanya dapat memperbarui event milik Anda sendiri.');
+        }
 
         $validated = $request->validate([
             'name' => 'required|string|max:255',
@@ -355,6 +368,12 @@ class AdminEventController extends Controller
     public function destroy($id)
     {
         $event = Event::with('galleries')->findOrFail($id);
+        $user = Auth::user();
+
+        // Keamanan IDOR: Cegah EO menghapus event milik EO lain
+        if ($user->role === 'eo' && $event->user_id !== $user->id) {
+            abort(403, 'Akses ditolak: Anda hanya dapat menghapus event milik Anda sendiri.');
+        }
 
         if ($event->image && Storage::disk('public')->exists($event->image)) {
             Storage::disk('public')->delete($event->image);
