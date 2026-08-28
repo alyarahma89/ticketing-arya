@@ -3,8 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Riwayat Pesanan - ARTIX ID</title>
-    <link rel="icon" href="{{ asset('main_logo.png') }}" type="image/x-icon">
+    <title>Riwayat Pesanan - Ticks ID</title>
+    <link rel="icon" href="{{ asset('favicon.png') }}" type="image/png">
 
     <!-- Tailwind CSS & Google Fonts -->
     <script src="https://cdn.tailwindcss.com"></script>
@@ -41,8 +41,8 @@
     <nav class="bg-white/90 dark:bg-[#041B4A]/90 backdrop-blur-md border-b border-slate-200 dark:border-white/10 fixed top-0 inset-x-0 z-50">
         <div class="max-w-5xl mx-auto px-6 h-20 flex items-center justify-between">
             <a href="{{ url('/') }}" class="flex items-center shrink-0">
-                <img src="{{ asset('logo_hitam.png') }}" alt="ARTIX ID" class="h-8 block dark:hidden">
-                <img src="{{ asset('logo_putih.png') }}" alt="ARTIX ID" class="h-8 hidden dark:block" style="filter: drop-shadow(0px 0px 8px rgba(0, 102, 255, 0.5));">
+                <img src="{{ asset('logoticksid.png') }}" alt="Ticks ID" class="h-8 w-auto object-contain block dark:hidden">
+                <img src="{{ asset('logo_putih_ticks.png') }}" alt="Ticks ID" class="h-8 w-auto object-contain hidden dark:block">
             </a>
             <div class="flex items-center gap-4">
                 <a href="{{ url('/') }}" class="text-sm font-bold text-slate-500 hover:text-[#0066FF] dark:text-white/60 dark:hover:text-white transition-colors flex items-center gap-2">

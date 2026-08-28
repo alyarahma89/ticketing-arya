@@ -3,8 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Kebijakan Refund - ARTIX ID</title>
-    <icon rel="icon" href="{{ asset('main_logo.png') }}" type="image/x-icon">
+    <title>Kebijakan Refund - Ticks ID</title>
+    <link rel="icon" href="{{ asset('favicon.png') }}" type="image/png">
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700;900&family=Exo+2:wght@400;500;600&display=swap" rel="stylesheet">
     <script src="https://unpkg.com/lucide@latest"></script>
@@ -21,7 +21,10 @@
             <a href="{{ url('/') }}" class="flex items-center gap-2 font-bold text-slate-600 hover:text-[#FF7A00] transition-colors">
                 <i data-lucide="arrow-left" class="w-5 h-5"></i> Kembali ke Beranda
             </a>
-            <h1 class="font-montserrat font-black text-xl">ARTIX <span class="text-[#FF7A00]">ID</span></h1>
+            <a href="{{ url('/') }}" class="flex items-center">
+                <img src="{{ asset('logoticksid.png') }}" alt="Ticks ID" class="h-8 w-auto object-contain block dark:hidden">
+                <img src="{{ asset('logo_putih_ticks.png') }}" alt="Ticks ID" class="h-8 w-auto object-contain hidden dark:block">
+            </a>
         </div>
     </nav>
 

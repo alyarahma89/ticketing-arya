@@ -1,6 +1,6 @@
 @extends('layouts.main')
 
-@section('title', 'ARTIX ID | Integrated Event Ecosystem')
+@section('title', 'Ticks ID | Integrated Event Ecosystem')
 
 @section('content')
 
@@ -23,10 +23,12 @@
             <!-- LOGO UTAMA -->
             <div class="relative flex justify-center w-full max-w-3xl mx-auto mb-6">
                 <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-3/4 h-3/4 bg-white/40 blur-[70px] rounded-full hidden dark:block pointer-events-none z-0"></div>
-                <img src="{{ asset('main_logo.png') }}"
-                     alt="ARTIX ID Primary Logo"
-                     class="relative z-10 h-48 md:h-64 lg:h-80 w-auto object-contain border-none outline-none drop-shadow-2xl hover:scale-105 transition-transform duration-500"
-                     style="clip-path: inset(5px);">
+                <img src="{{ asset('logoticksid.png') }}"
+                     alt="Ticks ID Primary Logo"
+                     class="relative z-10 h-28 md:h-36 lg:h-44 w-auto object-contain border-none outline-none drop-shadow-2xl hover:scale-105 transition-transform duration-500 block dark:hidden">
+                <img src="{{ asset('logo_putih_ticks.png') }}"
+                     alt="Ticks ID Primary Logo"
+                     class="relative z-10 h-28 md:h-36 lg:h-44 w-auto object-contain border-none outline-none drop-shadow-2xl hover:scale-105 transition-transform duration-500 hidden dark:block">
             </div>
 
             <!-- Headline Teks -->

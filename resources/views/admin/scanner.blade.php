@@ -3,8 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Check-in Scanner - ARTIX ID</title>
-    <link rel="icon" href="{{ asset('main_logo.png') }}" type="image/x-icon">
+    <title>Check-in Scanner - Ticks ID</title>
+    <link rel="icon" href="{{ asset('favicon.png') }}" type="image/png">
 
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>

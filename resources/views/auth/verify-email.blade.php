@@ -3,8 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-    <title>Verifikasi Email | ARTIX ID</title>
-    <link rel="icon" href="{{ asset('main_logo.png') }}" type="image/x-icon">
+    <title>Verifikasi Email | Ticks ID</title>
+    <link rel="icon" href="{{ asset('favicon.png') }}" type="image/png">
 
 
     <!-- Tailwind CSS -->
@@ -91,10 +91,9 @@
             <div class="p-8 sm:p-10">
                 <!-- Header Logo -->
                 <div class="flex justify-center mb-8">
-                    <!-- Logo Hitam untuk Mode Terang -->
-                    <img src="{{ asset('logo_hitam.png') }}" alt="ARTIX ID Logo" class="h-10 object-contain block dark:hidden">
-                    <!-- Logo Putih untuk Mode Gelap -->
-                    <img src="{{ asset('logo_putih.png') }}" alt="ARTIX ID Logo" class="h-10 object-contain hidden dark:block" style="filter: drop-shadow(0px 0px 8px rgba(0, 102, 255, 0.4));">
+                    <!-- Logo Ticks ID -->
+                    <img src="{{ asset('logoticksid.png') }}" alt="Ticks ID Logo" class="h-10 object-contain block dark:hidden">
+                    <img src="{{ asset('logo_putih_ticks.png') }}" alt="Ticks ID Logo" class="h-10 object-contain hidden dark:block">
                 </div>
 
                 <!-- Teks Instruksi -->

@@ -5,8 +5,8 @@
                 <!-- Logo -->
                 <div class="shrink-0 flex items-center">
                     <a href="{{ url('/') }}">
-                        <img src="{{ asset('logo_hitam.png') }}" alt="ARTIX ID" class="block h-9 w-auto dark:hidden">
-                        <img src="{{ asset('logo_putih.png') }}" alt="ARTIX ID" class="hidden h-9 w-auto dark:block" style="filter: drop-shadow(0px 0px 8px rgba(0, 102, 255, 0.5));">
+                        <img src="{{ asset('logoticksid.png') }}" alt="Ticks ID" class="h-9 w-auto object-contain block dark:hidden">
+                        <img src="{{ asset('logo_putih_ticks.png') }}" alt="Ticks ID" class="h-9 w-auto object-contain hidden dark:block">
                     </a>
                 </div>
 

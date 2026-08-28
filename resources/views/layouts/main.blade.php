@@ -3,8 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>@yield('title', 'ARTIX ID | Integrated Event Ecosystem')</title>
-    <link rel="icon" href="{{ asset('main_logo.png') }}" type="image/x-icon">
+    <title>@yield('title', 'Ticks ID | Integrated Event Ecosystem')</title>
+    <link rel="icon" href="{{ asset('favicon.png') }}" type="image/png">
 
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
@@ -111,8 +111,8 @@
 
             <!-- Logo Dinamis -->
             <a href="{{ url('/') }}" class="flex items-center shrink-0">
-                <img src="{{ asset('logo_hitam.png') }}" alt="ARTIX ID Logo Hitam" class="h-10 md:h-14 w-auto object-contain transition-all duration-300 block dark:hidden">
-                <img src="{{ asset('logo_putih.png') }}" alt="ARTIX ID Logo Putih" class="h-10 md:h-14 w-auto object-contain transition-all duration-300 hidden dark:block" style="filter: drop-shadow(0px 0px 8px rgba(0, 102, 255, 0.5));">
+                <img src="{{ asset('logoticksid.png') }}" alt="Ticks ID Logo" class="h-10 md:h-12 w-auto object-contain transition-all duration-300 block dark:hidden">
+                <img src="{{ asset('logo_putih_ticks.png') }}" alt="Ticks ID Logo" class="h-10 md:h-12 w-auto object-contain transition-all duration-300 hidden dark:block">
             </a>
 
             <!-- Desktop Links -->
@@ -210,8 +210,8 @@
             <div class="grid grid-cols-1 md:grid-cols-4 gap-10 mb-12">
                 <div>
                     <div class="flex items-center mb-5">
-                        <img src="{{ asset('logo_hitam.png') }}" alt="ARTIX ID Logo Hitam" class="h-8 object-contain block dark:hidden">
-                        <img src="{{ asset('logo_putih.png') }}" alt="ARTIX ID Logo Putih" class="h-8 object-contain hidden dark:block" style="filter: drop-shadow(0px 0px 8px rgba(0, 102, 255, 0.3));">
+                        <img src="{{ asset('logoticksid.png') }}" alt="Ticks ID Logo" class="h-8 object-contain block dark:hidden">
+                        <img src="{{ asset('logo_putih_ticks.png') }}" alt="Ticks ID Logo" class="h-8 object-contain hidden dark:block">
                     </div>
                     <p class="text-sm leading-relaxed mb-6 font-medium text-slate-500 dark:text-white/40">
                         Platform event ecosystem terbesar di Indonesia. Menghubungkan penyelenggara, sponsor, dan peserta.
@@ -264,7 +264,7 @@
             </div>
 
             <div class="flex flex-col md:flex-row items-center justify-between pt-8 border-t gap-3 border-slate-200 dark:border-white/10">
-                <p class="text-sm font-bold text-slate-400 dark:font-normal dark:text-white/30">© {{ date('Y') }} ARTIX ID. All rights reserved.</p>
+                <p class="text-sm font-bold text-slate-400 dark:font-normal dark:text-white/30">© {{ date('Y') }} TICKS ID. All rights reserved.</p>
                 <p class="text-sm font-bold text-slate-400 dark:font-normal dark:text-white/30 flex items-center gap-3">
                     <a href="https://mail.google.com/mail/?view=cm&fs=1&to=growaryacommunication@gmail.com" target="_blank" rel="noopener noreferrer" class="hover:text-[#0066FF] transition-colors flex items-center gap-1.5" title="Kirim Email ke growaryacommunication@gmail.com">
                         <i data-lucide="mail" class="w-4 h-4 text-[#0066FF]"></i> growaryacommunication@gmail.com

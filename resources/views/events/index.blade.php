@@ -1,6 +1,6 @@
 @extends('layouts.main')
 
-@section('title', 'ARTIX ID | Integrated Event Ecosystem')
+@section('title', 'Ticks ID | Integrated Event Ecosystem')
 
 @section('content')
 
@@ -23,10 +23,12 @@
             <!-- LOGO UTAMA -->
             <div class="relative flex justify-center w-full max-w-3xl mx-auto mb-6">
                 <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-3/4 h-3/4 bg-white/40 blur-[70px] rounded-full hidden dark:block pointer-events-none z-0"></div>
-                <img src="{{ asset('main_logo.png') }}"
-                     alt="ARTIX ID Primary Logo"
-                     class="relative z-10 h-48 md:h-64 lg:h-80 w-auto object-contain border-none outline-none drop-shadow-2xl hover:scale-105 transition-transform duration-500"
-                     style="clip-path: inset(5px);">
+                <img src="{{ asset('logoticksid.png') }}"
+                     alt="Ticks ID Primary Logo"
+                     class="relative z-10 h-28 md:h-36 lg:h-44 w-auto object-contain border-none outline-none drop-shadow-2xl hover:scale-105 transition-transform duration-500 block dark:hidden">
+                <img src="{{ asset('logo_putih_ticks.png') }}"
+                     alt="Ticks ID Primary Logo"
+                     class="relative z-10 h-28 md:h-36 lg:h-44 w-auto object-contain border-none outline-none drop-shadow-2xl hover:scale-105 transition-transform duration-500 hidden dark:block">
             </div>
 
             <!-- Headline Teks -->
@@ -249,7 +251,7 @@
                     <span class="text-gradient-blue">Dalam Satu Platform</span>
                 </h2>
                 <p class="text-lg max-w-xl mx-auto mt-5 leading-relaxed font-medium text-slate-600 dark:text-white/50">
-                    Tidak perlu tools terpisah. ARTIX ID mengintegrasikan seluruh kebutuhan event management dalam satu ekosistem.
+                    Tidak perlu tools terpisah. TICKS ID mengintegrasikan seluruh kebutuhan event management dalam satu ekosistem.
                 </p>
             </div>
 
@@ -338,7 +340,7 @@
                         Mulai dalam <span class="text-gradient-orange">3 Langkah</span>
                     </h2>
                     <p class="text-lg leading-relaxed font-medium text-slate-600 dark:text-white/50">
-                        Dari setup hingga go-live, ARTIX ID dirancang untuk kecepatan dan kemudahan bagi penyelenggara di semua skala — dari indie sampai enterprise.
+                        Dari setup hingga go-live, TICKS ID dirancang untuk kecepatan dan kemudahan bagi penyelenggara di semua skala — dari indie sampai enterprise.
                     </p>
                     <a href="{{ route('register') }}" class="group inline-flex items-center gap-2 mt-8 font-bold text-sm text-[#0066FF] hover:text-blue-700 dark:hover:text-blue-400">
                         Pelajari selengkapnya <i data-lucide="chevron-right" class="w-4 h-4 group-hover:translate-x-1 transition-transform"></i>
@@ -423,7 +425,7 @@
                 <span class="hidden dark:inline">Event Kamu?</span>
             </h2>
             <p class="text-lg mb-10 max-w-xl mx-auto leading-relaxed font-medium text-slate-600 dark:text-white/55">
-                Bergabung dengan ribuan event organizer yang sudah menggunakan ARTIX ID. Mulai gratis, upgrade kapan saja.
+                Bergabung dengan ribuan event organizer yang sudah menggunakan TICKS ID. Mulai gratis, upgrade kapan saja.
             </p>
             <div class="flex flex-col sm:flex-row gap-4 justify-center">
                 <a href="{{ route('register') }}" class="group inline-flex items-center justify-center gap-2 px-8 py-4 font-bold text-white rounded-xl transition-all hover:scale-105 shadow-xl hover:shadow-2xl font-montserrat dark:shadow-[0_0_50px_rgba(0,102,255,0.6)]" style="background: linear-gradient(135deg, #0066FF, #00C2FF);">

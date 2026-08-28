@@ -3,8 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-    <title>Daftar Akun | ARTIX ID</title>
-    <link rel="icon" href="{{ asset('main_logo.png') }}" type="image/x-icon">
+    <title>Daftar Akun | Ticks ID</title>
+    <link rel="icon" href="{{ asset('favicon.png') }}" type="image/png">
 
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
@@ -103,13 +103,12 @@
                 <!-- Header Logo & Teks -->
                 <div class="text-center mb-6">
                     <div class="flex justify-center mb-6">
-                        <!-- Logo Hitam untuk Mode Terang -->
-                        <img src="{{ asset('logo_hitam.png') }}" alt="ARTIX ID Logo" class="h-16 w-auto object-contain block dark:hidden">
-                        <!-- Logo Putih untuk Mode Gelap -->
-                        <img src="{{ asset('logo_putih.png') }}" alt="ARTIX ID Logo" class="h-16 w-auto object-contain hidden dark:block" style="filter: drop-shadow(0px 0px 8px rgba(0, 102, 255, 0.4));">
+                        <!-- Logo Ticks ID -->
+                        <img src="{{ asset('logoticksid.png') }}" alt="Ticks ID Logo" class="h-16 w-auto object-contain block dark:hidden">
+                        <img src="{{ asset('logo_putih_ticks.png') }}" alt="Ticks ID Logo" class="h-16 w-auto object-contain hidden dark:block">
                     </div>
                     <h3 class="text-2xl font-black font-montserrat text-slate-900 dark:text-white tracking-tight mb-2">Selamat Datang!</h3>
-                    <p class="text-sm font-medium text-slate-500 dark:text-white/50">Silakan isi formulir di bawah untuk bergabung dengan ARTIX ID.</p>
+                    <p class="text-sm font-medium text-slate-500 dark:text-white/50">Silakan isi formulir di bawah untuk bergabung dengan Ticks ID.</p>
                 </div>
 
                 <!-- ── KOTAK NOTIFIKASI ERROR (PENTING) ── -->

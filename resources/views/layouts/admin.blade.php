@@ -4,8 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <!-- Judul Halaman Dinamis -->
-    <title>@yield('title', 'Admin Panel') - ARTIX ID</title>
-    <link rel="icon" href="{{ asset('main_logo.png') }}" type="image/x-icon">
+    <title>@yield('title', 'Admin Panel') - Ticks ID</title>
+    <link rel="icon" href="{{ asset('favicon.png') }}" type="image/png">
 
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -69,8 +69,7 @@
 
         <div class="h-20 shrink-0 flex items-center px-8 border-b border-white/10">
             <a href="{{ url('/') }}" class="flex items-center gap-3">
-                <img src="{{ asset('main_logo.png') }}" alt="ARTIX ID Logo" class="h-10 w-auto object-contain">
-                <span class="text-white font-black text-xl tracking-tight font-montserrat">ARTIX <span class="text-gradient-orange">ID</span></span>
+                <img src="{{ asset('logo_putih_ticks.png') }}" alt="Ticks ID Logo" class="h-10 w-auto object-contain">
             </a>
         </div>
 

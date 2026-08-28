@@ -170,3 +170,4 @@ Route::get('/midtrans/finish', [CheckoutController::class, 'finish'])->name('mid
 
 
 require __DIR__.'/auth.php';
+

@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
-    <title>E-Ticket Resmi {{ $transaction->order_id }} - ARTIX ID</title>
+    <title>E-Ticket Resmi {{ $transaction->order_id }} - Ticks ID</title>
 
     <style>
         /* Pengaturan Dasar Dokumen PDF DomPDF */
@@ -242,9 +242,8 @@
             $packageDesc = null;
         }
 
-        // Gambar Logo Resmi ARTIX
-        $logoPutihPath = public_path('logo_putih.png');
-        $mainLogoPath = public_path('main_logo.png');
+        // Gambar Logo Resmi Ticks ID
+        $logoPath = public_path('logoticksid.png');
     @endphp
 
     <div class="page-break">
@@ -253,13 +252,13 @@
             <!-- 1. HEADER BAR -->
             <tr class="header-row">
                 <td class="header-left">
-                    OFFICIAL E-TICKET | ARTIX ID
+                    OFFICIAL E-TICKET | TICKS ID
                 </td>
                 <td class="header-right">
-                    @if(file_exists($logoPutihPath))
-                        <img src="{{ $logoPutihPath }}" alt="ARTIX ID" class="header-logo-img">
+                    @if(file_exists($logoPath))
+                        <img src="{{ $logoPath }}" alt="Ticks ID" class="header-logo-img">
                     @else
-                        <span style="font-size: 15px; font-weight: 900; color: #FFFFFF;">ARTIX<span style="color: #00C2FF;">.ID</span></span>
+                        <span style="font-size: 15px; font-weight: 900; color: #FFFFFF;">TICKS<span style="color: #00C2FF;">.ID</span></span>
                     @endif
                 </td>
             </tr>
@@ -364,11 +363,11 @@
 
                 <!-- ── KOLOM KANAN (28%): SOBEKAN TIKET & QR CODE SCANNER ── -->
                 <td class="body-right">
-                    <!-- Logo ARTIX ID di Atas Sobekan -->
-                    @if(file_exists($mainLogoPath))
-                        <img src="{{ $mainLogoPath }}" alt="ARTIX ID" class="stub-logo-img">
+                    <!-- Logo Ticks ID di Atas Sobekan -->
+                    @if(file_exists($logoPath))
+                        <img src="{{ $logoPath }}" alt="Ticks ID" class="stub-logo-img">
                     @else
-                        <div style="font-size: 12px; font-weight: 900; color: #0066FF; margin-bottom: 6px;">ARTIX ID</div>
+                        <div style="font-size: 12px; font-weight: 900; color: #0066FF; margin-bottom: 6px;">TICKS ID</div>
                     @endif
 
                     <div class="stub-title">E-TICKET</div>

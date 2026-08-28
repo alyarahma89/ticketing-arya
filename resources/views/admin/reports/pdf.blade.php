@@ -2,7 +2,7 @@
 <html lang="id">
 <head>
     <meta charset="UTF-8">
-    <title>Laporan Keuangan - ARTIX ID</title>
+    <title>Laporan Keuangan - Ticks ID</title>
 
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700;900&family=Exo+2:wght@400;600;700&display=swap');
@@ -131,7 +131,7 @@
     <table class="header-table">
         <tr>
             <td class="header-logo">
-                <img src="{{ public_path('main_logo.png') }}" alt="ARTIX ID Logo">
+                <img src="{{ public_path('logoticksid.png') }}" alt="Ticks ID Logo">
             </td>
             <td class="header-text">
                 <h1>Laporan Keuangan <span style="color: #FF7A00;">Event</span></h1>
