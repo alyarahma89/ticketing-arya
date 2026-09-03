@@ -400,15 +400,29 @@ class CheckoutController extends Controller
     {
         $userId = \Illuminate\Support\Facades\Auth::id();
 
-        $ticketTransactions = \App\Models\Transaction::with(['event.category', 'event.ticketPackages'])
-            ->where('user_id', $userId)
-            ->latest()
-            ->get();
+        try {
+            $ticketTransactions = \App\Models\Transaction::with(['event.category', 'event.ticketPackages'])
+                ->where('user_id', $userId)
+                ->latest()
+                ->get();
+        } catch (\Exception $e) {
+            \Illuminate\Support\Facades\Log::error("Error loading ticket transactions: " . $e->getMessage());
+            try {
+                $ticketTransactions = \App\Models\Transaction::where('user_id', $userId)->latest()->get();
+            } catch (\Exception $ex) {
+                $ticketTransactions = collect();
+            }
+        }
 
-        $sponsorshipTransactions = \App\Models\SponsorshipTransaction::with('sponsorship.event')
-            ->where('user_id', $userId)
-            ->latest()
-            ->get();
+        try {
+            $sponsorshipTransactions = \App\Models\SponsorshipTransaction::with('sponsorship.event')
+                ->where('user_id', $userId)
+                ->latest()
+                ->get();
+        } catch (\Exception $e) {
+            \Illuminate\Support\Facades\Log::error("Error loading sponsorship transactions: " . $e->getMessage());
+            $sponsorshipTransactions = collect();
+        }
 
         return view('history', compact('ticketTransactions', 'sponsorshipTransactions'));
     }
