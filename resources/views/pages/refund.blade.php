@@ -37,13 +37,13 @@
 
                 <div class="space-y-6 text-slate-700 leading-relaxed">
                     <h3 class="font-bold text-xl text-slate-900">1. Pembatalan Acara oleh Penyelenggara</h3>
-                    <p>Apabila acara dibatalkan sepenuhnya oleh pihak penyelenggara (Event Organizer), pembeli tiket berhak mendapatkan pengembalian dana penuh (100%) tidak termasuk biaya admin layanan (*platform fee*). Proses pencairan dana akan dilakukan maksimal 14 hari kerja setelah pengumuman resmi.</p>
+                    <p>Apabila acara dibatalkan sepenuhnya oleh pihak penyelenggara (Event Organizer), pembeli tiket berhak mendapatkan pengembalian dana penuh (100%) tidak termasuk biaya admin layanan (<em>platform fee</em>). Proses pencairan dana akan dilakukan maksimal 14 hari kerja setelah pengumuman resmi.</p>
 
                     <h3 class="font-bold text-xl text-slate-900 mt-6">2. Penundaan Acara atau Perubahan Jadwal</h3>
                     <p>Jika terjadi penundaan atau perubahan jadwal acara, tiket yang sudah dibeli akan otomatis berlaku untuk tanggal yang baru. Apabila pembeli tidak dapat hadir pada tanggal yang baru, pembeli berhak mengajukan refund dalam batas waktu yang akan diumumkan oleh penyelenggara.</p>
 
                     <h3 class="font-bold text-xl text-slate-900 mt-6">3. Ketidakhadiran Pembeli (No-Show)</h3>
-                    <p>Tiket yang sudah dibeli **TIDAK DAPAT** dikembalikan (Non-refundable) apabila pembeli batal hadir karena alasan pribadi, keterlambatan, atau kesalahan pembeli dalam membaca detail waktu dan lokasi acara.</p>
+                    <p>Tiket yang sudah dibeli <strong>TIDAK DAPAT</strong> dikembalikan (Non-refundable) apabila pembeli batal hadir karena alasan pribadi, keterlambatan, atau kesalahan pembeli dalam membaca detail waktu dan lokasi acara.</p>
                 </div>
             </div>
         </div>
