@@ -49,6 +49,7 @@ Route::middleware('auth')->group(function () {
     Route::get('/transaction/{id}/check-status', [CheckoutController::class, 'checkStatus'])->name('transaction.check_status');
     Route::post('/transaction/{id}/cancel', [CheckoutController::class, 'cancelTransaction'])->name('transaction.cancel');
     Route::get('/history', [CheckoutController::class, 'history'])->name('transaction.history');
+    Route::get('/transaction/{id}/download', [CheckoutController::class, 'downloadTicket'])->name('ticket.download');
     // Rute testing status bayar (Hanya aktif di mode pengembangan/local)
     if (app()->environment('local')) {
         Route::get('/debug-paid/{id}', [CheckoutController::class, 'debugPaid'])->name('debug.paid');
