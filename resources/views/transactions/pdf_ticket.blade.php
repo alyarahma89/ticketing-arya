@@ -242,8 +242,20 @@
             $packageDesc = null;
         }
 
-        // Gambar Logo Resmi Ticks ID
-        $logoPath = public_path('logoticksid.png');
+        // Gambar Logo Resmi Ticks ID (Base64 Embed)
+        $headerLogoSrc = '';
+        if (file_exists(public_path('logo_putih_ticks.png'))) {
+            $headerLogoSrc = 'data:image/png;base64,' . base64_encode(file_get_contents(public_path('logo_putih_ticks.png')));
+        } elseif (file_exists(public_path('logoticksid.png'))) {
+            $headerLogoSrc = 'data:image/png;base64,' . base64_encode(file_get_contents(public_path('logoticksid.png')));
+        }
+
+        $stubLogoSrc = '';
+        if (file_exists(public_path('logoticksid.png'))) {
+            $stubLogoSrc = 'data:image/png;base64,' . base64_encode(file_get_contents(public_path('logoticksid.png')));
+        } elseif (file_exists(public_path('logo_putih_ticks.png'))) {
+            $stubLogoSrc = 'data:image/png;base64,' . base64_encode(file_get_contents(public_path('logo_putih_ticks.png')));
+        }
     @endphp
 
     <div class="page-break">
@@ -255,8 +267,8 @@
                     OFFICIAL E-TICKET | TICKS ID
                 </td>
                 <td class="header-right">
-                    @if(file_exists($logoPath))
-                        <img src="{{ $logoPath }}" alt="Ticks ID" class="header-logo-img">
+                    @if(!empty($headerLogoSrc))
+                        <img src="{{ $headerLogoSrc }}" alt="Ticks ID" class="header-logo-img">
                     @else
                         <span style="font-size: 15px; font-weight: 900; color: #FFFFFF;">TICKS<span style="color: #00C2FF;">.ID</span></span>
                     @endif
@@ -364,8 +376,8 @@
                 <!-- ── KOLOM KANAN (28%): SOBEKAN TIKET & QR CODE SCANNER ── -->
                 <td class="body-right">
                     <!-- Logo Ticks ID di Atas Sobekan -->
-                    @if(file_exists($logoPath))
-                        <img src="{{ $logoPath }}" alt="Ticks ID" class="stub-logo-img">
+                    @if(!empty($stubLogoSrc))
+                        <img src="{{ $stubLogoSrc }}" alt="Ticks ID" class="stub-logo-img">
                     @else
                         <div style="font-size: 12px; font-weight: 900; color: #0066FF; margin-bottom: 6px;">TICKS ID</div>
                     @endif
