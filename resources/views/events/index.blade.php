@@ -221,19 +221,19 @@
             <div class="grid grid-cols-2 md:grid-cols-4 gap-8 md:gap-4">
                 <div class="text-center">
                     <div class="font-black text-4xl md:text-5xl text-gradient-blue font-montserrat">10K+</div>
-                    <div class="text-sm mt-2 font-bold text-slate-500 dark:text-white/45">Event Sukses</div>
+                    <div class="text-sm mt-2 font-bold text-slate-500 dark:text-white/45">Target Event</div>
                 </div>
                 <div class="text-center">
                     <div class="font-black text-4xl md:text-5xl text-gradient-blue font-montserrat">2.5M+</div>
-                    <div class="text-sm mt-2 font-bold text-slate-500 dark:text-white/45">Tiket Terjual</div>
+                    <div class="text-sm mt-2 font-bold text-slate-500 dark:text-white/45">Tiket Tersedia</div>
                 </div>
                 <div class="text-center">
                     <div class="font-black text-4xl md:text-5xl text-gradient-blue font-montserrat">500+</div>
-                    <div class="text-sm mt-2 font-bold text-slate-500 dark:text-white/45">Brand Partner</div>
+                    <div class="text-sm mt-2 font-bold text-slate-500 dark:text-white/45">Jaringan Mitra</div>
                 </div>
                 <div class="text-center">
                     <div class="font-black text-4xl md:text-5xl text-gradient-blue font-montserrat">98%</div>
-                    <div class="text-sm mt-2 font-bold text-slate-500 dark:text-white/45">Satisfaction Rate</div>
+                    <div class="text-sm mt-2 font-bold text-slate-500 dark:text-white/45">Keamanan Transaksi</div>
                 </div>
             </div>
         </div>
