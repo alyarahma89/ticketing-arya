@@ -70,9 +70,9 @@ class RegisteredUserController extends Controller
                 // ==========================================
                 // JALUR 1: HARDCODE UNTUK EO (MASTER KEY)
                 // ==========================================
-                $masterKeyEO = 'ARTIX-EO-PRO';
+                $masterKeyEO = 'TICKS-EO-PRO';
 
-                if ($request->secret_code !== $masterKeyEO) {
+                if ($request->secret_code !== $masterKeyEO && $request->secret_code !== 'ARTIX-EO-PRO') {
                     return back()->withErrors([
                         'secret_code' => 'Kode Akses EO (Master Key) tidak valid!'
                     ])->withInput();

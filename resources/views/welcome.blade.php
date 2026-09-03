@@ -192,7 +192,7 @@
                     <span class="text-gradient-blue">Dalam Satu Platform</span>
                 </h2>
                 <p class="text-lg max-w-xl mx-auto mt-5 leading-relaxed font-medium text-slate-600 dark:text-white/50">
-                    Tidak perlu tools terpisah. ARTIX ID mengintegrasikan seluruh kebutuhan event management dalam satu ekosistem.
+                    Tidak perlu tools terpisah. Ticks ID mengintegrasikan seluruh kebutuhan event management dalam satu ekosistem.
                 </p>
             </div>
 
@@ -281,7 +281,7 @@
                         Mulai dalam <span class="text-gradient-orange">3 Langkah</span>
                     </h2>
                     <p class="text-lg leading-relaxed font-medium text-slate-600 dark:text-white/50">
-                        Dari setup hingga go-live, ARTIX ID dirancang untuk kecepatan dan kemudahan bagi penyelenggara di semua skala — dari indie sampai enterprise.
+                        Dari setup hingga go-live, Ticks ID dirancang untuk kecepatan dan kemudahan bagi penyelenggara di semua skala — dari indie sampai enterprise.
                     </p>
                     <a href="{{ route('register') }}" class="group inline-flex items-center gap-2 mt-8 font-bold text-sm text-[#0066FF] hover:text-blue-700 dark:hover:text-blue-400">
                         Pelajari selengkapnya <i data-lucide="chevron-right" class="w-4 h-4 group-hover:translate-x-1 transition-transform"></i>
@@ -364,13 +364,13 @@
                 <span class="hidden dark:inline">Event Kamu?</span>
             </h2>
             <p class="text-lg mb-10 max-w-xl mx-auto leading-relaxed font-medium text-slate-600 dark:text-white/55">
-                Bergabung dengan ribuan event organizer yang sudah menggunakan ARTIX ID. Mulai gratis, upgrade kapan saja.
+                Bergabung dengan ribuan event organizer yang sudah menggunakan Ticks ID. Mulai gratis, upgrade kapan saja.
             </p>
             <div class="flex flex-col sm:flex-row gap-4 justify-center">
                 <a href="{{ route('register') }}" class="group inline-flex items-center justify-center gap-2 px-8 py-4 font-bold text-white rounded-xl transition-all hover:scale-105 shadow-xl hover:shadow-2xl font-montserrat dark:shadow-[0_0_50px_rgba(0,102,255,0.6)]" style="background: linear-gradient(135deg, #0066FF, #00C2FF);">
                     Daftar Gratis Sekarang <i data-lucide="arrow-right" class="w-4 h-4 group-hover:translate-x-1 transition-transform"></i>
                 </a>
-                <a href="https://wa.me/6282160762279?text=Halo%20Admin%20ARTIX%20ID,%20saya%20ingin%20konsultasi%20seputar%20penyelenggaraan%20event" target="_blank" rel="noopener noreferrer" class="inline-flex items-center justify-center gap-2 px-8 py-4 font-bold rounded-xl border transition-all text-slate-700 bg-white border-slate-300 hover:bg-slate-50 hover:shadow-md dark:bg-transparent dark:text-white dark:border-white/20 dark:hover:bg-white/5 dark:shadow-none">
+                <a href="https://wa.me/6282160762279?text=Halo%20Admin%20Ticks%20ID,%20saya%20ingin%20konsultasi%20seputar%20penyelenggaraan%20event" target="_blank" rel="noopener noreferrer" class="inline-flex items-center justify-center gap-2 px-8 py-4 font-bold rounded-xl border transition-all text-slate-700 bg-white border-slate-300 hover:bg-slate-50 hover:shadow-md dark:bg-transparent dark:text-white dark:border-white/20 dark:hover:bg-white/5 dark:shadow-none">
                     <i data-lucide="message-circle" class="w-5 h-5 text-emerald-500"></i> Hubungi Sales (+62 821-6076-2279)
                 </a>
             </div>

@@ -1,6 +1,6 @@
 @extends('layouts.main')
 
-@section('title', $event->name . ' | ARTIX ID')
+@section('title', $event->name . ' | Ticks ID')
 
 <!-- ── MENYUNTIKKAN CSS KHUSUS HALAMAN DETAIL ── -->
 @push('styles')
@@ -201,7 +201,7 @@
                         </h3>
                         <ul class="text-sm flex flex-col gap-3 ps-5 list-disc m-0 leading-relaxed font-medium text-slate-600 dark:text-white/60">
                             <li>Tiket yang sudah dibeli bersifat <strong class="text-slate-900 dark:text-white">Non-Refundable</strong> (tidak dapat diuangkan kembali).</li>
-                            <li>Pengunjung wajib menunjukkan e-tiket (QR Code) resmi dari ARTIX ID saat registrasi di lokasi.</li>
+                            <li>Pengunjung wajib menunjukkan e-tiket (QR Code) resmi dari Ticks ID saat registrasi di lokasi.</li>
                             <li>Pembeli tiket livestream dilarang menyebarkan ulang link siaran ke pihak lain.</li>
                             <li>Satu tiket hanya berlaku untuk satu orang pengunjung.</li>
                         </ul>

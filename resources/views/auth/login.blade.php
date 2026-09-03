@@ -174,7 +174,7 @@
 
                     <!-- Link Register -->
                     <div class="text-center border-t border-slate-200 dark:border-white/10 pt-6">
-                        <span class="text-sm font-medium text-slate-500 dark:text-white/50">Belum tergabung di ARTIX? </span>
+                        <span class="text-sm font-medium text-slate-500 dark:text-white/50">Belum tergabung di Ticks ID? </span>
                         <a href="{{ route('register') }}" class="text-sm font-bold text-[#0066FF] dark:text-[#00C2FF] hover:underline transition-colors">
                             Buat Akun Sekarang
                         </a>

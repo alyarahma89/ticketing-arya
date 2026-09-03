@@ -37,13 +37,13 @@
 
                 <div class="space-y-6 text-slate-700 leading-relaxed">
                     <h3 class="font-bold text-xl text-slate-900">1. Ketentuan Umum</h3>
-                    <p>Dengan mengakses dan menggunakan layanan ARTIX ID, Anda menyetujui untuk terikat oleh Syarat dan Ketentuan ini. Sistem kami bertindak sebagai perantara antara penyelenggara acara (Event Organizer) dan pembeli tiket.</p>
+                    <p>Dengan mengakses dan menggunakan layanan Ticks ID, Anda menyetujui untuk terikat oleh Syarat dan Ketentuan ini. Sistem kami bertindak sebagai perantara antara penyelenggara acara (Event Organizer) dan pembeli tiket.</p>
 
                     <h3 class="font-bold text-xl text-slate-900 mt-6">2. Pembelian Tiket</h3>
-                    <p>Semua tiket yang dibeli melalui platform ARTIX ID adalah sah. Pembeli wajib membawa identitas asli yang sesuai dengan nama pada E-Ticket saat melakukan registrasi ulang di lokasi acara.</p>
+                    <p>Semua tiket yang dibeli melalui platform Ticks ID adalah sah. Pembeli wajib membawa identitas asli yang sesuai dengan nama pada E-Ticket saat melakukan registrasi ulang di lokasi acara.</p>
 
                     <h3 class="font-bold text-xl text-slate-900 mt-6">3. Tanggung Jawab Penyelenggara</h3>
-                    <p>ARTIX ID tidak bertanggung jawab atas isi, kualitas, atau perubahan jadwal dari acara yang diselenggarakan. Segala bentuk keluhan terkait pelaksanaan acara merupakan tanggung jawab penuh pihak penyelenggara acara (Mitra/EO).</p>
+                    <p>Ticks ID tidak bertanggung jawab atas isi, kualitas, atau perubahan jadwal dari acara yang diselenggarakan. Segala bentuk keluhan terkait pelaksanaan acara merupakan tanggung jawab penuh pihak penyelenggara acara (Mitra/EO).</p>
 
                     <!-- Tambahkan teks legalitas lainnya sesuai kebutuhan mitramu di sini -->
                 </div>

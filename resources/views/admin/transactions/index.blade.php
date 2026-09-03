@@ -40,7 +40,7 @@
             </form>
 
             <!-- Tombol Export CSV -->
-            <button onclick="exportTableToCSV('data_transaksi_artix.csv')" class="bg-white border border-slate-200 text-slate-600 hover:text-[#0066FF] hover:border-[#0066FF] hover:bg-blue-50 px-6 py-2.5 rounded-[12px] text-sm font-bold transition-all shadow-sm flex items-center justify-center gap-2 shrink-0 w-full sm:w-auto">
+            <button onclick="exportTableToCSV('data_transaksi_ticks.csv')" class="bg-white border border-slate-200 text-slate-600 hover:text-[#0066FF] hover:border-[#0066FF] hover:bg-blue-50 px-6 py-2.5 rounded-[12px] text-sm font-bold transition-all shadow-sm flex items-center justify-center gap-2 shrink-0 w-full sm:w-auto">
                 <i data-lucide="download" class="w-4 h-4"></i> Export (CSV)
             </button>
 

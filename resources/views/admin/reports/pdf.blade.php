@@ -233,7 +233,7 @@
         <table class="footer-table">
             <tr>
                 <td style="text-align: left;">
-                    Dokumen resmi ini di-generate secara otomatis oleh Sistem <strong>ARTIX ID</strong>.
+                    Dokumen resmi ini di-generate secara otomatis oleh Sistem <strong>Ticks ID</strong>.
                 </td>
                 <td style="text-align: right;">
                     Dicetak pada: {{ \Carbon\Carbon::now()->format('d F Y, H:i') }} WIB

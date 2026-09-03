@@ -1,6 +1,6 @@
 @extends('layouts.main')
 
-@section('title', 'Pengajuan Sponsor - ' . $sponsorship->name . ' | ARTIX ID')
+@section('title', 'Pengajuan Sponsor - ' . $sponsorship->name . ' | Ticks ID')
 
 @section('content')
 

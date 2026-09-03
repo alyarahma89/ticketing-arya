@@ -40,7 +40,7 @@
         @if(Auth::user()->role === 'admin')
             <div class="mb-8 p-4 bg-blue-50 text-blue-700 rounded-xl border border-blue-200 flex items-center gap-3 font-medium shadow-sm">
                 <i data-lucide="info" class="w-5 h-5 text-blue-500 shrink-0"></i>
-                <span><strong>Halo Admin!</strong> Anda melihat data keseluruhan platform ARTIX ID.</span>
+                <span><strong>Halo Admin!</strong> Anda melihat data keseluruhan platform Ticks ID.</span>
             </div>
         @else
             <div class="mb-8 p-4 bg-emerald-50 text-emerald-700 rounded-xl border border-emerald-200 flex items-center gap-3 font-medium shadow-sm">

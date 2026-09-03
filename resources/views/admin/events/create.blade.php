@@ -15,7 +15,7 @@
                 <div>
                     <span class="text-[#0066FF] font-bold text-xs uppercase tracking-widest bg-blue-50 px-3 py-1.5 rounded-full border border-blue-100 inline-block mb-3">Manajemen Acara</span>
                     <h1 class="text-3xl font-black tracking-tight font-montserrat text-slate-900 mb-2">Tambah Event Baru</h1>
-                    <p class="text-[14px] text-slate-500 font-medium max-w-xl">Publikasikan informasi event, atur ketersediaan tiket, dan kelola rincian acara secara real-time ke dalam ekosistem ARTIX.</p>
+                    <p class="text-[14px] text-slate-500 font-medium max-w-xl">Publikasikan informasi event, atur ketersediaan tiket, dan kelola rincian acara secara real-time ke dalam ekosistem Ticks ID.</p>
                 </div>
             </div>
         </div>
@@ -59,7 +59,7 @@
                             <label class="block text-[11px] font-bold text-slate-500 mb-2 uppercase tracking-widest">Nama Resmi Event</label>
                             <div class="relative">
                                 <span class="absolute inset-y-0 left-0 flex items-center pl-4 text-slate-400"><i data-lucide="type" class="w-5 h-5"></i></span>
-                                <input type="text" name="name" id="name" value="{{ old('name') }}" required placeholder="Contoh: Artix Music Festival 2026"
+                                <input type="text" name="name" id="name" value="{{ old('name') }}" required placeholder="Contoh: Ticks Music Festival 2026"
                                     class="w-full bg-slate-50 focus:bg-white border border-slate-200 text-slate-900 text-sm font-bold rounded-[12px] pl-11 pr-4 py-3.5 focus:outline-none focus:border-[#0066FF] focus:ring-4 focus:ring-[#0066FF]/10 transition-all duration-200 placeholder:font-medium placeholder:text-slate-400">
                             </div>
                         </div>
@@ -142,7 +142,7 @@
                             </label>
                             <div class="relative">
                                 <span class="absolute inset-y-0 left-0 flex items-center pl-4 text-purple-400"><i data-lucide="lock" class="w-5 h-5"></i></span>
-                                <input type="text" name="secret_code" value="{{ old('secret_code') }}" placeholder="Contoh: PANITIA_ARTIX_2026"
+                                <input type="text" name="secret_code" value="{{ old('secret_code') }}" placeholder="Contoh: PANITIA_TICKS_2026"
                                     class="w-full bg-purple-50 focus:bg-white border border-purple-200 focus:border-[#A100FF] text-slate-900 text-sm font-bold rounded-[12px] pl-11 pr-4 py-3.5 focus:outline-none focus:ring-4 focus:ring-[#A100FF]/10 transition-all duration-200 placeholder:font-medium placeholder:text-purple-300">
                             </div>
                             <span class="text-[11px] font-medium text-slate-400 mt-2 block leading-relaxed">

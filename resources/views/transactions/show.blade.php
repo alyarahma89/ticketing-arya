@@ -1,6 +1,6 @@
 @extends('layouts.main')
 
-@section('title', 'Invoice ' . $transaction->event->name . ' | ARTIX ID')
+@section('title', 'Invoice ' . $transaction->event->name . ' | Ticks ID')
 
 <!-- ── MENYUNTIKKAN CSS KHUSUS HALAMAN INVOICE ── -->
 @push('styles')

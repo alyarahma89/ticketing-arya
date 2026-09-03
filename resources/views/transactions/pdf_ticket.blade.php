@@ -404,7 +404,7 @@
         <!-- SYARAT & KETENTUAN PENGGUNAAN TIKET -->
         <div class="terms-box">
             <strong style="color: #0F172A;">KETENTUAN TIKET RESMI:</strong> 
-            1. Tiket ini merupakan tanda bukti masuk sah yang diterbitkan oleh ARTIX ID. 
+            1. Tiket ini merupakan tanda bukti masuk sah yang diterbitkan oleh Ticks ID. 
             2. Satu (1) QR Code hanya berlaku untuk 1 (satu) kali scan masuk (1 Tiket = 1 Orang). 
             3. Dilarang menyebarluaskan QR Code kepada pihak lain. 
             4. Tunjukkan tiket ini dalam bentuk cetak atau layar HP saat registrasi di pintu masuk.

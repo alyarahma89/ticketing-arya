@@ -431,7 +431,7 @@
                 <a href="{{ route('register') }}" class="group inline-flex items-center justify-center gap-2 px-8 py-4 font-bold text-white rounded-xl transition-all hover:scale-105 shadow-xl hover:shadow-2xl font-montserrat dark:shadow-[0_0_50px_rgba(0,102,255,0.6)]" style="background: linear-gradient(135deg, #0066FF, #00C2FF);">
                     Daftar Gratis Sekarang <i data-lucide="arrow-right" class="w-4 h-4 group-hover:translate-x-1 transition-transform"></i>
                 </a>
-                <a href="https://wa.me/6282160762279?text=Halo%20Admin%20ARTIX%20ID,%20saya%20ingin%20konsultasi%20seputar%20penyelenggaraan%20event" target="_blank" rel="noopener noreferrer" class="inline-flex items-center justify-center gap-2 px-8 py-4 font-bold rounded-xl border transition-all text-slate-700 bg-white border-slate-300 hover:bg-slate-50 hover:shadow-md dark:bg-transparent dark:text-white dark:border-white/20 dark:hover:bg-white/5 dark:shadow-none">
+                <a href="https://wa.me/6282160762279?text=Halo%20Admin%20Ticks%20ID,%20saya%20ingin%20konsultasi%20seputar%20penyelenggaraan%20event" target="_blank" rel="noopener noreferrer" class="inline-flex items-center justify-center gap-2 px-8 py-4 font-bold rounded-xl border transition-all text-slate-700 bg-white border-slate-300 hover:bg-slate-50 hover:shadow-md dark:bg-transparent dark:text-white dark:border-white/20 dark:hover:bg-white/5 dark:shadow-none">
                     <i data-lucide="message-circle" class="w-5 h-5 text-emerald-500"></i> Hubungi Sekarang
                 </a>
             </div>
