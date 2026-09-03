@@ -54,7 +54,10 @@
 
                     <!-- Gambar Event -->
                     <div class="w-full h-64 md:h-96 rounded-3xl overflow-hidden mb-8 border border-slate-200 dark:border-white/10 shadow-sm bg-slate-100 dark:bg-slate-800">
-                        <img src="{{ $transaction->event->image ? asset('storage/' . $transaction->event->image) : 'https://images.unsplash.com/photo-1470225620780-dba8ba36b745?auto=format&fit=crop&w=1200&q=80' }}" alt="{{ $transaction->event->name }}" class="w-full h-full object-cover">
+                        <img src="{{ $transaction->event->image ? (Str::startsWith($transaction->event->image, ['http://', 'https://']) ? $transaction->event->image : asset('storage/' . $transaction->event->image)) : 'https://images.unsplash.com/photo-1470225620780-dba8ba36b745?auto=format&fit=crop&w=1200&q=80' }}" 
+                             alt="{{ $transaction->event->name }}" 
+                             onerror="this.onerror=null;this.src='https://images.unsplash.com/photo-1470225620780-dba8ba36b745?auto=format&fit=crop&w=1200&q=80';"
+                             class="w-full h-full object-cover">
                     </div>
 
                     <!-- Informasi Event -->

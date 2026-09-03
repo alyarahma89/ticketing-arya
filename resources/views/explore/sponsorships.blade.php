@@ -125,7 +125,10 @@
                 @endphp
                 <div class="reveal-up {{ $delayClass }} group relative p-4 rounded-3xl border shadow-sm transition-all duration-300 hover:-translate-y-2 hover:shadow-xl flex flex-col bg-white border-slate-200 dark:bg-white/5 dark:border-white/10 dark:hover:border-[#A100FF55]">
                     <div class="h-44 w-full relative overflow-hidden rounded-2xl mb-5 bg-slate-100 dark:bg-[#0A1A3A]">
-                        <img src="{{ $event->image ? asset('storage/' . $event->image) : 'https://images.unsplash.com/photo-1492684223066-81342ee5ff30?w=600&q=80' }}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
+                        <img src="{{ $event->image ? (Str::startsWith($event->image, ['http://', 'https://']) ? $event->image : asset('storage/' . $event->image)) : 'https://images.unsplash.com/photo-1492684223066-81342ee5ff30?w=600&q=80' }}" 
+                             alt="{{ $event->name }}" 
+                             onerror="this.onerror=null;this.src='https://images.unsplash.com/photo-1492684223066-81342ee5ff30?w=600&q=80';"
+                             class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
                     </div>
                     <h3 class="font-bold text-lg mb-2 font-montserrat text-slate-900 dark:text-white">{{ $event->name }}</h3>
                     <p class="text-sm mb-4 line-clamp-2 font-medium text-slate-500 dark:text-white/50">{{ $event->description }}</p>
