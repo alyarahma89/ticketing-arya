@@ -3,315 +3,109 @@
 <head>
     <meta charset="UTF-8">
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
     <title>E-Ticket Resmi {{ $transaction->order_id }} - Ticks ID</title>
-
-    <style>
-        /* Pengaturan Dasar Email & Dokumen PDF */
-        * { box-sizing: border-box; }
-        body {
-            font-family: 'Helvetica', 'Arial', sans-serif;
-            background-color: #F8FAFC;
-            margin: 0;
-            padding: 20px 10px;
-            color: #0F172A;
-        }
-
-        /* ── KERANGKA UTAMA BOARDING PASS TIKET ── */
-        .ticket-wrapper {
-            width: 100%;
-            max-width: 780px;
-            margin: 0 auto 15px auto;
-            border: 2px solid #CBD5E1;
-            border-radius: 16px;
-            border-collapse: collapse;
-            overflow: hidden;
-            background-color: #FFFFFF;
-            box-shadow: 0 10px 25px rgba(0,0,0,0.06);
-            page-break-inside: avoid;
-        }
-
-        /* ── HEADER TIKET (Navy Gelap ARTIX) ── */
-        .header-row td {
-            background-color: #041B4A;
-            color: #FFFFFF;
-            padding: 10px 20px;
-            vertical-align: middle;
-        }
-        .header-left {
-            font-size: 11px;
-            font-weight: 900;
-            letter-spacing: 2px;
-            color: #00C2FF;
-            text-transform: uppercase;
-        }
-        .header-right {
-            text-align: right;
-            border-left: 2px dashed #1E3A8A;
-            padding-left: 15px;
-        }
-        .header-logo-img {
-            height: 26px;
-            max-width: 130px;
-            vertical-align: middle;
-        }
-
-        /* ── BADAN TIKET (Dua Kolom: Utama & Sobekan) ── */
-        .body-row td {
-            padding: 0;
-            vertical-align: top;
-        }
-        .body-left {
-            width: 72%;
-            background-color: #FFFFFF;
-            padding: 18px;
-        }
-        .body-right {
-            width: 28%;
-            background-color: #F8FAFC;
-            border-left: 3px dashed #CBD5E1;
-            padding: 16px 12px;
-            text-align: center;
-            vertical-align: top;
-        }
-
-        /* ── HERO BANNER EVENT DI DALAM TIKET ── */
-        .event-hero-box {
-            background-color: #041B4A;
-            color: #FFFFFF;
-            border-radius: 12px;
-            padding: 14px 16px;
-            margin-bottom: 12px;
-        }
-        .category-badge {
-            background-color: rgba(0, 194, 255, 0.25);
-            color: #00C2FF;
-            font-size: 8.5px;
-            font-weight: 900;
-            padding: 2px 7px;
-            border-radius: 4px;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-            display: inline-block;
-            margin-bottom: 6px;
-        }
-        .event-title {
-            font-size: 16px;
-            font-weight: 900;
-            color: #FFFFFF;
-            text-transform: uppercase;
-            margin: 0 0 10px 0;
-            line-height: 1.25;
-        }
-
-        /* ── KOTAK PAKET TIKET & FASILITAS (HIGHLIGHT) ── */
-        .package-box {
-            background-color: #F8FAFC;
-            border: 1.5px solid #E2E8F0;
-            border-radius: 10px;
-            padding: 10px 14px;
-            margin-bottom: 12px;
-        }
-
-        /* ── TABEL INFORMASI PESANAN ── */
-        .info-grid {
-            width: 100%;
-            border-collapse: collapse;
-            margin-top: 8px;
-        }
-        .info-grid td {
-            padding: 3px 5px;
-            vertical-align: top;
-        }
-        .lbl {
-            font-size: 8.5px;
-            font-weight: 800;
-            color: #64748B;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-            display: block;
-            margin-bottom: 2px;
-        }
-        .val {
-            font-size: 11.5px;
-            font-weight: 700;
-            color: #0F172A;
-            display: block;
-        }
-
-        /* ── AREA SOBEKAN / QR CODE (KANAN) ── */
-        .stub-logo-img {
-            height: 28px;
-            max-width: 100px;
-            margin: 0 auto 6px auto;
-            display: block;
-        }
-        .stub-title {
-            font-size: 13px;
-            font-weight: 900;
-            color: #0F172A;
-            letter-spacing: 1px;
-            margin-bottom: 2px;
-        }
-        .stub-subtitle {
-            font-size: 8.5px;
-            font-weight: 700;
-            color: #64748B;
-            text-transform: uppercase;
-            margin-bottom: 8px;
-        }
-        .package-pill {
-            font-size: 8.5px;
-            font-weight: 900;
-            color: #FFFFFF;
-            padding: 3px 8px;
-            border-radius: 6px;
-            display: inline-block;
-            margin-bottom: 8px;
-            text-transform: uppercase;
-        }
-        .qr-card {
-            background-color: #FFFFFF;
-            padding: 6px;
-            border: 1.5px solid #E2E8F0;
-            border-radius: 10px;
-            display: inline-block;
-            margin-bottom: 6px;
-        }
-        .ticket-code-badge {
-            font-size: 10px;
-            font-weight: 900;
-            letter-spacing: 1.2px;
-            color: #041B4A;
-            background-color: #E2E8F0;
-            padding: 4px 6px;
-            border-radius: 6px;
-            display: block;
-            margin-top: 2px;
-        }
-
-        /* ── SYARAT DAN KETENTUAN TIKET ── */
-        .terms-box {
-            width: 100%;
-            max-width: 780px;
-            margin: 0 auto 20px auto;
-            padding: 7px 12px;
-            font-size: 8px;
-            color: #64748B;
-            line-height: 1.35;
-            background-color: #FFFFFF;
-            border: 1px solid #E2E8F0;
-            border-radius: 8px;
-        }
-
-        .page-break {
-            page-break-after: always;
-        }
-        .page-break:last-child {
-            page-break-after: auto;
-        }
-    </style>
 </head>
-<body>
+<body style="margin: 0; padding: 20px 10px; background-color: #0F172A; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; -webkit-font-smoothing: antialiased;">
 
-    @foreach($transaction->tickets as $index => $ticket)
+    <div style="max-width: 720px; margin: 0 auto;">
 
-    @php
-        // Palet warna resmi ARTIX ID
-        $artixPalette = ['#0066FF', '#FF7A00', '#A100FF', '#FF3B30', '#00C2FF'];
-        $themeColor = $artixPalette[$transaction->event_id % count($artixPalette)];
-        $isOnlineTicket = (strtolower($transaction->ticket_type) === 'online' || stripos($transaction->ticket_type, 'livestream') !== false || stripos($transaction->ticket_type, 'online') !== false);
+        @foreach($transaction->tickets as $index => $ticket)
 
-        // Pencarian detail paket tiket
-        $matchedPackage = null;
-        if ($transaction->ticketPackage) {
-            $matchedPackage = $transaction->ticketPackage;
-        } elseif ($transaction->event && $transaction->event->ticketPackages) {
-            $matchedPackage = $transaction->event->ticketPackages->where('name', $transaction->ticket_type)->first();
-        }
+        @php
+            // Palet warna resmi Ticks ID
+            $artixPalette = ['#0066FF', '#FF7A00', '#A100FF', '#FF3B30', '#00C2FF'];
+            $themeColor = $artixPalette[$transaction->event_id % count($artixPalette)];
+            $isOnlineTicket = (strtolower($transaction->ticket_type) === 'online' || stripos($transaction->ticket_type, 'livestream') !== false || stripos($transaction->ticket_type, 'online') !== false);
 
-        if ($matchedPackage) {
-            $packageName = $matchedPackage->name;
-            $packageDesc = $matchedPackage->description;
-        } elseif ($isOnlineTicket) {
-            $packageName = 'AKSES VIRTUAL (LIVESTREAM)';
-            $packageDesc = 'Saksikan siaran langsung via tautan resmi YouTube';
-        } elseif (strtolower($transaction->ticket_type) === 'offline' || empty($transaction->ticket_type)) {
-            $packageName = 'TIKET REGULER (OFFLINE)';
-            $packageDesc = 'Akses standar masuk ke area venue acara';
-        } else {
-            $packageName = strtoupper($transaction->ticket_type);
-            $packageDesc = null;
-        }
+            // Detail Paket Tiket
+            $matchedPackage = null;
+            if ($transaction->ticketPackage) {
+                $matchedPackage = $transaction->ticketPackage;
+            } elseif ($transaction->event && $transaction->event->ticketPackages) {
+                $matchedPackage = $transaction->event->ticketPackages->where('name', $transaction->ticket_type)->first();
+            }
 
-        // Gambar Logo Resmi Ticks ID (Base64 Embed agar tidak crash di aplikasi email manapun)
-        $headerLogoSrc = '';
-        if (file_exists(public_path('logo_putih_ticks.png'))) {
-            $headerLogoSrc = 'data:image/png;base64,' . base64_encode(file_get_contents(public_path('logo_putih_ticks.png')));
-        } elseif (file_exists(public_path('logoticksid.png'))) {
-            $headerLogoSrc = 'data:image/png;base64,' . base64_encode(file_get_contents(public_path('logoticksid.png')));
-        }
+            if ($matchedPackage) {
+                $packageName = $matchedPackage->name;
+                $packageDesc = $matchedPackage->description;
+            } elseif ($isOnlineTicket) {
+                $packageName = 'AKSES VIRTUAL (LIVESTREAM)';
+                $packageDesc = 'Saksikan siaran langsung via tautan resmi YouTube';
+            } elseif (strtolower($transaction->ticket_type) === 'offline' || empty($transaction->ticket_type)) {
+                $packageName = 'TIKET REGULER (OFFLINE)';
+                $packageDesc = 'Akses standar masuk ke area venue acara';
+            } else {
+                $packageName = strtoupper($transaction->ticket_type);
+                $packageDesc = null;
+            }
+        @endphp
 
-        $stubLogoSrc = '';
-        if (file_exists(public_path('logoticksid.png'))) {
-            $stubLogoSrc = 'data:image/png;base64,' . base64_encode(file_get_contents(public_path('logoticksid.png')));
-        } elseif (file_exists(public_path('logo_putih_ticks.png'))) {
-            $stubLogoSrc = 'data:image/png;base64,' . base64_encode(file_get_contents(public_path('logo_putih_ticks.png')));
-        }
-    @endphp
-
-    <div class="page-break">
-        <!-- ── TABEL UTAMA BOARDING PASS TIKET ── -->
-        <table class="ticket-wrapper" cellpadding="0" cellspacing="0">
+        <!-- ── TABEL BOARDING PASS TIKET ── -->
+        <table width="100%" cellpadding="0" cellspacing="0" border="0" style="background-color: #FFFFFF; border: 2px solid #CBD5E1; border-radius: 16px; overflow: hidden; margin-bottom: 16px; box-shadow: 0 4px 20px rgba(0,0,0,0.15);">
+            
             <!-- 1. HEADER BAR -->
-            <tr class="header-row">
-                <td class="header-left">
-                    OFFICIAL E-TICKET | TICKS ID
-                </td>
-                <td class="header-right">
-                    @if(!empty($headerLogoSrc))
-                        <img src="{{ $headerLogoSrc }}" alt="Ticks ID" class="header-logo-img">
-                    @else
-                        <span style="font-size: 15px; font-weight: 900; color: #FFFFFF;">TICKS<span style="color: #00C2FF;">.ID</span></span>
-                    @endif
+            <tr>
+                <td colspan="2" style="background-color: #041B4A; padding: 12px 20px; border-bottom: 2px solid #0066FF;">
+                    <table width="100%" cellpadding="0" cellspacing="0" border="0">
+                        <tr>
+                            <td align="left" style="vertical-align: middle;">
+                                <span style="font-size: 11px; font-weight: 900; letter-spacing: 2px; color: #00C2FF; text-transform: uppercase; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;">
+                                    OFFICIAL E-TICKET | TICKS ID
+                                </span>
+                            </td>
+                            <td align="right" style="vertical-align: middle;">
+                                <table cellpadding="0" cellspacing="0" border="0" align="right" style="border-collapse: collapse;">
+                                    <tr>
+                                        <td style="background-color: #0066FF; color: #FFFFFF; font-size: 12px; font-weight: 900; padding: 3px 8px; border-radius: 5px; letter-spacing: 1px; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;">TICKS</td>
+                                        <td style="color: #00C2FF; font-size: 12px; font-weight: 900; padding-left: 4px; letter-spacing: 1px; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;">.ID</td>
+                                    </tr>
+                                </table>
+                            </td>
+                        </tr>
+                    </table>
                 </td>
             </tr>
 
-            <!-- 2. ISI TIKET -->
-            <tr class="body-row">
-                <!-- ── KOLOM KIRI (72%): DETAIL UTAMA ACARA & PAKET ── -->
-                <td class="body-left">
-
+            <!-- 2. ISI TIKET: KOLOM KIRI (UTAMA) & KOLOM KANAN (SOBEKAN) -->
+            <tr>
+                <!-- KOLOM KIRI (70%): Detail Acara & Paket -->
+                <td width="70%" style="background-color: #FFFFFF; padding: 18px 18px 14px 18px; vertical-align: top;">
+                    
                     <!-- HERO BANNER EVENT -->
-                    <div class="event-hero-box">
-                        <span class="category-badge">
+                    <div style="background-color: #041B4A; border-radius: 12px; padding: 14px 16px; margin-bottom: 12px; color: #FFFFFF;">
+                        <span style="background-color: rgba(0, 194, 255, 0.25); color: #00C2FF; font-size: 8.5px; font-weight: 900; padding: 2px 7px; border-radius: 4px; text-transform: uppercase; letter-spacing: 1px; display: inline-block; margin-bottom: 6px;">
                             {{ $transaction->event->category->name ?? 'EVENT RESMI' }}
                         </span>
-                        <h1 class="event-title">{{ $transaction->event->name }}</h1>
+                        
+                        <h1 style="font-size: 17px; font-weight: 900; color: #FFFFFF; text-transform: uppercase; margin: 0 0 10px 0; line-height: 1.25; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;">
+                            {{ $transaction->event->name }}
+                        </h1>
 
-                        <table width="100%" cellpadding="0" cellspacing="0">
+                        <table width="100%" cellpadding="0" cellspacing="0" border="0">
                             <tr>
-                                <td style="width: 55%; padding: 0; vertical-align: top;">
-                                    <span class="lbl" style="color: #00C2FF;">WAKTU PELAKSANAAN</span>
-                                    <span class="val" style="color: #FFFFFF; font-size: 11.5px;">
+                                <td width="55%" style="vertical-align: top; padding: 0;">
+                                    <span style="font-size: 8.5px; font-weight: 800; color: #00C2FF; text-transform: uppercase; letter-spacing: 0.5px; display: block; margin-bottom: 2px;">WAKTU PELAKSANAAN</span>
+                                    <span style="font-size: 11.5px; font-weight: bold; color: #FFFFFF; display: block; line-height: 1.25;">
                                         {{ date('d M Y', strtotime($transaction->event->event_date)) }} | {{ date('H:i', strtotime($transaction->event->event_date)) }} WIB
                                     </span>
                                 </td>
-                                <td style="width: 45%; padding: 0; vertical-align: top;">
-                                    <span class="lbl" style="color: #00C2FF;">{{ $isOnlineTicket ? 'FORMAT ACARA' : 'LOKASI VENUE' }}</span>
-                                    <span class="val" style="color: #FFFFFF; font-size: 11px; line-height: 1.3;">
-                                        {{ $isOnlineTicket ? 'Online via YouTube Livestream' : ($transaction->event->location ?? 'Venue Belum Ditentukan') }}
+                                <td width="45%" style="vertical-align: top; padding: 0;">
+                                    <span style="font-size: 8.5px; font-weight: 800; color: #00C2FF; text-transform: uppercase; letter-spacing: 0.5px; display: block; margin-bottom: 2px;">{{ $isOnlineTicket ? 'FORMAT ACARA' : 'LOKASI VENUE' }}</span>
+                                    <span style="font-size: 11px; font-weight: bold; color: #FFFFFF; display: block; line-height: 1.25;">
+                                        {{ $isOnlineTicket ? 'Online via Livestream' : ($transaction->event->location ?? 'Venue Acara') }}
                                     </span>
                                 </td>
                             </tr>
                         </table>
                     </div>
 
-                    <!-- KOTAK PAKET TIKET & FASILITAS (BERSIH & JELAS) -->
-                    <div class="package-box" style="border-left: 6px solid {{ $themeColor }};">
-                        <table width="100%" cellpadding="0" cellspacing="0">
+                    <!-- KOTAK DETAIL PAKET TIKET -->
+                    <div style="background-color: #F8FAFC; border: 1.5px solid #E2E8F0; border-left: 6px solid {{ $themeColor }}; border-radius: 10px; padding: 10px 14px; margin-bottom: 12px;">
+                        <table width="100%" cellpadding="0" cellspacing="0" border="0">
                             <tr>
                                 <td style="vertical-align: middle; padding: 0;">
-                                    <span class="lbl">KATEGORI & PAKET TIKET</span>
+                                    <span style="font-size: 8.5px; font-weight: 800; color: #64748B; text-transform: uppercase; letter-spacing: 0.5px; display: block;">KATEGORI & PAKET TIKET</span>
                                     <span style="font-size: 15px; font-weight: 900; color: {{ $themeColor }}; text-transform: uppercase; display: block; margin-top: 1px;">
                                         {{ $packageName }}
                                     </span>
@@ -321,9 +115,9 @@
                                         </span>
                                     @endif
                                 </td>
-                                <td style="text-align: right; vertical-align: middle; width: 30%; padding: 0;">
-                                    <span class="lbl">STATUS TIKET</span>
-                                    <span style="font-size: 9.5px; font-weight: 900; background-color: #DCFCE7; color: #15803D; padding: 3px 8px; border-radius: 20px; display: inline-block; margin-top: 2px;">
+                                <td align="right" style="vertical-align: middle; width: 30%; padding: 0;">
+                                    <span style="font-size: 8.5px; font-weight: 800; color: #64748B; text-transform: uppercase; display: block; margin-bottom: 2px;">STATUS TIKET</span>
+                                    <span style="font-size: 9.5px; font-weight: 900; background-color: #DCFCE7; color: #15803D; padding: 3px 8px; border-radius: 20px; display: inline-block;">
                                         LUNAS (VALID)
                                     </span>
                                 </td>
@@ -332,43 +126,34 @@
                     </div>
 
                     @if($isOnlineTicket && !empty($transaction->event->youtube_link))
-                    <!-- KOTAK LINK LIVESTREAM YOUTUBE (BEBAS DARI TANDA TANYA EMOJI) -->
+                    <!-- LINK LIVESTREAM -->
                     <div style="background-color: #FEF2F2; border: 1.5px solid #FCA5A5; border-left: 6px solid #EF4444; border-radius: 10px; padding: 10px 12px; margin-bottom: 12px; text-align: center;">
-                        <table width="100%" cellpadding="0" cellspacing="0">
-                            <tr>
-                                <td style="vertical-align: middle; width: 14px; padding-right: 6px;">
-                                    <div style="width: 8px; height: 8px; background-color: #DC2626; border-radius: 50%;"></div>
-                                </td>
-                                <td style="vertical-align: middle; text-align: left;">
-                                    <span style="font-size: 9px; font-weight: 900; color: #DC2626; text-transform: uppercase; letter-spacing: 0.5px; display: block;">
-                                        LINK RESMI LIVESTREAM YOUTUBE
-                                    </span>
-                                </td>
-                            </tr>
-                        </table>
-                        <a href="{{ $transaction->event->youtube_link }}" target="_blank" style="display: inline-block; background-color: #DC2626; color: #FFFFFF; font-weight: 800; font-size: 10.5px; text-decoration: none; padding: 6px 14px; border-radius: 6px; margin: 5px 0;">
-                            KLIK DI SINI UNTUK NONTON SIARAN
+                        <span style="font-size: 9px; font-weight: 900; color: #DC2626; text-transform: uppercase; letter-spacing: 0.5px; display: block; margin-bottom: 6px;">
+                            LINK RESMI LIVESTREAM YOUTUBE
+                        </span>
+                        <a href="{{ $transaction->event->youtube_link }}" target="_blank" style="display: inline-block; background-color: #DC2626; color: #FFFFFF; font-weight: 800; font-size: 11px; text-decoration: none; padding: 7px 16px; border-radius: 6px; margin: 4px 0;">
+                            KLIK UNTUK NONTON SIARAN
                         </a>
-                        <span style="font-size: 9.5px; color: #991B1B; font-weight: bold; word-break: break-all; display: block;">
+                        <span style="font-size: 9.5px; color: #991B1B; font-weight: bold; word-break: break-all; display: block; margin-top: 4px;">
                             {{ $transaction->event->youtube_link }}
                         </span>
                     </div>
                     @endif
 
-                    <!-- TABEL METADATA PEMESAN & TRANSAKSI -->
-                    <table class="info-grid">
+                    <!-- TABEL INFORMASI PESANAN -->
+                    <table width="100%" cellpadding="0" cellspacing="0" border="0" style="border-top: 1px solid #E2E8F0; padding-top: 8px; margin-top: 6px;">
                         <tr>
-                            <td style="width: 40%; border-right: 1px solid #E2E8F0;">
-                                <span class="lbl">Nama Pemesan (Guest)</span>
-                                <span class="val" style="font-size: 12px;">{{ strtoupper($transaction->user->name ?? 'GUEST') }}</span>
+                            <td width="40%" style="vertical-align: top; padding: 4px 6px 4px 0; border-right: 1px solid #E2E8F0;">
+                                <span style="font-size: 8.5px; font-weight: 800; color: #64748B; text-transform: uppercase; display: block; margin-bottom: 2px;">NAMA PEMESAN</span>
+                                <span style="font-size: 12px; font-weight: 800; color: #0F172A; display: block;">{{ strtoupper($transaction->user->name ?? 'GUEST') }}</span>
                             </td>
-                            <td style="width: 32%; padding-left: 10px; border-right: 1px solid #E2E8F0;">
-                                <span class="lbl">Order ID Transaksi</span>
-                                <span class="val" style="color: #0066FF;">#{{ $transaction->order_id }}</span>
+                            <td width="35%" style="vertical-align: top; padding: 4px 6px 4px 10px; border-right: 1px solid #E2E8F0;">
+                                <span style="font-size: 8.5px; font-weight: 800; color: #64748B; text-transform: uppercase; display: block; margin-bottom: 2px;">ORDER ID</span>
+                                <span style="font-size: 11.5px; font-weight: 800; color: #0066FF; display: block;">#{{ $transaction->order_id }}</span>
                             </td>
-                            <td style="width: 28%; padding-left: 10px;">
-                                <span class="lbl">Total Harga</span>
-                                <span class="val" style="color: #0F172A;">
+                            <td width="25%" style="vertical-align: top; padding: 4px 0 4px 10px;">
+                                <span style="font-size: 8.5px; font-weight: 800; color: #64748B; text-transform: uppercase; display: block; margin-bottom: 2px;">TOTAL HARGA</span>
+                                <span style="font-size: 11.5px; font-weight: 800; color: #0F172A; display: block;">
                                     {{ $transaction->total_amount == 0 ? 'GRATIS' : 'Rp ' . number_format($transaction->total_amount, 0, ',', '.') }}
                                 </span>
                             </td>
@@ -377,57 +162,70 @@
 
                 </td>
 
-                <!-- ── KOLOM KANAN (28%): SOBEKAN TIKET & QR CODE SCANNER ── -->
-                <td class="body-right">
-                    <!-- Logo Ticks ID di Atas Sobekan -->
-                    @if(!empty($stubLogoSrc))
-                        <img src="{{ $stubLogoSrc }}" alt="Ticks ID" class="stub-logo-img">
-                    @else
-                        <div style="font-size: 12px; font-weight: 900; color: #0066FF; margin-bottom: 6px;">TICKS ID</div>
-                    @endif
-
-                    <div class="stub-title">E-TICKET</div>
-                    <div class="stub-subtitle">Tiket {{ $index + 1 }} dari {{ $transaction->quantity }}</div>
-
-                    <!-- Badge Kategori Mini -->
-                    <span class="package-pill" style="background-color: {{ $themeColor }};">
-                        {{ strtoupper($packageName) }}
-                    </span>
-
-                    <!-- QR CODE (UNIVERSAL EMAIL + DOMPDF COMPATIBLE) -->
-                    <div class="qr-card">
-                        <img src="https://api.qrserver.com/v1/create-qr-code/?size=100x100&data={{ $ticket->ticket_code }}&color=041B4A&bgcolor=ffffff" alt="QR Code" width="100" height="100" style="display: block; margin: 0 auto;">
+                <!-- KOLOM KANAN (30%): SOBEKAN TIKET & QR CODE SCANNER (HIGH CONTRAST & EMAIL PROOF) -->
+                <td width="30%" style="background-color: #F8FAFC; border-left: 2px dashed #94A3B8; padding: 18px 12px; text-align: center; vertical-align: top;">
+                    
+                    <!-- BRANDING KECIL DI STUB -->
+                    <div style="font-size: 12px; font-weight: 900; color: #0066FF; letter-spacing: 1px; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; margin-bottom: 2px;">
+                        TICKS ID
+                    </div>
+                    
+                    <div style="font-size: 13px; font-weight: 900; color: #041B4A; letter-spacing: 1px; margin-bottom: 1px; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;">
+                        E-TICKET
+                    </div>
+                    
+                    <div style="font-size: 9px; font-weight: 700; color: #64748B; text-transform: uppercase; margin-bottom: 8px;">
+                        Tiket {{ $index + 1 }} dari {{ $transaction->quantity }}
                     </div>
 
-                    <!-- Kode Unik Tiket -->
-                    <span class="ticket-code-badge">
-                        {{ $ticket->ticket_code }}
-                    </span>
+                    <!-- BADGE KATEGORI MINI -->
+                    <div style="margin-bottom: 8px;">
+                        <span style="font-size: 8.5px; font-weight: 900; color: #FFFFFF; background-color: {{ $themeColor }}; padding: 3px 8px; border-radius: 6px; display: inline-block; text-transform: uppercase;">
+                            {{ strtoupper($packageName) }}
+                        </span>
+                    </div>
 
-                    <div style="margin-top: 10px; padding-top: 6px; border-top: 1px dashed #CBD5E1;">
-                        <p style="font-size: 8px; font-weight: 700; color: #64748B; margin: 0; line-height: 1.3;">
+                    <!-- KOTAK QR CODE DENGAN BACKGROUND PUTIH SOLID (TIDAK AKAN HILANG DI GMAIL DARK MODE) -->
+                    <div style="background-color: #FFFFFF !important; padding: 8px; border: 2px solid #CBD5E1; border-radius: 12px; display: inline-block; margin: 0 auto 6px auto; text-align: center; box-shadow: 0 2px 8px rgba(0,0,0,0.06);">
+                        <img src="https://api.qrserver.com/v1/create-qr-code/?size=140x140&data={{ $ticket->ticket_code }}&color=041B4A&bgcolor=ffffff" 
+                             alt="QR Code Tiket" 
+                             width="110" 
+                             height="110" 
+                             style="display: block; width: 110px; height: 110px; margin: 0 auto; background-color: #FFFFFF; border: 0;">
+                    </div>
+
+                    <!-- KODE TIKET UNIK -->
+                    <div style="background-color: #041B4A; color: #FFFFFF; font-family: Consolas, 'Courier New', monospace; font-size: 11px; font-weight: 900; letter-spacing: 1.5px; padding: 5px 8px; border-radius: 6px; display: inline-block; margin-top: 4px; border: 1px solid #1E293B;">
+                        {{ $ticket->ticket_code }}
+                    </div>
+
+                    <!-- PETUNJUK CHECK-IN -->
+                    <div style="margin-top: 10px; padding-top: 8px; border-top: 1px dashed #CBD5E1;">
+                        <p style="font-size: 8.5px; font-weight: 700; color: #475569; margin: 0; line-height: 1.35; text-align: center;">
                             @if($isOnlineTicket)
                                 Akses Siaran<br>Langsung Online
                             @else
-                                Tunjukkan QR Code ini<br>di Gerbang Masuk Event
+                                Tunjukkan QR Code ini<br>di Pintu Masuk Event
                             @endif
                         </p>
                     </div>
+
                 </td>
             </tr>
         </table>
 
-        <!-- SYARAT & KETENTUAN PENGGUNAAN TIKET -->
-        <div class="terms-box">
-            <strong style="color: #0F172A;">KETENTUAN TIKET RESMI:</strong> 
-            1. Tiket ini merupakan tanda bukti masuk sah yang diterbitkan oleh Ticks ID. 
-            2. Satu (1) QR Code hanya berlaku untuk 1 (satu) kali scan masuk (1 Tiket = 1 Orang). 
-            3. Dilarang menyebarluaskan QR Code kepada pihak lain. 
-            4. Tunjukkan tiket ini dalam bentuk cetak atau layar HP saat registrasi di pintu masuk.
+        <!-- 3. SYARAT & KETENTUAN PENGGUNAAN TIKET -->
+        <div style="background-color: #FFFFFF; border: 1px solid #E2E8F0; border-radius: 10px; padding: 10px 14px; margin-bottom: 24px; font-size: 8.5px; color: #64748B; line-height: 1.45;">
+            <strong style="color: #0F172A; text-transform: uppercase;">Ketentuan Tiket Resmi:</strong><br>
+            1. Tiket ini merupakan tanda bukti masuk sah yang diterbitkan resmi oleh Ticks ID.<br>
+            2. Satu (1) QR Code hanya berlaku untuk 1 (satu) kali scan masuk (1 Tiket = 1 Orang).<br>
+            3. Dilarang menggandakan atau menyebarluaskan gambar QR Code tiket ini kepada pihak lain.<br>
+            4. Tunjukkan tiket ini dalam bentuk cetak atau langsung melalui layar HP saat registrasi di venue acara.
         </div>
-    </div>
 
-    @endforeach
+        @endforeach
+
+    </div>
 
 </body>
 </html>
