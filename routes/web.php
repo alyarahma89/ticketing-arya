@@ -47,6 +47,7 @@ Route::middleware('auth')->group(function () {
     Route::post('/checkout/{id}', [CheckoutController::class, 'processCheckout'])->name('checkout.process');
     Route::get('/transaction/{id}', [CheckoutController::class, 'show'])->name('transaction.show');
     Route::get('/transaction/{id}/check-status', [CheckoutController::class, 'checkStatus'])->name('transaction.check_status');
+    Route::get('/transaction/{id}/check-status-json', [CheckoutController::class, 'checkStatusJson'])->name('transaction.check_status_json');
     Route::post('/transaction/{id}/cancel', [CheckoutController::class, 'cancelTransaction'])->name('transaction.cancel');
     Route::get('/history', [CheckoutController::class, 'history'])->name('transaction.history');
     Route::get('/transaction/{id}/download', [CheckoutController::class, 'downloadTicket'])->name('ticket.download');

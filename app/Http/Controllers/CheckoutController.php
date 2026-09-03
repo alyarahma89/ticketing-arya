@@ -310,6 +310,29 @@ class CheckoutController extends Controller
         }
     }
 
+    // 4d. Cek Status Background Polling (JSON untuk Auto-Refresh Real-Time di Halaman Invoice)
+    public function checkStatusJson($id)
+    {
+        $transaction = Transaction::where('id', $id)
+            ->where('user_id', Auth::id())
+            ->first();
+
+        if (!$transaction) {
+            return response()->json(['status' => 'not_found'], 404);
+        }
+
+        if ($transaction->payment_status === 'paid') {
+            return response()->json([
+                'status' => 'paid',
+                'redirect' => route('transaction.history')
+            ]);
+        }
+
+        return response()->json([
+            'status' => $transaction->payment_status
+        ]);
+    }
+
     // 4c. Batalkan Pesanan Tiket (Mengembalikan Kuota Event)
     public function cancelTransaction($id)
     {

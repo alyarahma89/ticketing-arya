@@ -257,29 +257,51 @@
         });
     </script>
 
-    <!-- ── SCRIPT MIDTRANS ── -->
-    @if($transaction->payment_status == 'pending' && !empty($snapToken))
-        <script src="https://app.sandbox.midtrans.com/snap/snap.js" data-client-key="{{ config('midtrans.client_key') }}"></script>
+    <!-- ── SCRIPT MIDTRANS & AUTO-SYNC REAL-TIME ── -->
+    @if($transaction->payment_status == 'pending')
+        @if(!empty($snapToken))
+            <script src="https://app.sandbox.midtrans.com/snap/snap.js" data-client-key="{{ config('midtrans.client_key') }}"></script>
+            <script type="text/javascript">
+                var payButton = document.getElementById('pay-button');
+                if (payButton) {
+                    payButton.addEventListener('click', function () {
+                        window.snap.pay('{{ $snapToken }}', {
+                            onSuccess: function(result){
+                                window.location.href = "{{ route('transaction.check_status', $transaction->id) }}";
+                            },
+                            onPending: function(result){
+                                window.location.href = "{{ route('transaction.check_status', $transaction->id) }}";
+                            },
+                            onError: function(result){
+                                alert("Pembayaran belum berhasil diselesaikan.");
+                                window.location.href = "{{ route('transaction.check_status', $transaction->id) }}";
+                            },
+                            onClose: function(){
+                                // Otomatis verifikasi status ke server setelah pop-up ditutup
+                                window.location.href = "{{ route('transaction.check_status', $transaction->id) }}";
+                            }
+                        });
+                    });
+                }
+            </script>
+        @endif
+
         <script type="text/javascript">
-            var payButton = document.getElementById('pay-button');
-            payButton.addEventListener('click', function () {
-                window.snap.pay('{{ $snapToken }}', {
-                    onSuccess: function(result){
-                        window.location.href = "{{ route('transaction.check_status', $transaction->id) }}";
-                    },
-                    onPending: function(result){
-                        window.location.href = "{{ route('transaction.check_status', $transaction->id) }}";
-                    },
-                    onError: function(result){
-                        alert("Pembayaran belum berhasil diselesaikan.");
-                        window.location.href = "{{ route('transaction.check_status', $transaction->id) }}";
-                    },
-                    onClose: function(){
-                        // Otomatis verifikasi status ke server setelah pop-up ditutup
-                        window.location.href = "{{ route('transaction.check_status', $transaction->id) }}";
-                    }
-                });
-            });
+            // ── Auto-Polling Background (Cek otomatis setiap 3 detik jika user bayar di HP lain / scan QRIS) ──
+            var checkInterval = setInterval(function () {
+                fetch("{{ route('transaction.check_status_json', $transaction->id) }}")
+                    .then(function (res) { return res.json(); })
+                    .then(function (data) {
+                        if (data && data.status === 'paid') {
+                            clearInterval(checkInterval);
+                            // Otomatis berpindah ke riwayat tiket tanpa pembeli harus refresh manual!
+                            window.location.href = data.redirect || "{{ route('transaction.history') }}";
+                        }
+                    })
+                    .catch(function (e) {
+                        // Abaikan error network sesaat
+                    });
+            }, 3000);
         </script>
     @endif
 @endpush
