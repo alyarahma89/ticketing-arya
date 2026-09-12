@@ -79,8 +79,11 @@
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
 
-    <!-- Google Fonts -->
-    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700;800;900&family=Exo+2:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <!-- Google Fonts (Non-blocking Asynchronous Preload) -->
+    <link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700;800;900&family=Exo+2:wght@400;500;600;700;800&display=swap" onload="this.onload=null;this.rel='stylesheet'">
+    <noscript>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700;800;900&family=Exo+2:wght@400;500;600;700;800&display=swap">
+    </noscript>
 
     <!-- Konfigurasi Tailwind untuk Dark Mode -->
     <script>
@@ -198,8 +201,14 @@
 
                 <!-- Logo Dinamis -->
                 <a href="{{ url('/') }}" class="flex items-center shrink-0" aria-label="Ticks ID Beranda">
-                    <img src="{{ asset('logoticksid.png') }}" alt="Ticks ID Logo" width="160" height="48" class="h-10 md:h-12 w-auto object-contain transition-all duration-300 block dark:hidden">
-                    <img src="{{ asset('logo_putih_ticks.png') }}" alt="Ticks ID Logo" width="160" height="48" class="h-10 md:h-12 w-auto object-contain transition-all duration-300 hidden dark:block">
+                    <picture class="h-10 md:h-12 w-auto object-contain block dark:hidden">
+                        <source srcset="{{ asset('logoticksid.webp') }}" type="image/webp">
+                        <img src="{{ asset('logoticksid.png') }}" alt="Ticks ID Logo" width="160" height="48" class="h-10 md:h-12 w-auto object-contain transition-all duration-300">
+                    </picture>
+                    <picture class="h-10 md:h-12 w-auto object-contain hidden dark:block">
+                        <source srcset="{{ asset('logo_putih_ticks.webp') }}" type="image/webp">
+                        <img src="{{ asset('logo_putih_ticks.png') }}" alt="Ticks ID Logo" width="160" height="48" class="h-10 md:h-12 w-auto object-contain transition-all duration-300">
+                    </picture>
                 </a>
 
                 <!-- Desktop Links -->
@@ -298,8 +307,14 @@
             <div class="grid grid-cols-1 md:grid-cols-4 gap-10 mb-12">
                 <div>
                     <div class="flex items-center mb-5">
-                        <img src="{{ asset('logoticksid.png') }}" alt="Ticks ID Logo" width="128" height="32" class="h-8 object-contain block dark:hidden">
-                        <img src="{{ asset('logo_putih_ticks.png') }}" alt="Ticks ID Logo" width="128" height="32" class="h-8 object-contain hidden dark:block">
+                        <picture class="h-8 object-contain block dark:hidden">
+                            <source srcset="{{ asset('logoticksid.webp') }}" type="image/webp">
+                            <img src="{{ asset('logoticksid.png') }}" alt="Ticks ID Logo" width="128" height="32" class="h-8 object-contain">
+                        </picture>
+                        <picture class="h-8 object-contain hidden dark:block">
+                            <source srcset="{{ asset('logo_putih_ticks.webp') }}" type="image/webp">
+                            <img src="{{ asset('logo_putih_ticks.png') }}" alt="Ticks ID Logo" width="128" height="32" class="h-8 object-contain">
+                        </picture>
                     </div>
                     <p class="text-sm leading-relaxed mb-6 font-medium text-slate-600 dark:text-white/70">
                         Platform event ecosystem terbesar di Indonesia. Menghubungkan penyelenggara, sponsor, dan peserta.

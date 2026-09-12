@@ -22,20 +22,26 @@
         <div class="relative z-10 max-w-5xl mx-auto px-6 text-center pt-28 pb-10 flex flex-col items-center">
 
             <!-- LOGO UTAMA -->
-            <div class="relative flex justify-center w-full max-w-3xl mx-auto mb-6">
+            <div class="relative flex justify-center items-center w-full max-w-3xl mx-auto mb-6 h-28 md:h-36 lg:h-44">
                 <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-3/4 h-3/4 bg-white/40 blur-[70px] rounded-full hidden dark:block pointer-events-none z-0"></div>
-                <img src="{{ asset('logoticksid.png') }}"
-                     alt="Ticks ID - Platform Ekosistem Event Terintegrasi"
-                     width="400"
-                     height="176"
-                     fetchpriority="high"
-                     class="relative z-10 h-28 md:h-36 lg:h-44 w-auto object-contain border-none outline-none drop-shadow-2xl hover:scale-105 transition-transform duration-500 block dark:hidden">
-                <img src="{{ asset('logo_putih_ticks.png') }}"
-                     alt="Ticks ID - Platform Ekosistem Event Terintegrasi"
-                     width="400"
-                     height="176"
-                     fetchpriority="high"
-                     class="relative z-10 h-28 md:h-36 lg:h-44 w-auto object-contain border-none outline-none drop-shadow-2xl hover:scale-105 transition-transform duration-500 hidden dark:block">
+                <picture class="relative z-10 h-28 md:h-36 lg:h-44 w-auto object-contain block dark:hidden">
+                    <source srcset="{{ asset('logoticksid.webp') }}" type="image/webp">
+                    <img src="{{ asset('logoticksid.png') }}"
+                         alt="Ticks ID - Platform Ekosistem Event Terintegrasi"
+                         width="400"
+                         height="133"
+                         fetchpriority="high"
+                         class="h-28 md:h-36 lg:h-44 w-auto object-contain border-none outline-none drop-shadow-2xl hover:scale-105 transition-transform duration-500">
+                </picture>
+                <picture class="relative z-10 h-28 md:h-36 lg:h-44 w-auto object-contain hidden dark:block">
+                    <source srcset="{{ asset('logo_putih_ticks.webp') }}" type="image/webp">
+                    <img src="{{ asset('logo_putih_ticks.png') }}"
+                         alt="Ticks ID - Platform Ekosistem Event Terintegrasi"
+                         width="400"
+                         height="124"
+                         fetchpriority="high"
+                         class="h-28 md:h-36 lg:h-44 w-auto object-contain border-none outline-none drop-shadow-2xl hover:scale-105 transition-transform duration-500">
+                </picture>
             </div>
 
             <!-- Headline Teks -->
