@@ -26,6 +26,52 @@
 
     <link rel="icon" href="{{ asset('favicon.png') }}" type="image/png">
 
+    <!-- JSON-LD Structured Data for Search Engines & AI Agent Indexing -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@graph": [
+        {
+          "@type": "Organization",
+          "@id": "{{ url('/') }}#organization",
+          "name": "Ticks ID",
+          "url": "{{ url('/') }}",
+          "logo": {
+            "@type": "ImageObject",
+            "url": "{{ asset('logoticksid.png') }}",
+            "width": 400,
+            "height": 176
+          },
+          "sameAs": [
+            "https://www.instagram.com/eventorganizermedan"
+          ],
+          "contactPoint": {
+            "@type": "ContactPoint",
+            "telephone": "+62-821-6076-2279",
+            "contactType": "Customer Service",
+            "areaServed": "ID",
+            "availableLanguage": ["id", "en"]
+          }
+        },
+        {
+          "@type": "WebSite",
+          "@id": "{{ url('/') }}#website",
+          "url": "{{ url('/') }}",
+          "name": "Ticks ID",
+          "description": "Integrated Event Ecosystem di Indonesia untuk Ticketing, Sponsorship Marketplace, Livestreaming, dan Turnamen.",
+          "publisher": {
+            "@id": "{{ url('/') }}#organization"
+          },
+          "potentialAction": {
+            "@type": "SearchAction",
+            "target": "{{ url('/') }}?search={search_term_string}",
+            "query-input": "required name=search_term_string"
+          }
+        }
+      ]
+    }
+    </script>
+
     <!-- Preconnect Font Providers -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -35,9 +81,6 @@
 
     <!-- Google Fonts -->
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700;800;900&family=Exo+2:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-
-    <!-- Lucide Icons -->
-    <script src="https://unpkg.com/lucide@latest"></script>
 
     <!-- Konfigurasi Tailwind untuk Dark Mode -->
     <script>
@@ -104,12 +147,31 @@
             -webkit-text-fill-color: transparent;
             background-clip: text;
         }
+
+        /* Optimized Navbar Scrolled State */
+        .navbar-scrolled {
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+        }
+        html.dark .navbar-scrolled {
+            background: rgba(4, 27, 74, 0.9) !important;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05) !important;
+        }
+        html.light .navbar-scrolled {
+            background: rgba(255, 255, 255, 0.9) !important;
+            border-bottom: 1px solid rgba(0, 0, 0, 0.05) !important;
+        }
     </style>
 
     <!-- Slot khusus jika halaman anak butuh style tambahan -->
     @stack('styles')
 </head>
 <body class="bg-[#F8FAFC] text-slate-900 dark:bg-[#041B4A] dark:text-white flex flex-col min-h-screen relative">
+
+    <!-- ── AKSESIBILITAS: SKIP LINK ── -->
+    <a href="#main-content" class="sr-only focus:not-sr-only focus:fixed focus:top-4 focus:left-4 focus:z-[9999] focus:px-4 focus:py-2 focus:bg-[#0066FF] focus:text-white focus:font-bold focus:rounded-xl focus:shadow-2xl">
+        Lewati ke Konten Utama
+    </a>
 
     <!-- ── DEFINISI GRADIEN UNTUK IKON SVG BRAND GUIDELINE ── -->
     <svg width="0" height="0" class="hidden" aria-hidden="true">
@@ -129,102 +191,104 @@
         </defs>
     </svg>
 
-    <!-- ── NAVBAR ──────────────────────────────────────── -->
-    <nav id="navbar" class="fixed top-0 inset-x-0 z-50 transition-all duration-300 bg-transparent border-transparent" aria-label="Navigasi Utama">
-        <div class="max-w-7xl mx-auto px-6 lg:px-10 flex items-center justify-between py-4">
+    <!-- ── NAVBAR (LANDMARK HEADER) ────────────────────── -->
+    <header class="relative z-50">
+        <nav id="navbar" class="fixed top-0 inset-x-0 z-50 transition-all duration-300 bg-transparent border-transparent" aria-label="Navigasi Utama">
+            <div class="max-w-7xl mx-auto px-6 lg:px-10 flex items-center justify-between py-4">
 
-            <!-- Logo Dinamis -->
-            <a href="{{ url('/') }}" class="flex items-center shrink-0" aria-label="Ticks ID Beranda">
-                <img src="{{ asset('logoticksid.png') }}" alt="Ticks ID Logo" width="160" height="48" class="h-10 md:h-12 w-auto object-contain transition-all duration-300 block dark:hidden">
-                <img src="{{ asset('logo_putih_ticks.png') }}" alt="Ticks ID Logo" width="160" height="48" class="h-10 md:h-12 w-auto object-contain transition-all duration-300 hidden dark:block">
-            </a>
+                <!-- Logo Dinamis -->
+                <a href="{{ url('/') }}" class="flex items-center shrink-0" aria-label="Ticks ID Beranda">
+                    <img src="{{ asset('logoticksid.png') }}" alt="Ticks ID Logo" width="160" height="48" class="h-10 md:h-12 w-auto object-contain transition-all duration-300 block dark:hidden">
+                    <img src="{{ asset('logo_putih_ticks.png') }}" alt="Ticks ID Logo" width="160" height="48" class="h-10 md:h-12 w-auto object-contain transition-all duration-300 hidden dark:block">
+                </a>
 
-            <!-- Desktop Links -->
-            <div class="hidden md:flex items-center gap-8">
-                <a href="{{ url('/') }}#event-list" class="text-sm font-bold transition-colors text-slate-700 hover:text-[#0066FF] dark:text-white/80 dark:hover:text-white">Event</a>
-                <a href="{{ url('/') }}#packages" class="text-sm font-bold transition-colors text-slate-700 hover:text-[#0066FF] dark:text-white/80 dark:hover:text-white">Sponsorship</a>
+                <!-- Desktop Links -->
+                <div class="hidden md:flex items-center gap-8">
+                    <a href="{{ url('/') }}#event-list" class="text-sm font-bold transition-colors text-slate-700 hover:text-[#0066FF] dark:text-white/80 dark:hover:text-white">Event</a>
+                    <a href="{{ url('/') }}#packages" class="text-sm font-bold transition-colors text-slate-700 hover:text-[#0066FF] dark:text-white/80 dark:hover:text-white">Sponsorship</a>
+                </div>
+
+                <!-- Desktop CTA & Theme Toggle -->
+                <div class="hidden md:flex items-center gap-5">
+                    @auth
+                        @if(Auth::user()->role === 'admin' || Auth::user()->role === 'eo')
+                            <a href="{{ route('admin.dashboard') }}" class="text-sm font-bold transition-colors text-slate-700 hover:text-[#0066FF] dark:text-white/80 dark:hover:text-white">Dashboard</a>
+                        @endif
+
+                        <!-- LINK RIWAYAT -->
+                        <a href="{{ route('transaction.history') }}" class="text-sm font-bold transition-colors text-slate-700 hover:text-[#0066FF] dark:text-white/80 dark:hover:text-white flex items-center gap-1.5">
+                            <i data-lucide="clock" class="w-4 h-4"></i> Riwayat
+                        </a>
+
+                        <!-- LINK PROFIL -->
+                        <a href="{{ route('profile.edit') }}" class="text-sm font-bold transition-colors text-slate-700 hover:text-[#0066FF] dark:text-white/80 dark:hover:text-white">
+                            Halo, {{ explode(' ', Auth::user()->name)[0] }}
+                        </a>
+
+                        <!-- TOMBOL LOGOUT -->
+                        <form action="{{ route('logout') }}" method="POST" class="m-0 flex items-center">
+                            @csrf
+                            <button type="submit" aria-label="Keluar dari akun" class="text-sm font-bold transition-colors text-red-600 hover:text-red-700 dark:text-red-400 dark:hover:text-red-300">
+                                Logout
+                            </button>
+                        </form>
+                    @else
+                        <a href="{{ route('login') }}" class="text-sm font-bold transition-colors text-slate-700 hover:text-[#0066FF] dark:text-white/80 dark:hover:text-white">Masuk</a>
+                        <a href="{{ route('register') }}" class="px-5 py-2.5 text-sm font-bold text-white rounded-xl transition-all hover:opacity-90 hover:scale-105 shadow-md"
+                            style="background: linear-gradient(135deg, #0066FF, #00C2FF); font-family: 'Montserrat', sans-serif;">
+                            Mulai Gratis
+                        </a>
+                    @endauth
+
+                    <!-- Tombol Toggle Mode Gelap/Terang Desktop -->
+                    <button id="theme-toggle-desktop" aria-label="Ganti tema gelap atau terang" class="p-2.5 ml-2 rounded-full text-slate-600 bg-slate-200 hover:text-[#0066FF] dark:bg-white/10 dark:text-white/80 dark:hover:text-white transition-all focus:outline-none shadow-inner">
+                        <i id="theme-icon-desktop" data-lucide="moon" class="w-5 h-5"></i>
+                    </button>
+                </div>
+
+                <!-- Mobile Toggle -->
+                <div class="flex items-center gap-3 md:hidden">
+                    <button id="theme-toggle-mobile" aria-label="Ganti tema gelap atau terang" class="p-2 rounded-full text-slate-600 bg-slate-200 dark:bg-white/10 dark:text-white/80 transition-all focus:outline-none shadow-inner">
+                        <i id="theme-icon-mobile" data-lucide="moon" class="w-5 h-5"></i>
+                    </button>
+                    <button id="mobile-menu-btn" aria-label="Buka menu navigasi" aria-expanded="false" class="text-slate-800 dark:text-white p-1 focus:outline-none">
+                        <i data-lucide="menu" class="w-6 h-6" id="menu-icon"></i>
+                    </button>
+                </div>
             </div>
 
-            <!-- Desktop CTA & Theme Toggle -->
-            <div class="hidden md:flex items-center gap-5">
+            <!-- Mobile Drawer -->
+            <div id="mobile-drawer" class="hidden md:hidden px-6 py-5 flex-col gap-4 border-t bg-white border-slate-200 dark:bg-[#041B4A] dark:border-white/10 shadow-xl transition-colors duration-300">
+                <a href="{{ url('/') }}#event-list" class="text-slate-700 hover:text-[#0066FF] dark:text-white/80 dark:hover:text-white py-1 text-sm font-bold transition-colors">Event</a>
+                <a href="{{ url('/') }}#packages" class="text-slate-700 hover:text-[#0066FF] dark:text-white/80 dark:hover:text-white py-1 text-sm font-bold transition-colors">Sponsorship</a>
                 @auth
                     @if(Auth::user()->role === 'admin' || Auth::user()->role === 'eo')
-                        <a href="{{ route('admin.dashboard') }}" class="text-sm font-bold transition-colors text-slate-700 hover:text-[#0066FF] dark:text-white/80 dark:hover:text-white">Dashboard</a>
+                        <a href="{{ route('admin.dashboard') }}" class="text-slate-700 hover:text-[#0066FF] dark:text-white/80 dark:hover:text-white py-1 text-sm font-bold transition-colors">Dashboard</a>
                     @endif
-
-                    <!-- LINK RIWAYAT -->
-                    <a href="{{ route('transaction.history') }}" class="text-sm font-bold transition-colors text-slate-700 hover:text-[#0066FF] dark:text-white/80 dark:hover:text-white flex items-center gap-1.5">
+                    <a href="{{ route('transaction.history') }}" class="text-slate-700 hover:text-[#0066FF] dark:text-white/80 dark:hover:text-white py-1 text-sm font-bold transition-colors flex items-center gap-2">
                         <i data-lucide="clock" class="w-4 h-4"></i> Riwayat
                     </a>
-
-                    <!-- LINK PROFIL -->
-                    <a href="{{ route('profile.edit') }}" class="text-sm font-bold transition-colors text-slate-700 hover:text-[#0066FF] dark:text-white/80 dark:hover:text-white">
-                        Halo, {{ explode(' ', Auth::user()->name)[0] }}
+                    <a href="{{ route('profile.edit') }}" class="text-slate-700 hover:text-[#0066FF] dark:text-white/80 dark:hover:text-white py-1 text-sm font-bold transition-colors flex items-center gap-2">
+                        <i data-lucide="user" class="w-4 h-4"></i> Profil Saya
                     </a>
-
-                    <!-- TOMBOL LOGOUT -->
-                    <form action="{{ route('logout') }}" method="POST" class="m-0 flex items-center">
+                    <form action="{{ route('logout') }}" method="POST" class="w-full m-0">
                         @csrf
-                        <button type="submit" aria-label="Keluar dari akun" class="text-sm font-bold transition-colors text-red-600 hover:text-red-700 dark:text-red-400 dark:hover:text-red-300">
-                            Logout
+                        <button type="submit" aria-label="Keluar dari akun" class="w-full text-left text-red-600 hover:text-red-700 dark:text-red-400 py-1 text-sm font-bold transition-colors flex items-center gap-2">
+                            <i data-lucide="log-out" class="w-4 h-4"></i> Logout
                         </button>
                     </form>
                 @else
-                    <a href="{{ route('login') }}" class="text-sm font-bold transition-colors text-slate-700 hover:text-[#0066FF] dark:text-white/80 dark:hover:text-white">Masuk</a>
-                    <a href="{{ route('register') }}" class="px-5 py-2.5 text-sm font-bold text-white rounded-xl transition-all hover:opacity-90 hover:scale-105 shadow-md"
-                        style="background: linear-gradient(135deg, #0066FF, #00C2FF); font-family: 'Montserrat', sans-serif;">
+                    <a href="{{ route('login') }}" class="text-slate-700 hover:text-[#0066FF] dark:text-white/80 dark:hover:text-white py-1 text-sm font-bold transition-colors">Masuk</a>
+                    <a href="{{ route('register') }}" class="mt-2 px-5 py-3 text-sm font-bold text-white rounded-xl text-center shadow-md" style="background: linear-gradient(135deg, #0066FF, #00C2FF);">
                         Mulai Gratis
                     </a>
                 @endauth
-
-                <!-- Tombol Toggle Mode Gelap/Terang Desktop -->
-                <button id="theme-toggle-desktop" aria-label="Ganti tema gelap atau terang" class="p-2.5 ml-2 rounded-full text-slate-600 bg-slate-200 hover:text-[#0066FF] dark:bg-white/10 dark:text-white/80 dark:hover:text-white transition-all focus:outline-none shadow-inner">
-                    <i id="theme-icon-desktop" data-lucide="moon" class="w-5 h-5"></i>
-                </button>
             </div>
+        </nav>
+    </header>
 
-            <!-- Mobile Toggle -->
-            <div class="flex items-center gap-3 md:hidden">
-                <button id="theme-toggle-mobile" aria-label="Ganti tema gelap atau terang" class="p-2 rounded-full text-slate-600 bg-slate-200 dark:bg-white/10 dark:text-white/80 transition-all focus:outline-none shadow-inner">
-                    <i id="theme-icon-mobile" data-lucide="moon" class="w-5 h-5"></i>
-                </button>
-                <button id="mobile-menu-btn" aria-label="Buka menu navigasi" aria-expanded="false" class="text-slate-800 dark:text-white p-1 focus:outline-none">
-                    <i data-lucide="menu" class="w-6 h-6" id="menu-icon"></i>
-                </button>
-            </div>
-        </div>
-
-        <!-- Mobile Drawer -->
-        <div id="mobile-drawer" class="hidden md:hidden px-6 py-5 flex-col gap-4 border-t bg-white border-slate-200 dark:bg-[#041B4A] dark:border-white/10 shadow-xl transition-colors duration-300">
-            <a href="{{ url('/') }}#event-list" class="text-slate-700 hover:text-[#0066FF] dark:text-white/80 dark:hover:text-white py-1 text-sm font-bold transition-colors">Event</a>
-            <a href="{{ url('/') }}#packages" class="text-slate-700 hover:text-[#0066FF] dark:text-white/80 dark:hover:text-white py-1 text-sm font-bold transition-colors">Sponsorship</a>
-            @auth
-                @if(Auth::user()->role === 'admin' || Auth::user()->role === 'eo')
-                    <a href="{{ route('admin.dashboard') }}" class="text-slate-700 hover:text-[#0066FF] dark:text-white/80 dark:hover:text-white py-1 text-sm font-bold transition-colors">Dashboard</a>
-                @endif
-                <a href="{{ route('transaction.history') }}" class="text-slate-700 hover:text-[#0066FF] dark:text-white/80 dark:hover:text-white py-1 text-sm font-bold transition-colors flex items-center gap-2">
-                    <i data-lucide="clock" class="w-4 h-4"></i> Riwayat
-                </a>
-                <a href="{{ route('profile.edit') }}" class="text-slate-700 hover:text-[#0066FF] dark:text-white/80 dark:hover:text-white py-1 text-sm font-bold transition-colors flex items-center gap-2">
-                    <i data-lucide="user" class="w-4 h-4"></i> Profil Saya
-                </a>
-                <form action="{{ route('logout') }}" method="POST" class="w-full m-0">
-                    @csrf
-                    <button type="submit" aria-label="Keluar dari akun" class="w-full text-left text-red-600 hover:text-red-700 dark:text-red-400 py-1 text-sm font-bold transition-colors flex items-center gap-2">
-                        <i data-lucide="log-out" class="w-4 h-4"></i> Logout
-                    </button>
-                </form>
-            @else
-                <a href="{{ route('login') }}" class="text-slate-700 hover:text-[#0066FF] dark:text-white/80 dark:hover:text-white py-1 text-sm font-bold transition-colors">Masuk</a>
-                <a href="{{ route('register') }}" class="mt-2 px-5 py-3 text-sm font-bold text-white rounded-xl text-center shadow-md" style="background: linear-gradient(135deg, #0066FF, #00C2FF);">
-                    Mulai Gratis
-                </a>
-            @endauth
-        </div>
-    </nav>
-
-    <!-- ── LUBANG KONTEN HALAMAN ───────────────────────── -->
-    <main class="flex-grow">
+    <!-- ── LUBANG KONTEN HALAMAN (LANDMARK MAIN) ───────── -->
+    <main id="main-content" class="flex-grow">
         @yield('content')
     </main>
 
@@ -298,6 +362,9 @@
         </div>
     </footer>
 
+    <!-- Lucide Icons (Non-blocking) -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+
     <script>
         // Inisialisasi ikon
         lucide.createIcons();
@@ -320,24 +387,22 @@
         if(themeToggleDesktop) themeToggleDesktop.addEventListener('click', toggleTheme);
         if(themeToggleMobile) themeToggleMobile.addEventListener('click', toggleTheme);
 
-        // ── LOGIKA NAVBAR SAAT SCROLL ──
+        // ── LOGIKA NAVBAR SAAT SCROLL (OPTIMIZED DENGAN REQUESTANIMATIONFRAME) ──
         const navbar = document.getElementById('navbar');
+        let isTicking = false;
         window.addEventListener('scroll', () => {
-            if (window.scrollY > 40) {
-                if (html.classList.contains('dark')) {
-                    navbar.style.background = 'rgba(4, 27, 74, 0.9)';
-                    navbar.style.borderBottom = '1px solid rgba(255, 255, 255, 0.05)';
-                } else {
-                    navbar.style.background = 'rgba(255, 255, 255, 0.9)';
-                    navbar.style.borderBottom = '1px solid rgba(0, 0, 0, 0.05)';
-                }
-                navbar.style.backdropFilter = 'blur(16px)';
-            } else {
-                navbar.style.background = 'transparent';
-                navbar.style.backdropFilter = 'none';
-                navbar.style.borderBottom = 'none';
+            if (!isTicking) {
+                window.requestAnimationFrame(() => {
+                    if (window.scrollY > 40) {
+                        navbar.classList.add('navbar-scrolled');
+                    } else {
+                        navbar.classList.remove('navbar-scrolled');
+                    }
+                    isTicking = false;
+                });
+                isTicking = true;
             }
-        });
+        }, { passive: true });
 
         // ── LOGIKA MOBILE MENU ──
         const menuBtn = document.getElementById('mobile-menu-btn');
