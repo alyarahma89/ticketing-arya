@@ -4,7 +4,12 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Syarat & Ketentuan - Ticks ID</title>
+    <meta name="description" content="Syarat dan ketentuan penggunaan layanan ekosistem platform event Ticks ID.">
     <link rel="icon" href="{{ asset('favicon.png') }}" type="image/png">
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700;900&family=Exo+2:wght@400;500;600&display=swap" rel="stylesheet">
     <script src="https://unpkg.com/lucide@latest"></script>
@@ -16,14 +21,14 @@
 <body class="bg-[#F8FAFC] text-slate-900 flex flex-col min-h-screen">
 
     <!-- Navbar Sederhana -->
-    <nav class="sticky top-0 z-50 bg-white/90 backdrop-blur-md border-b border-slate-200 py-4">
+    <nav class="sticky top-0 z-50 bg-white/90 backdrop-blur-md border-b border-slate-200 py-4" aria-label="Navigasi Syarat & Ketentuan">
         <div class="max-w-4xl mx-auto px-6 flex items-center justify-between">
-            <a href="{{ url('/') }}" class="flex items-center gap-2 font-bold text-slate-600 hover:text-[#0066FF] transition-colors">
+            <a href="{{ url('/') }}" aria-label="Kembali ke Beranda" class="flex items-center gap-2 font-bold text-slate-600 hover:text-[#0066FF] transition-colors">
                 <i data-lucide="arrow-left" class="w-5 h-5"></i> Kembali ke Beranda
             </a>
-            <a href="{{ url('/') }}" class="flex items-center">
-                <img src="{{ asset('logoticksid.png') }}" alt="Ticks ID" class="h-8 w-auto object-contain block dark:hidden">
-                <img src="{{ asset('logo_putih_ticks.png') }}" alt="Ticks ID" class="h-8 w-auto object-contain hidden dark:block">
+            <a href="{{ url('/') }}" aria-label="Beranda Ticks ID" class="flex items-center">
+                <img src="{{ asset('logoticksid.png') }}" alt="Ticks ID Logo" width="128" height="32" class="h-8 w-auto object-contain block dark:hidden">
+                <img src="{{ asset('logo_putih_ticks.png') }}" alt="Ticks ID Logo" width="128" height="32" class="h-8 w-auto object-contain hidden dark:block">
             </a>
         </div>
     </nav>
