@@ -1,6 +1,7 @@
 @extends('layouts.main')
 
 @section('title', 'Ticks ID | Integrated Event Ecosystem')
+@section('meta_description', 'Platform ekosistem event terlengkap di Indonesia: Jual beli tiket event, livestreaming HD, sponsorship marketplace, dan manajemen turnamen dalam satu ekosistem.')
 
 @section('content')
 
@@ -24,10 +25,14 @@
             <div class="relative flex justify-center w-full max-w-3xl mx-auto mb-6">
                 <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-3/4 h-3/4 bg-white/40 blur-[70px] rounded-full hidden dark:block pointer-events-none z-0"></div>
                 <img src="{{ asset('logoticksid.png') }}"
-                     alt="Ticks ID Primary Logo"
+                     alt="Ticks ID Primary Logo - Ecosystem Event Platform"
+                     width="400"
+                     height="176"
                      class="relative z-10 h-28 md:h-36 lg:h-44 w-auto object-contain border-none outline-none drop-shadow-2xl hover:scale-105 transition-transform duration-500 block dark:hidden">
                 <img src="{{ asset('logo_putih_ticks.png') }}"
-                     alt="Ticks ID Primary Logo"
+                     alt="Ticks ID Primary Logo - Ecosystem Event Platform"
+                     width="400"
+                     height="176"
                      class="relative z-10 h-28 md:h-36 lg:h-44 w-auto object-contain border-none outline-none drop-shadow-2xl hover:scale-105 transition-transform duration-500 hidden dark:block">
             </div>
 
@@ -39,7 +44,7 @@
                 <span class="text-gradient-orange dark:text-gradient-neon">EVENT</span>
             </h1>
 
-            <p class="text-lg md:text-xl max-w-2xl mx-auto mb-10 leading-relaxed font-medium text-slate-600 dark:text-white/55 transition-colors">
+            <p class="text-lg md:text-xl max-w-2xl mx-auto mb-10 leading-relaxed font-medium text-slate-700 dark:text-white/75 transition-colors">
                 Dari ticketing hingga livestream, sponsorship hingga tournament — semua terintegrasi dalam satu ekosistem digital untuk event Indonesia yang lebih besar.
             </p>
 
@@ -58,13 +63,16 @@
 
             <form action="{{ url('/') }}" method="GET" class="max-w-3xl mx-auto p-4 rounded-2xl border shadow-xl relative z-20 transition-colors bg-white border-slate-200 dark:bg-white/5 dark:border-white/10 dark:backdrop-blur-md">
                 <div class="flex flex-col md:flex-row gap-3">
-                    <input type="text" name="search" value="{{ request('search') }}" placeholder="Cari nama event atau kategori..." class="flex-1 rounded-xl px-4 py-3 text-sm font-medium focus:outline-none focus:ring-2 transition-all bg-slate-50 border border-slate-200 text-slate-900 focus:border-[#0066FF] focus:ring-[#0066FF]/20 dark:bg-[#020C1F] dark:border-white/10 dark:text-white dark:focus:border-[#00C2FF]">
-                    <select name="location" class="rounded-xl px-4 py-3 text-sm font-medium focus:outline-none focus:ring-2 transition-all bg-slate-50 border border-slate-200 text-slate-900 focus:border-[#0066FF] focus:ring-[#0066FF]/20 dark:bg-[#020C1F] dark:border-white/10 dark:text-white dark:focus:border-[#00C2FF]">
+                    <label for="event-search-input" class="sr-only">Cari event atau kategori</label>
+                    <input type="text" id="event-search-input" name="search" value="{{ request('search') }}" aria-label="Cari nama event atau kategori" placeholder="Cari nama event atau kategori..." class="flex-1 rounded-xl px-4 py-3 text-sm font-medium focus:outline-none focus:ring-2 transition-all bg-slate-50 border border-slate-200 text-slate-900 focus:border-[#0066FF] focus:ring-[#0066FF]/20 dark:bg-[#020C1F] dark:border-white/10 dark:text-white dark:focus:border-[#00C2FF]">
+                    
+                    <label for="event-location-select" class="sr-only">Pilih lokasi event</label>
+                    <select id="event-location-select" name="location" aria-label="Pilih lokasi event" class="rounded-xl px-4 py-3 text-sm font-medium focus:outline-none focus:ring-2 transition-all bg-slate-50 border border-slate-200 text-slate-900 focus:border-[#0066FF] focus:ring-[#0066FF]/20 dark:bg-[#020C1F] dark:border-white/10 dark:text-white dark:focus:border-[#00C2FF]">
                         <option value="">Semua Lokasi</option>
                         <option value="Medan" {{ request('location') == 'Medan' ? 'selected' : '' }}>Medan</option>
                         <option value="Jakarta" {{ request('location') == 'Jakarta' ? 'selected' : '' }}>Jakarta</option>
                     </select>
-                    <button type="submit" class="px-8 py-3 font-bold text-white rounded-xl transition-all hover:scale-105 shadow-md" style="background: linear-gradient(135deg, #0066FF, #00C2FF);">
+                    <button type="submit" aria-label="Cari event sekarang" class="px-8 py-3 font-bold text-white rounded-xl transition-all hover:scale-105 shadow-md" style="background: linear-gradient(135deg, #0066FF, #00C2FF);">
                         Cari
                     </button>
                 </div>
@@ -86,20 +94,26 @@
                 <div class="group relative p-4 rounded-3xl border shadow-sm transition-all duration-300 hover:-translate-y-2 hover:shadow-xl flex flex-col bg-white border-slate-200 dark:bg-white/5 dark:border-white/10 dark:hover:border-[#0066FF55] dark:hover:shadow-[0_8px_40px_rgba(0,102,255,0.35)]">
 
                     <div class="h-44 w-full relative overflow-hidden rounded-2xl mb-5 bg-slate-100 dark:bg-[#0A1A3A]">
-                        <img src="{{ $event->image ? asset('storage/' . $event->image) : 'https://images.unsplash.com/photo-1492684223066-81342ee5ff30?w=600&q=80' }}" alt="{{ $event->name }}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
+                        <img src="{{ $event->image ? (Str::startsWith($event->image, ['http://', 'https://']) ? $event->image : asset('storage/' . $event->image)) : 'https://images.unsplash.com/photo-1492684223066-81342ee5ff30?w=600&q=80' }}" 
+                             alt="{{ $event->name }}" 
+                             width="600"
+                             height="350"
+                             loading="lazy"
+                             onerror="this.onerror=null;this.src='https://images.unsplash.com/photo-1492684223066-81342ee5ff30?w=600&q=80';"
+                             class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
                         <div class="absolute top-3 right-3 px-3 py-1 text-[10px] font-bold rounded-full tracking-wider shadow-sm text-white font-montserrat" style="background: #0066FF;">
                             {{ strtoupper($event->category->name ?? 'TANPA KATEGORI') }}
                         </div>
                     </div>
 
                     <h3 class="font-bold text-lg mb-2 font-montserrat text-slate-900 dark:text-white">{{ $event->name }}</h3>
-                    <p class="text-sm mb-4 line-clamp-2 font-medium text-slate-500 dark:text-white/50">{{ $event->description }}</p>
+                    <p class="text-sm mb-4 line-clamp-2 font-medium text-slate-600 dark:text-white/70">{{ $event->description }}</p>
 
-                    <div class="flex items-center gap-2 text-xs font-bold mb-2 text-slate-500 dark:text-white/40">
-                        <i data-lucide="map-pin" class="w-3.5 h-3.5 text-blue-500 dark:text-white/40"></i> {{ $event->location ?? 'Lokasi Belum Ditentukan' }}
+                    <div class="flex items-center gap-2 text-xs font-bold mb-2 text-slate-600 dark:text-white/70">
+                        <i data-lucide="map-pin" class="w-3.5 h-3.5 text-blue-500 dark:text-white/60"></i> {{ $event->location ?? 'Lokasi Belum Ditentukan' }}
                     </div>
-                    <div class="flex items-center gap-2 text-xs font-bold mb-4 pb-4 border-b text-slate-500 border-slate-100 dark:text-white/40 dark:border-white/10">
-                        <i data-lucide="calendar" class="w-3.5 h-3.5 text-orange-500 dark:text-white/40"></i> {{ date('d M Y', strtotime($event->event_date)) }}
+                    <div class="flex items-center gap-2 text-xs font-bold mb-4 pb-4 border-b text-slate-600 border-slate-100 dark:text-white/70 dark:border-white/10">
+                        <i data-lucide="calendar" class="w-3.5 h-3.5 text-orange-500 dark:text-white/60"></i> {{ date('d M Y', strtotime($event->event_date)) }}
                     </div>
 
                     <div class="mt-auto flex items-center justify-between">
@@ -110,7 +124,7 @@
                 @empty
                 <div class="col-span-1 md:col-span-2 lg:col-span-3 text-center py-16 rounded-3xl border border-dashed bg-slate-50 border-slate-300 dark:bg-transparent dark:border-white/20">
                     <i data-lucide="search-x" class="w-12 h-12 mx-auto mb-3 text-slate-400 dark:text-white/30"></i>
-                    <h3 class="font-bold text-lg text-slate-600 dark:text-white">Tidak ada event ditemukan</h3>
+                    <h3 class="font-bold text-lg text-slate-700 dark:text-white">Tidak ada event ditemukan</h3>
                 </div>
                 @endforelse
             </div>
@@ -125,20 +139,26 @@
                     SPONSORSHIP MARKETPLACE
                 </div>
                 <h2 class="font-black text-3xl md:text-4xl font-montserrat text-slate-900 dark:text-white">Dukung Event Terbaik</h2>
-                <p class="mt-4 max-w-2xl mx-auto font-medium text-slate-600 dark:text-white/50">Pilih event yang sesuai dengan target audiens brand kamu dan lihat berbagai penawaran paket sponsorship yang tersedia.</p>
+                <p class="mt-4 max-w-2xl mx-auto font-medium text-slate-700 dark:text-white/75">Pilih event yang sesuai dengan target audiens brand kamu dan lihat berbagai penawaran paket sponsorship yang tersedia.</p>
             </div>
 
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                 @forelse($events as $event)
                 <div class="group relative p-4 rounded-3xl border shadow-sm transition-all duration-300 hover:-translate-y-2 hover:shadow-xl flex flex-col bg-white border-slate-200 dark:bg-white/5 dark:border-white/10">
                     <div class="h-44 w-full relative overflow-hidden rounded-2xl mb-5 bg-slate-100 dark:bg-[#0A1A3A]">
-                        <img src="{{ $event->image ? asset('storage/' . $event->image) : 'https://images.unsplash.com/photo-1492684223066-81342ee5ff30?w=600&q=80' }}" alt="{{ $event->name }}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
+                        <img src="{{ $event->image ? (Str::startsWith($event->image, ['http://', 'https://']) ? $event->image : asset('storage/' . $event->image)) : 'https://images.unsplash.com/photo-1492684223066-81342ee5ff30?w=600&q=80' }}" 
+                             alt="{{ $event->name }}" 
+                             width="600"
+                             height="350"
+                             loading="lazy"
+                             onerror="this.onerror=null;this.src='https://images.unsplash.com/photo-1492684223066-81342ee5ff30?w=600&q=80';"
+                             class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
                     </div>
                     <h3 class="font-bold text-lg mb-2 font-montserrat text-slate-900 dark:text-white">{{ $event->name }}</h3>
-                    <p class="text-sm mb-4 line-clamp-2 font-medium text-slate-500 dark:text-white/50">{{ $event->description }}</p>
+                    <p class="text-sm mb-4 line-clamp-2 font-medium text-slate-600 dark:text-white/70">{{ $event->description }}</p>
 
-                    <div class="flex items-center gap-2 text-xs font-bold mb-4 text-slate-500 dark:text-white/40">
-                        <i data-lucide="map-pin" class="w-3.5 h-3.5 text-blue-500 dark:text-white/40"></i> {{ $event->location ?? 'Lokasi Belum Ditentukan' }}
+                    <div class="flex items-center gap-2 text-xs font-bold mb-4 text-slate-600 dark:text-white/70">
+                        <i data-lucide="map-pin" class="w-3.5 h-3.5 text-blue-500 dark:text-white/60"></i> {{ $event->location ?? 'Lokasi Belum Ditentukan' }}
                     </div>
 
                     <div class="mt-auto pt-4 border-t border-slate-100 dark:border-white/10">
@@ -148,7 +168,7 @@
                     </div>
                 </div>
                 @empty
-                <div class="col-span-1 md:col-span-3 text-center py-10 text-sm font-medium text-slate-500 dark:text-white/40">
+                <div class="col-span-1 md:col-span-3 text-center py-10 text-sm font-medium text-slate-600 dark:text-white/60">
                     Saat ini belum ada event yang membuka sponsorship.
                 </div>
                 @endforelse
@@ -162,19 +182,19 @@
             <div class="grid grid-cols-2 md:grid-cols-4 gap-8 md:gap-4">
                 <div class="text-center">
                     <div class="font-black text-4xl md:text-5xl text-gradient-blue font-montserrat">10K+</div>
-                    <div class="text-sm mt-2 font-bold text-slate-500 dark:text-white/45">Event Sukses</div>
+                    <div class="text-sm mt-2 font-bold text-slate-600 dark:text-white/70">Event Sukses</div>
                 </div>
                 <div class="text-center">
                     <div class="font-black text-4xl md:text-5xl text-gradient-blue font-montserrat">2.5M+</div>
-                    <div class="text-sm mt-2 font-bold text-slate-500 dark:text-white/45">Tiket Terjual</div>
+                    <div class="text-sm mt-2 font-bold text-slate-600 dark:text-white/70">Tiket Terjual</div>
                 </div>
                 <div class="text-center">
                     <div class="font-black text-4xl md:text-5xl text-gradient-blue font-montserrat">500+</div>
-                    <div class="text-sm mt-2 font-bold text-slate-500 dark:text-white/45">Brand Partner</div>
+                    <div class="text-sm mt-2 font-bold text-slate-600 dark:text-white/70">Brand Partner</div>
                 </div>
                 <div class="text-center">
                     <div class="font-black text-4xl md:text-5xl text-gradient-blue font-montserrat">98%</div>
-                    <div class="text-sm mt-2 font-bold text-slate-500 dark:text-white/45">Satisfaction Rate</div>
+                    <div class="text-sm mt-2 font-bold text-slate-600 dark:text-white/70">Satisfaction Rate</div>
                 </div>
             </div>
         </div>
@@ -191,8 +211,8 @@
                     Semua yang Kamu Butuhkan<br>
                     <span class="text-gradient-blue">Dalam Satu Platform</span>
                 </h2>
-                <p class="text-lg max-w-xl mx-auto mt-5 leading-relaxed font-medium text-slate-600 dark:text-white/50">
-                    Tidak perlu tools terpisah. ARTIX ID mengintegrasikan seluruh kebutuhan event management dalam satu ekosistem.
+                <p class="text-lg max-w-xl mx-auto mt-5 leading-relaxed font-medium text-slate-700 dark:text-white/75">
+                    Tidak perlu tools terpisah. Ticks ID mengintegrasikan seluruh kebutuhan event management dalam satu ekosistem.
                 </p>
             </div>
 
@@ -202,66 +222,84 @@
                 <div class="p-8 rounded-3xl border shadow-sm transition-all hover:-translate-y-1 bg-white border-slate-200 hover:shadow-xl dark:bg-white/5 dark:border-white/10 dark:hover:border-[#0066FF55] dark:hover:shadow-[0_8px_40px_rgba(0,102,255,0.35)] dark:hover:bg-[#0066FF08]">
                     <div class="mb-6 w-14 h-14 flex items-center justify-center rounded-2xl bg-blue-50 dark:bg-[#0066FF1E]">
                         <img src="{{ asset('images/ticketing.svg') }}"
-                             alt="Smart Ticketing"
+                             alt="Icon Smart Ticketing"
+                             width="32"
+                             height="32"
+                             loading="lazy"
                              class="w-8 h-8">
                     </div>
                     <h3 class="font-bold text-xl mb-3 font-montserrat text-slate-900 dark:text-white">Smart Ticketing</h3>
-                    <p class="text-sm leading-relaxed font-medium text-slate-600 dark:text-white/50">Jual tiket dengan sistem manajemen kapasitas, multi-kategori harga, dan payment gateway terintegrasi.</p>
+                    <p class="text-sm leading-relaxed font-medium text-slate-600 dark:text-white/70">Jual tiket dengan sistem manajemen kapasitas, multi-kategori harga, dan payment gateway terintegrasi.</p>
                 </div>
 
                 <!-- 2. Livestream -->
                 <div class="p-8 rounded-3xl border shadow-sm transition-all hover:-translate-y-1 bg-white border-slate-200 hover:shadow-xl dark:bg-white/5 dark:border-white/10 dark:hover:border-[#FF3B3055] dark:hover:shadow-[0_8px_40px_rgba(255,59,48,0.35)] dark:hover:bg-[#FF3B3008]">
                     <div class="mb-6 w-14 h-14 flex items-center justify-center rounded-2xl bg-blue-50 dark:bg-[#0066FF1E]">
                         <img src="{{ asset('images/livestream.svg') }}"
-                             alt="Livestream HD"
+                             alt="Icon Livestream HD"
+                             width="32"
+                             height="32"
+                             loading="lazy"
                              class="w-8 h-8">
                     </div>
                     <h3 class="font-bold text-xl mb-3 font-montserrat text-slate-900 dark:text-white">Livestream HD</h3>
-                    <p class="text-sm leading-relaxed font-medium text-slate-600 dark:text-white/50">Broadcast ke seluruh Indonesia dengan latensi rendah. Monetisasi lewat tiket virtual dan sponsorship slot.</p>
+                    <p class="text-sm leading-relaxed font-medium text-slate-600 dark:text-white/70">Broadcast ke seluruh Indonesia dengan latensi rendah. Monetisasi lewat tiket virtual dan sponsorship slot.</p>
                 </div>
 
                 <!-- 3. Sponsorship -->
                 <div class="p-8 rounded-3xl border shadow-sm transition-all hover:-translate-y-1 bg-white border-slate-200 hover:shadow-xl dark:bg-white/5 dark:border-white/10 dark:hover:border-[#A100FF55] dark:hover:shadow-[0_8px_40px_rgba(161,0,255,0.35)] dark:hover:bg-[#A100FF08]">
                     <div class="mb-6 w-14 h-14 flex items-center justify-center rounded-2xl bg-blue-50 dark:bg-[#0066FF1E]">
                         <img src="{{ asset('images/sponsorship.svg') }}"
-                             alt="Sponsorship Marketplace"
+                             alt="Icon Sponsorship Marketplace"
+                             width="32"
+                             height="32"
+                             loading="lazy"
                              class="w-8 h-8">
                     </div>
                     <h3 class="font-bold text-xl mb-3 font-montserrat text-slate-900 dark:text-white">Sponsorship Marketplace</h3>
-                    <p class="text-sm leading-relaxed font-medium text-slate-600 dark:text-white/50">AI-matching antara brand dan event. Proposal, kontrak, dan pembayaran dalam satu platform.</p>
+                    <p class="text-sm leading-relaxed font-medium text-slate-600 dark:text-white/70">AI-matching antara brand dan event. Proposal, kontrak, dan pembayaran dalam satu platform.</p>
                 </div>
 
                 <!-- 4. Tournament -->
                 <div class="p-8 rounded-3xl border shadow-sm transition-all hover:-translate-y-1 bg-white border-slate-200 hover:shadow-xl dark:bg-white/5 dark:border-white/10 dark:hover:border-[#0066FF55] dark:hover:shadow-[0_8px_40px_rgba(0,102,255,0.35)] dark:hover:bg-[#0066FF08]">
                     <div class="mb-6 w-14 h-14 flex items-center justify-center rounded-2xl bg-blue-50 dark:bg-[#0066FF1E]">
                         <img src="{{ asset('images/tournament.svg') }}"
-                             alt="Tournament System"
+                             alt="Icon Tournament System"
+                             width="32"
+                             height="32"
+                             loading="lazy"
                              class="w-8 h-8">
                     </div>
                     <h3 class="font-bold text-xl mb-3 font-montserrat text-slate-900 dark:text-white">Tournament System</h3>
-                    <p class="text-sm leading-relaxed font-medium text-slate-600 dark:text-white/50">Kelola bracket kompetisi secara real-time untuk event E-Sports, olahraga, maupun kompetisi akademik.</p>
+                    <p class="text-sm leading-relaxed font-medium text-slate-600 dark:text-white/70">Kelola bracket kompetisi secara real-time untuk event E-Sports, olahraga, maupun kompetisi akademik.</p>
                 </div>
 
                 <!-- 5. Community -->
                 <div class="p-8 rounded-3xl border shadow-sm transition-all hover:-translate-y-1 bg-white border-slate-200 hover:shadow-xl dark:bg-white/5 dark:border-white/10 dark:hover:border-[#FF3B3055] dark:hover:shadow-[0_8px_40px_rgba(255,59,48,0.35)] dark:hover:bg-[#FF3B3008]">
                     <div class="mb-6 w-14 h-14 flex items-center justify-center rounded-2xl bg-orange-50 dark:bg-[#FF3B301E]">
                         <img src="{{ asset('images/community.svg') }}"
-                             alt="Community Engagement"
+                             alt="Icon Community Engagement"
+                             width="32"
+                             height="32"
+                             loading="lazy"
                              class="w-8 h-8">
                     </div>
                     <h3 class="font-bold text-xl mb-3 font-montserrat text-slate-900 dark:text-white">Community Engagement</h3>
-                    <p class="text-sm leading-relaxed font-medium text-slate-600 dark:text-white/50">Bangun koneksi peserta sebelum, selama, dan setelah event untuk loyalitas komunitas jangka panjang.</p>
+                    <p class="text-sm leading-relaxed font-medium text-slate-600 dark:text-white/70">Bangun koneksi peserta sebelum, selama, dan setelah event untuk loyalitas komunitas jangka panjang.</p>
                 </div>
 
                 <!-- 6. Analytics -->
                 <div class="p-8 rounded-3xl border shadow-sm transition-all hover:-translate-y-1 bg-white border-slate-200 hover:shadow-xl dark:bg-white/5 dark:border-white/10 dark:hover:border-[#A100FF55] dark:hover:shadow-[0_8px_40px_rgba(161,0,255,0.35)] dark:hover:bg-[#A100FF08]">
                     <div class="mb-6 w-14 h-14 flex items-center justify-center rounded-2xl bg-purple-50 dark:bg-[#A100FF1E]">
                         <img src="{{ asset('images/analytics.svg') }}"
-                             alt="Analytics & Report"
+                             alt="Icon Analytics & Report"
+                             width="32"
+                             height="32"
+                             loading="lazy"
                              class="w-8 h-8">
                     </div>
                     <h3 class="font-bold text-xl mb-3 font-montserrat text-slate-900 dark:text-white">Analytics & Report</h3>
-                    <p class="text-sm leading-relaxed font-medium text-slate-600 dark:text-white/50">Data demografi, laporan penjualan tiket, hingga engagement secara live untuk optimasi event berikutnya.</p>
+                    <p class="text-sm leading-relaxed font-medium text-slate-600 dark:text-white/70">Data demografi, laporan penjualan tiket, hingga engagement secara live untuk optimasi event berikutnya.</p>
                 </div>
 
             </div>
@@ -280,8 +318,8 @@
                     <h2 class="font-black text-4xl md:text-5xl leading-tight mb-6 font-montserrat text-slate-900 dark:text-white">
                         Mulai dalam <span class="text-gradient-orange">3 Langkah</span>
                     </h2>
-                    <p class="text-lg leading-relaxed font-medium text-slate-600 dark:text-white/50">
-                        Dari setup hingga go-live, ARTIX ID dirancang untuk kecepatan dan kemudahan bagi penyelenggara di semua skala — dari indie sampai enterprise.
+                    <p class="text-lg leading-relaxed font-medium text-slate-700 dark:text-white/75">
+                        Dari setup hingga go-live, Ticks ID dirancang untuk kecepatan dan kemudahan bagi penyelenggara di semua skala — dari indie sampai enterprise.
                     </p>
                     <a href="{{ route('register') }}" class="group inline-flex items-center gap-2 mt-8 font-bold text-sm text-[#0066FF] hover:text-blue-700 dark:hover:text-blue-400">
                         Pelajari selengkapnya <i data-lucide="chevron-right" class="w-4 h-4 group-hover:translate-x-1 transition-transform"></i>
@@ -294,7 +332,7 @@
                         <div class="font-black text-4xl md:text-3xl shrink-0 leading-none text-gradient-blue font-montserrat">01</div>
                         <div>
                             <h3 class="font-bold text-lg mb-1 font-montserrat text-slate-900 dark:text-white">Daftar & Konfigurasi</h3>
-                            <p class="text-sm leading-relaxed font-medium text-slate-600 dark:text-white/50">Buat akun dalam hitungan menit. Atur profil event dan pilih fitur yang kamu butuhkan.</p>
+                            <p class="text-sm leading-relaxed font-medium text-slate-600 dark:text-white/70">Buat akun dalam hitungan menit. Atur profil event dan pilih fitur yang kamu butuhkan.</p>
                         </div>
                     </div>
                     <!-- Step 2 -->
@@ -302,7 +340,7 @@
                         <div class="font-black text-4xl md:text-3xl shrink-0 leading-none text-gradient-blue font-montserrat">02</div>
                         <div>
                             <h3 class="font-bold text-lg mb-1 font-montserrat text-slate-900 dark:text-white">Publish & Promote</h3>
-                            <p class="text-sm leading-relaxed font-medium text-slate-600 dark:text-white/50">Go-live dengan ticketing, livestream, atau tournament. Sebarkan ke komunitas kamu.</p>
+                            <p class="text-sm leading-relaxed font-medium text-slate-600 dark:text-white/70">Go-live dengan ticketing, livestream, atau tournament. Sebarkan ke komunitas kamu.</p>
                         </div>
                     </div>
                     <!-- Step 3 -->
@@ -310,7 +348,7 @@
                         <div class="font-black text-4xl md:text-3xl shrink-0 leading-none text-gradient-blue font-montserrat">03</div>
                         <div>
                             <h3 class="font-bold text-lg mb-1 font-montserrat text-slate-900 dark:text-white">Grow & Monetize</h3>
-                            <p class="text-sm leading-relaxed font-medium text-slate-600 dark:text-white/50">Analisis data real-time, tarik sponsor lewat marketplace, dan kembangkan komunitas event.</p>
+                            <p class="text-sm leading-relaxed font-medium text-slate-600 dark:text-white/70">Analisis data real-time, tarik sponsor lewat marketplace, dan kembangkan komunitas event.</p>
                         </div>
                     </div>
                 </div>
@@ -329,9 +367,14 @@
                 @foreach(\App\Models\Category::all() as $cat)
                 <a href="{{ route('events.byCategory', $cat->id) }}" class="relative rounded-3xl overflow-hidden group cursor-pointer block shadow-md bg-slate-800 dark:bg-[#0A1A3A]" style="height: 340px;">
 
-                    <!-- ── LOGIKA LINK GAMBAR DINAMIS (DIPERBAIKI) ── -->
-                    <!-- Menggunakan ?: (Elvis Operator) agar teks kosong ("") tetap memunculkan gambar default -->
-                    <img src="{{ $cat->image ?: 'https://images.unsplash.com/photo-1501281668745-f7f57925c3b4?w=800&h=600&fit=crop' }}" class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105" style="opacity: 0.6;">
+                    <!-- ── LOGIKA LINK GAMBAR DINAMIS ── -->
+                    <img src="{{ $cat->image ?: 'https://images.unsplash.com/photo-1501281668745-f7f57925c3b4?w=800&h=600&fit=crop' }}" 
+                         alt="Kategori Event {{ $cat->name }}" 
+                         width="600" 
+                         height="340" 
+                         loading="lazy" 
+                         class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105" 
+                         style="opacity: 0.6;">
 
                     <div class="absolute inset-0 bg-gradient-to-t from-[#0F172A] via-[#0F172A]/30 to-transparent dark:from-[#020C1F] dark:via-[#020C1F]/30"></div>
                     <div class="absolute bottom-8 left-8 right-8">
@@ -363,25 +406,25 @@
                 <span class="text-gradient-blue dark:hidden">Event Kamu?</span>
                 <span class="hidden dark:inline">Event Kamu?</span>
             </h2>
-            <p class="text-lg mb-10 max-w-xl mx-auto leading-relaxed font-medium text-slate-600 dark:text-white/55">
-                Bergabung dengan ribuan event organizer yang sudah menggunakan ARTIX ID. Mulai gratis, upgrade kapan saja.
+            <p class="text-lg mb-10 max-w-xl mx-auto leading-relaxed font-medium text-slate-700 dark:text-white/75">
+                Bergabung dengan ribuan event organizer yang sudah menggunakan Ticks ID. Mulai gratis, upgrade kapan saja.
             </p>
             <div class="flex flex-col sm:flex-row gap-4 justify-center">
                 <a href="{{ route('register') }}" class="group inline-flex items-center justify-center gap-2 px-8 py-4 font-bold text-white rounded-xl transition-all hover:scale-105 shadow-xl hover:shadow-2xl font-montserrat dark:shadow-[0_0_50px_rgba(0,102,255,0.6)]" style="background: linear-gradient(135deg, #0066FF, #00C2FF);">
                     Daftar Gratis Sekarang <i data-lucide="arrow-right" class="w-4 h-4 group-hover:translate-x-1 transition-transform"></i>
                 </a>
-                <a href="https://wa.me/6282160762279?text=Halo%20Admin%20ARTIX%20ID,%20saya%20ingin%20konsultasi%20seputar%20penyelenggaraan%20event" target="_blank" rel="noopener noreferrer" class="inline-flex items-center justify-center gap-2 px-8 py-4 font-bold rounded-xl border transition-all text-slate-700 bg-white border-slate-300 hover:bg-slate-50 hover:shadow-md dark:bg-transparent dark:text-white dark:border-white/20 dark:hover:bg-white/5 dark:shadow-none">
+                <a href="https://wa.me/6282160762279?text=Halo%20Admin%20Ticks%20ID,%20saya%20ingin%20konsultasi%20seputar%20penyelenggaraan%20event" target="_blank" rel="noopener noreferrer" class="inline-flex items-center justify-center gap-2 px-8 py-4 font-bold rounded-xl border transition-all text-slate-700 bg-white border-slate-300 hover:bg-slate-50 hover:shadow-md dark:bg-transparent dark:text-white dark:border-white/20 dark:hover:bg-white/5 dark:shadow-none">
                     <i data-lucide="message-circle" class="w-5 h-5 text-emerald-500"></i> Hubungi Sales (+62 821-6076-2279)
                 </a>
             </div>
             <div class="flex flex-wrap items-center justify-center gap-6 mt-10">
-                <div class="flex items-center gap-2 text-sm font-bold text-slate-500 dark:font-medium dark:text-white/50">
+                <div class="flex items-center gap-2 text-sm font-bold text-slate-600 dark:font-medium dark:text-white/70">
                     <i data-lucide="check-circle" class="w-4 h-4 text-blue-500 dark:text-[#00C2FF]"></i> Setup 5 menit
                 </div>
-                <div class="flex items-center gap-2 text-sm font-bold text-slate-500 dark:font-medium dark:text-white/50">
+                <div class="flex items-center gap-2 text-sm font-bold text-slate-600 dark:font-medium dark:text-white/70">
                     <i data-lucide="check-circle" class="w-4 h-4 text-blue-500 dark:text-[#00C2FF]"></i> Gratis 30 hari
                 </div>
-                <div class="flex items-center gap-2 text-sm font-bold text-slate-500 dark:font-medium dark:text-white/50">
+                <div class="flex items-center gap-2 text-sm font-bold text-slate-600 dark:font-medium dark:text-white/70">
                     <i data-lucide="check-circle" class="w-4 h-4 text-blue-500 dark:text-[#00C2FF]"></i> Tanpa kartu kredit
                 </div>
             </div>

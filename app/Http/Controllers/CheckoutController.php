@@ -310,6 +310,29 @@ class CheckoutController extends Controller
         }
     }
 
+    // 4d. Cek Status Background Polling (JSON untuk Auto-Refresh Real-Time di Halaman Invoice)
+    public function checkStatusJson($id)
+    {
+        $transaction = Transaction::where('id', $id)
+            ->where('user_id', Auth::id())
+            ->first();
+
+        if (!$transaction) {
+            return response()->json(['status' => 'not_found'], 404);
+        }
+
+        if ($transaction->payment_status === 'paid') {
+            return response()->json([
+                'status' => 'paid',
+                'redirect' => route('transaction.history')
+            ]);
+        }
+
+        return response()->json([
+            'status' => $transaction->payment_status
+        ]);
+    }
+
     // 4c. Batalkan Pesanan Tiket (Mengembalikan Kuota Event)
     public function cancelTransaction($id)
     {
@@ -400,15 +423,29 @@ class CheckoutController extends Controller
     {
         $userId = \Illuminate\Support\Facades\Auth::id();
 
-        $ticketTransactions = \App\Models\Transaction::with(['event.category', 'event.ticketPackages'])
-            ->where('user_id', $userId)
-            ->latest()
-            ->get();
+        try {
+            $ticketTransactions = \App\Models\Transaction::with(['event.category', 'event.ticketPackages'])
+                ->where('user_id', $userId)
+                ->latest()
+                ->get();
+        } catch (\Exception $e) {
+            \Illuminate\Support\Facades\Log::error("Error loading ticket transactions: " . $e->getMessage());
+            try {
+                $ticketTransactions = \App\Models\Transaction::where('user_id', $userId)->latest()->get();
+            } catch (\Exception $ex) {
+                $ticketTransactions = collect();
+            }
+        }
 
-        $sponsorshipTransactions = \App\Models\SponsorshipTransaction::with('sponsorship.event')
-            ->where('user_id', $userId)
-            ->latest()
-            ->get();
+        try {
+            $sponsorshipTransactions = \App\Models\SponsorshipTransaction::with('sponsorship.event')
+                ->where('user_id', $userId)
+                ->latest()
+                ->get();
+        } catch (\Exception $e) {
+            \Illuminate\Support\Facades\Log::error("Error loading sponsorship transactions: " . $e->getMessage());
+            $sponsorshipTransactions = collect();
+        }
 
         return view('history', compact('ticketTransactions', 'sponsorshipTransactions'));
     }

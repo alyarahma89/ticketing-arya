@@ -4,7 +4,12 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Katalog Event - Ticks ID</title>
+    <meta name="description" content="Jelajahi dan temukan berbagai event menarik, konser musik, workshop, dan seminar di Indonesia melalui Ticks ID.">
     <link rel="icon" href="{{ asset('favicon.png') }}" type="image/png">
+
+    <!-- Preconnect Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 
     <!-- Tailwind & Fonts -->
     <script src="https://cdn.tailwindcss.com"></script>
@@ -52,9 +57,9 @@
 <body class="bg-[#F8FAFC] text-slate-900 dark:bg-[#041B4A] dark:text-white flex flex-col min-h-screen transition-colors duration-300">
 
     <!-- Navbar Sederhana -->
-    <nav class="sticky top-0 z-50 bg-white/90 dark:bg-[#041B4A]/90 backdrop-blur-md border-b border-slate-200 dark:border-white/10 py-4">
+    <nav class="sticky top-0 z-50 bg-white/90 dark:bg-[#041B4A]/90 backdrop-blur-md border-b border-slate-200 dark:border-white/10 py-4" aria-label="Navigasi Katalog">
         <div class="max-w-7xl mx-auto px-6 flex items-center justify-between">
-            <a href="{{ url('/') }}" class="flex items-center gap-2 font-bold text-slate-600 hover:text-[#0066FF] dark:text-white/70 dark:hover:text-white transition-colors">
+            <a href="{{ url('/') }}" aria-label="Kembali ke Beranda" class="flex items-center gap-2 font-bold text-slate-700 hover:text-[#0066FF] dark:text-white/80 dark:hover:text-white transition-colors">
                 <i data-lucide="arrow-left" class="w-5 h-5"></i> Kembali
             </a>
 
@@ -62,7 +67,7 @@
 
             <!-- Tempat Tombol Toggle Tema (Pengganti Spacer) -->
             <div class="flex justify-end w-24">
-                <button id="theme-toggle" class="p-2.5 rounded-full text-slate-500 bg-slate-100 border border-slate-200 shadow-sm hover:text-[#0066FF] dark:bg-white/10 dark:border-white/10 dark:text-white/70 dark:hover:text-white transition-all focus:outline-none">
+                <button id="theme-toggle" aria-label="Ganti mode gelap atau terang" class="p-2.5 rounded-full text-slate-600 bg-slate-100 border border-slate-200 shadow-sm hover:text-[#0066FF] dark:bg-white/10 dark:border-white/10 dark:text-white/80 dark:hover:text-white transition-all focus:outline-none">
                     <i id="theme-icon" data-lucide="moon" class="w-4 h-4"></i>
                 </button>
             </div>
@@ -80,7 +85,7 @@
                     <h2 class="font-black text-3xl md:text-4xl font-montserrat leading-tight">
                         Temukan Event <span class="text-gradient-blue">Favoritmu</span>
                     </h2>
-                    <p class="text-xs md:text-sm font-medium text-slate-500 dark:text-white/50 mt-1">
+                    <p class="text-xs md:text-sm font-medium text-slate-600 dark:text-white/70 mt-1">
                         Jelajahi dan dapatkan tiket event terbaik di seluruh Indonesia.
                     </p>
                 </div>
@@ -91,13 +96,13 @@
                     <!-- 1. Ikon & Input Pencarian Nama -->
                     <div class="relative flex-1 min-w-[180px] flex items-center px-3 border-b lg:border-b-0 lg:border-r border-slate-100 dark:border-white/10 py-1.5">
                         <i data-lucide="search" class="w-4 h-4 text-[#0066FF] dark:text-[#00C2FF] shrink-0"></i>
-                        <input type="text" name="search" value="{{ request('search') }}" placeholder="Cari nama event..." class="w-full bg-transparent text-xs md:text-sm font-medium pl-2.5 pr-2 focus:outline-none text-slate-900 dark:text-white placeholder-slate-400">
+                        <input type="text" name="search" value="{{ request('search') }}" aria-label="Cari nama event" placeholder="Cari nama event..." class="w-full bg-transparent text-xs md:text-sm font-medium pl-2.5 pr-2 focus:outline-none text-slate-900 dark:text-white placeholder-slate-400">
                     </div>
 
                     <!-- 2. Ikon & Dropdown Kategori -->
                     <div class="relative flex-1 min-w-[150px] flex items-center px-3 border-b lg:border-b-0 lg:border-r border-slate-100 dark:border-white/10 py-1.5">
                         <i data-lucide="grid" class="w-4 h-4 text-purple-500 shrink-0"></i>
-                        <select name="category_id" class="w-full bg-transparent text-xs md:text-sm font-medium pl-2 pr-2 focus:outline-none text-slate-900 dark:text-white cursor-pointer appearance-none">
+                        <select name="category_id" aria-label="Filter kategori event" class="w-full bg-transparent text-xs md:text-sm font-medium pl-2 pr-2 focus:outline-none text-slate-900 dark:text-white cursor-pointer appearance-none">
                             <option value="" class="dark:bg-[#041B4A]">Semua Kategori</option>
                             @foreach($categories as $cat)
                                 <option value="{{ $cat->id }}" class="dark:bg-[#041B4A]" {{ request('category_id') == $cat->id ? 'selected' : '' }}>{{ $cat->name }}</option>
@@ -108,7 +113,7 @@
                     <!-- 3. Ikon & Dropdown Lokasi -->
                     <div class="relative flex-1 min-w-[140px] flex items-center px-3 py-1.5">
                         <i data-lucide="map-pin" class="w-4 h-4 text-[#FF7A00] shrink-0"></i>
-                        <select name="location" class="w-full bg-transparent text-xs md:text-sm font-medium pl-2 pr-2 focus:outline-none text-slate-900 dark:text-white cursor-pointer appearance-none">
+                        <select name="location" aria-label="Filter lokasi event" class="w-full bg-transparent text-xs md:text-sm font-medium pl-2 pr-2 focus:outline-none text-slate-900 dark:text-white cursor-pointer appearance-none">
                             <option value="" class="dark:bg-[#041B4A]">Semua Lokasi</option>
                             <option value="Medan" class="dark:bg-[#041B4A]" {{ request('location') == 'Medan' ? 'selected' : '' }}>Medan</option>
                             <option value="Jakarta" class="dark:bg-[#041B4A]" {{ request('location') == 'Jakarta' ? 'selected' : '' }}>Jakarta</option>
@@ -116,14 +121,14 @@
                     </div>
 
                     <!-- Tombol Terapkan (Cari) -->
-                    <button type="submit" class="w-full lg:w-auto px-6 py-2.5 rounded-xl lg:rounded-full font-bold text-xs text-white transition-all hover:scale-105 shadow-md flex items-center justify-center gap-2 shrink-0" style="background: linear-gradient(135deg, #0066FF, #00C2FF);">
+                    <button type="submit" aria-label="Terapkan pencarian event" class="w-full lg:w-auto px-6 py-2.5 rounded-xl lg:rounded-full font-bold text-xs text-white transition-all hover:scale-105 shadow-md flex items-center justify-center gap-2 shrink-0" style="background: linear-gradient(135deg, #0066FF, #00C2FF);">
                         <i data-lucide="arrow-right" class="w-4 h-4"></i>
                         <span class="lg:hidden">Cari Event</span>
                     </button>
 
                     <!-- Tombol Reset (Muncul jika ada filter yang aktif) -->
                     @if(request('search') || request('category_id') || request('location'))
-                        <a href="{{ route('explore.events') }}" class="p-2.5 rounded-full bg-slate-100 dark:bg-white/10 text-slate-400 hover:text-red-500 transition-colors shrink-0" title="Reset Filter">
+                        <a href="{{ route('explore.events') }}" class="p-2.5 rounded-full bg-slate-100 dark:bg-white/10 text-slate-400 hover:text-red-500 transition-colors shrink-0" aria-label="Reset Filter" title="Reset Filter">
                             <i data-lucide="x" class="w-4 h-4"></i>
                         </a>
                     @endif
@@ -139,18 +144,24 @@
                 @endphp
                 <div class="reveal-up {{ $delayClass }} group relative p-4 rounded-3xl border shadow-sm transition-all duration-300 hover:-translate-y-2 hover:shadow-xl flex flex-col bg-white border-slate-200 dark:bg-white/5 dark:border-white/10 dark:hover:border-[#0066FF55]">
                     <div class="h-44 w-full relative overflow-hidden rounded-2xl mb-5 bg-slate-100 dark:bg-[#0A1A3A]">
-                        <img src="{{ $event->image ? asset('storage/' . $event->image) : 'https://images.unsplash.com/photo-1492684223066-81342ee5ff30?w=600&q=80' }}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
+                        <img src="{{ $event->image ? (Str::startsWith($event->image, ['http://', 'https://']) ? $event->image : asset('storage/' . $event->image)) : 'https://images.unsplash.com/photo-1492684223066-81342ee5ff30?w=600&q=80' }}" 
+                             alt="{{ $event->name }}" 
+                             width="600"
+                             height="350"
+                             loading="lazy"
+                             onerror="this.onerror=null;this.src='https://images.unsplash.com/photo-1492684223066-81342ee5ff30?w=600&q=80';"
+                             class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
                         <div class="absolute top-3 right-3 px-3 py-1 text-[10px] font-bold rounded-full text-white font-montserrat bg-[#0066FF]">
                             {{ strtoupper($event->category->name ?? 'TANPA KATEGORI') }}
                         </div>
                     </div>
                     <h3 class="font-bold text-lg mb-2 font-montserrat text-slate-900 dark:text-white">{{ $event->name }}</h3>
-                    <p class="text-sm mb-4 line-clamp-2 font-medium text-slate-500 dark:text-white/50">{{ $event->description }}</p>
+                    <p class="text-sm mb-4 line-clamp-2 font-medium text-slate-600 dark:text-white/70">{{ $event->description }}</p>
 
-                    <div class="flex items-center gap-2 text-xs font-bold mb-2 text-slate-500 dark:text-white/40">
+                    <div class="flex items-center gap-2 text-xs font-bold mb-2 text-slate-600 dark:text-white/70">
                         <i data-lucide="map-pin" class="w-3.5 h-3.5 text-blue-500"></i> {{ $event->location ?? 'Lokasi Belum Ditentukan' }}
                     </div>
-                    <div class="flex items-center gap-2 text-xs font-bold mb-4 pb-4 border-b text-slate-500 border-slate-100 dark:border-white/10 dark:text-white/40">
+                    <div class="flex items-center gap-2 text-xs font-bold mb-4 pb-4 border-b text-slate-600 border-slate-100 dark:border-white/10 dark:text-white/70">
                         <i data-lucide="calendar" class="w-3.5 h-3.5 text-orange-500"></i> {{ date('d M Y', strtotime($event->event_date)) }}
                     </div>
 
@@ -162,7 +173,7 @@
                 @empty
                 <div class="reveal-up col-span-1 md:col-span-2 lg:col-span-3 text-center py-20 rounded-3xl border border-dashed bg-slate-50 border-slate-300 dark:bg-transparent dark:border-white/20">
                     <i data-lucide="search-x" class="w-12 h-12 mx-auto mb-3 text-slate-400 dark:text-white/30"></i>
-                    <h3 class="font-bold text-lg text-slate-600 dark:text-white">Tidak ada event yang sesuai pencarian</h3>
+                    <h3 class="font-bold text-lg text-slate-700 dark:text-white">Tidak ada event yang sesuai pencarian</h3>
                 </div>
                 @endforelse
             </div>

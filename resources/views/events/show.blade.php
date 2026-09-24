@@ -1,6 +1,6 @@
 @extends('layouts.main')
 
-@section('title', $event->name . ' | ARTIX ID')
+@section('title', $event->name . ' | Ticks ID')
 
 <!-- ── MENYUNTIKKAN CSS KHUSUS HALAMAN DETAIL ── -->
 @push('styles')
@@ -96,14 +96,19 @@
                             <div class="swiper mainGallerySwiper w-full h-full">
                                 <div class="swiper-wrapper">
                                     <div class="swiper-slide relative cursor-grab">
-                                        <img src="{{ $event->image ? asset('storage/' . $event->image) : 'https://images.unsplash.com/photo-1470225620780-dba8ba36b745?auto=format&fit=crop&w=1200&q=80' }}" alt="{{ $event->name }}" class="w-full h-full object-cover">
+                                        <img src="{{ $event->image ? (Str::startsWith($event->image, ['http://', 'https://']) ? $event->image : asset('storage/' . $event->image)) : 'https://images.unsplash.com/photo-1470225620780-dba8ba36b745?auto=format&fit=crop&w=1200&q=80' }}" 
+                                             alt="{{ $event->name }}" 
+                                             onerror="this.onerror=null;this.src='https://images.unsplash.com/photo-1470225620780-dba8ba36b745?auto=format&fit=crop&w=1200&q=80';"
+                                             class="w-full h-full object-cover">
                                         <div class="absolute inset-0 bg-gradient-to-t from-slate-900/40 to-transparent pointer-events-none"></div>
                                     </div>
 
                                     @if($event->galleries && $event->galleries->count() > 0)
                                         @foreach($event->galleries as $gallery)
                                             <div class="swiper-slide relative cursor-grab">
-                                                <img src="{{ asset('storage/' . $gallery->image) }}" class="w-full h-full object-cover">
+                                                <img src="{{ asset('storage/' . $gallery->image) }}" 
+                                                     onerror="this.onerror=null;this.src='https://images.unsplash.com/photo-1470225620780-dba8ba36b745?auto=format&fit=crop&w=1200&q=80';"
+                                                     class="w-full h-full object-cover">
                                                 <div class="absolute inset-0 bg-gradient-to-t from-slate-900/40 to-transparent pointer-events-none"></div>
                                             </div>
                                         @endforeach
@@ -120,11 +125,15 @@
                         <div class="swiper thumbGallerySwiper w-full h-20 md:h-24 px-1 py-1">
                             <div class="swiper-wrapper">
                                 <div class="swiper-slide cursor-pointer rounded-xl overflow-hidden shadow-sm">
-                                    <img src="{{ $event->image ? asset('storage/' . $event->image) : 'https://images.unsplash.com/photo-1470225620780-dba8ba36b745?auto=format&fit=crop&w=1200&q=80' }}" class="w-full h-full object-cover">
+                                    <img src="{{ $event->image ? (Str::startsWith($event->image, ['http://', 'https://']) ? $event->image : asset('storage/' . $event->image)) : 'https://images.unsplash.com/photo-1470225620780-dba8ba36b745?auto=format&fit=crop&w=1200&q=80' }}" 
+                                         onerror="this.onerror=null;this.src='https://images.unsplash.com/photo-1470225620780-dba8ba36b745?auto=format&fit=crop&w=1200&q=80';"
+                                         class="w-full h-full object-cover">
                                 </div>
                                 @foreach($event->galleries as $gallery)
                                     <div class="swiper-slide cursor-pointer rounded-xl overflow-hidden shadow-sm">
-                                        <img src="{{ asset('storage/' . $gallery->image) }}" class="w-full h-full object-cover">
+                                        <img src="{{ asset('storage/' . $gallery->image) }}" 
+                                             onerror="this.onerror=null;this.src='https://images.unsplash.com/photo-1470225620780-dba8ba36b745?auto=format&fit=crop&w=1200&q=80';"
+                                             class="w-full h-full object-cover">
                                     </div>
                                 @endforeach
                             </div>
@@ -201,7 +210,7 @@
                         </h3>
                         <ul class="text-sm flex flex-col gap-3 ps-5 list-disc m-0 leading-relaxed font-medium text-slate-600 dark:text-white/60">
                             <li>Tiket yang sudah dibeli bersifat <strong class="text-slate-900 dark:text-white">Non-Refundable</strong> (tidak dapat diuangkan kembali).</li>
-                            <li>Pengunjung wajib menunjukkan e-tiket (QR Code) resmi dari ARTIX ID saat registrasi di lokasi.</li>
+                            <li>Pengunjung wajib menunjukkan e-tiket (QR Code) resmi dari Ticks ID saat registrasi di lokasi.</li>
                             <li>Pembeli tiket livestream dilarang menyebarkan ulang link siaran ke pihak lain.</li>
                             <li>Satu tiket hanya berlaku untuk satu orang pengunjung.</li>
                         </ul>

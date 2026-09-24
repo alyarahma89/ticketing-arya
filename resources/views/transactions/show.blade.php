@@ -1,6 +1,6 @@
 @extends('layouts.main')
 
-@section('title', 'Invoice ' . $transaction->event->name . ' | ARTIX ID')
+@section('title', 'Invoice ' . $transaction->event->name . ' | Ticks ID')
 
 <!-- ── MENYUNTIKKAN CSS KHUSUS HALAMAN INVOICE ── -->
 @push('styles')
@@ -54,7 +54,10 @@
 
                     <!-- Gambar Event -->
                     <div class="w-full h-64 md:h-96 rounded-3xl overflow-hidden mb-8 border border-slate-200 dark:border-white/10 shadow-sm bg-slate-100 dark:bg-slate-800">
-                        <img src="{{ $transaction->event->image ? asset('storage/' . $transaction->event->image) : 'https://images.unsplash.com/photo-1470225620780-dba8ba36b745?auto=format&fit=crop&w=1200&q=80' }}" alt="{{ $transaction->event->name }}" class="w-full h-full object-cover">
+                        <img src="{{ $transaction->event->image ? (Str::startsWith($transaction->event->image, ['http://', 'https://']) ? $transaction->event->image : asset('storage/' . $transaction->event->image)) : 'https://images.unsplash.com/photo-1470225620780-dba8ba36b745?auto=format&fit=crop&w=1200&q=80' }}" 
+                             alt="{{ $transaction->event->name }}" 
+                             onerror="this.onerror=null;this.src='https://images.unsplash.com/photo-1470225620780-dba8ba36b745?auto=format&fit=crop&w=1200&q=80';"
+                             class="w-full h-full object-cover">
                     </div>
 
                     <!-- Informasi Event -->
@@ -171,9 +174,15 @@
 
                             <!-- Area Tombol Aksi -->
                             @if($transaction->payment_status == 'pending' && !empty($snapToken))
-                                <button id="pay-button" class="w-full flex items-center justify-center gap-2 py-4 font-bold text-white rounded-xl transition-all hover:scale-105 shadow-md shadow-blue-500/30" style="background: linear-gradient(135deg, #0066FF, #00C2FF);">
+                                <button id="pay-button" class="w-full flex items-center justify-center gap-2 py-4 font-bold text-white rounded-xl transition-all hover:scale-105 shadow-md shadow-blue-500/30 cursor-pointer" style="background: linear-gradient(135deg, #0066FF, #00C2FF);">
                                     <i data-lucide="credit-card" class="w-5 h-5"></i> Bayar Sekarang
                                 </button>
+                                
+                                <!-- Tombol Verifikasi Cepat (Tanpa Perlu Refresh Manual) -->
+                                <a href="{{ route('transaction.check_status', $transaction->id) }}" class="w-full mt-3 flex items-center justify-center gap-2 py-3 font-bold text-[#0066FF] bg-blue-50 hover:bg-blue-100 dark:bg-blue-500/10 dark:hover:bg-blue-500/20 border border-blue-200 dark:border-blue-500/30 rounded-xl transition-all text-xs">
+                                    <i data-lucide="refresh-cw" class="w-4 h-4"></i> Sudah Bayar? Cek Status Pembayaran
+                                </a>
+
                                 <p class="text-center text-xs font-medium text-slate-400 dark:text-white/30 mt-4 flex items-center justify-center gap-1.5">
                                     <i data-lucide="shield-check" class="w-4 h-4"></i> Transaksi aman oleh Midtrans
                                 </p>
@@ -248,27 +257,51 @@
         });
     </script>
 
-    <!-- ── SCRIPT MIDTRANS ── -->
-    @if($transaction->payment_status == 'pending' && !empty($snapToken))
-        <script src="https://app.sandbox.midtrans.com/snap/snap.js" data-client-key="{{ config('midtrans.client_key') }}"></script>
+    <!-- ── SCRIPT MIDTRANS & AUTO-SYNC REAL-TIME ── -->
+    @if($transaction->payment_status == 'pending')
+        @if(!empty($snapToken))
+            <script src="https://app.sandbox.midtrans.com/snap/snap.js" data-client-key="{{ config('midtrans.client_key') }}"></script>
+            <script type="text/javascript">
+                var payButton = document.getElementById('pay-button');
+                if (payButton) {
+                    payButton.addEventListener('click', function () {
+                        window.snap.pay('{{ $snapToken }}', {
+                            onSuccess: function(result){
+                                window.location.href = "{{ route('transaction.check_status', $transaction->id) }}";
+                            },
+                            onPending: function(result){
+                                window.location.href = "{{ route('transaction.check_status', $transaction->id) }}";
+                            },
+                            onError: function(result){
+                                alert("Pembayaran belum berhasil diselesaikan.");
+                                window.location.href = "{{ route('transaction.check_status', $transaction->id) }}";
+                            },
+                            onClose: function(){
+                                // Otomatis verifikasi status ke server setelah pop-up ditutup
+                                window.location.href = "{{ route('transaction.check_status', $transaction->id) }}";
+                            }
+                        });
+                    });
+                }
+            </script>
+        @endif
+
         <script type="text/javascript">
-            var payButton = document.getElementById('pay-button');
-            payButton.addEventListener('click', function () {
-                window.snap.pay('{{ $snapToken }}', {
-                    onSuccess: function(result){
-                        window.location.href = "{{ url('/midtrans/finish') }}?order_id={{ $transaction->order_id }}";
-                    },
-                    onPending: function(result){
-                        window.location.href = "{{ url('/midtrans/finish') }}?order_id={{ $transaction->order_id }}";
-                    },
-                    onError: function(result){
-                        alert("Pembayaran gagal.");
-                    },
-                    onClose: function(){
-                        alert('Kamu menutup jendela pembayaran sebelum menyelesaikannya.');
-                    }
-                });
-            });
+            // ── Auto-Polling Background (Cek otomatis setiap 3 detik jika user bayar di HP lain / scan QRIS) ──
+            var checkInterval = setInterval(function () {
+                fetch("{{ route('transaction.check_status_json', $transaction->id) }}")
+                    .then(function (res) { return res.json(); })
+                    .then(function (data) {
+                        if (data && data.status === 'paid') {
+                            clearInterval(checkInterval);
+                            // Otomatis berpindah ke riwayat tiket tanpa pembeli harus refresh manual!
+                            window.location.href = data.redirect || "{{ route('transaction.history') }}";
+                        }
+                    })
+                    .catch(function (e) {
+                        // Abaikan error network sesaat
+                    });
+            }, 3000);
         </script>
     @endif
 @endpush

@@ -1,6 +1,6 @@
 @extends('layouts.main')
 
-@section('title', 'Proposal Sponsorship - ' . $event->name . ' | ARTIX ID')
+@section('title', 'Proposal Sponsorship - ' . $event->name . ' | Ticks ID')
 
 @section('content')
 
@@ -53,7 +53,9 @@
                             <!-- Gambar Badge (Bisa Logo EO atau Gambar Paket) -->
                             <div class="w-16 h-16 rounded-xl overflow-hidden shrink-0 bg-slate-100 dark:bg-[#0A1A3A] flex items-center justify-center border border-slate-200 dark:border-white/10">
                                 @if($sponsor->image)
-                                    <img src="{{ asset('storage/' . $sponsor->image) }}" class="w-full h-full object-cover">
+                                    <img src="{{ asset('storage/' . $sponsor->image) }}" 
+                                         onerror="this.onerror=null;this.parentElement.innerHTML='<i data-lucide=\'shield\' class=\'w-8 h-8 text-slate-300 dark:text-white/20\'></i>';lucide.createIcons();" 
+                                         class="w-full h-full object-cover">
                                 @else
                                     <i data-lucide="shield" class="w-8 h-8 text-slate-300 dark:text-white/20"></i>
                                 @endif

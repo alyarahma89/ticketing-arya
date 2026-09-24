@@ -12,7 +12,10 @@ class VerifyCsrfToken extends Middleware
      * @var array<int, string>
      */
     protected $except = [
-        // Mengecualikan rute callback dari penjagaan CSRF
+        // Mengecualikan rute callback Midtrans dari penjagaan CSRF
         '/midtrans-callback',
+        'midtrans-callback',
+        'midtrans-callback/*',
+        '/midtrans-callback/*',
     ];
 }

@@ -20,13 +20,13 @@ class TicketMail extends Mailable
 
     public function build()
     {
-        // 1. PERHATIKAN DI SINI: Sudah diubah menjadi 'emails.ticket'
-        $pdf = Pdf::loadView('emails.ticket', ['transaction' => $this->transaction]);
+        // 1. Generate lampiran PDF menggunakan template PDF teroptimasi DomPDF
+        $pdf = Pdf::loadView('transactions.pdf_ticket', ['transaction' => $this->transaction]);
 
-        // 2. Kirim email dengan lampiran PDF tersebut
-        return $this->subject('E-Ticket Resmi: ' . $this->transaction->event->name)
-                    ->view('emails.ticket') // Ini isi teks emailnya
-                    ->attachData($pdf->output(), 'E-Ticket-' . $this->transaction->id . '.pdf', [
+        // 2. Kirim email dengan tampilan emails.ticket dan lampirkan file PDF
+        return $this->subject('E-Ticket Resmi: ' . ($this->transaction->event->name ?? 'Event') . ' - #' . $this->transaction->order_id)
+                    ->view('emails.ticket')
+                    ->attachData($pdf->output(), 'E-Ticket-' . $this->transaction->order_id . '.pdf', [
                         'mime' => 'application/pdf',
                     ]);
     }
