@@ -180,9 +180,6 @@
     <section id="packages" class="py-20 border-t transition-colors bg-slate-50 border-slate-200 dark:bg-[#020C1F] dark:border-white/10">
         <div class="max-w-7xl mx-auto px-6">
             <div class="text-center mb-12">
-                <div class="inline-flex items-center gap-1.5 px-4 py-1.5 rounded-full text-xs font-bold tracking-widest border mb-4 bg-purple-100 border-purple-200 text-purple-700 dark:bg-[#A100FF18] dark:border-[#A100FF45] dark:text-[#A100FF]">
-                    SPONSORSHIP MARKETPLACE
-                </div>
                 <h2 class="font-black text-3xl md:text-4xl font-montserrat text-slate-900 dark:text-white">Dukung Event Terbaik</h2>
                 <p class="mt-4 max-w-2xl mx-auto font-medium text-slate-600 dark:text-white/50">Pilih event yang sesuai dengan target audiens brand kamu dan lihat berbagai penawaran paket sponsorship yang tersedia.</p>
             </div>
@@ -243,9 +240,6 @@
     <section id="features" class="py-28 transition-colors bg-[#F8FAFC] dark:bg-[#030F2E]">
         <div class="max-w-7xl mx-auto px-6">
             <div class="text-center mb-16">
-                <div class="inline-flex items-center gap-1.5 px-4 py-1.5 rounded-full text-xs font-bold tracking-widest border mb-6 bg-blue-50 border-blue-200 text-blue-600 dark:bg-[#0066FF18] dark:border-[#0066FF45] dark:text-[#00C2FF]">
-                    <i data-lucide="globe" class="w-3 h-3"></i> PLATFORM ECOSYSTEM
-                </div>
                 <h2 class="font-black text-4xl md:text-5xl leading-tight font-montserrat text-slate-900 dark:text-white">
                     Semua yang Kamu Butuhkan<br>
                     <span class="text-gradient-blue">Dalam Satu Platform</span>
@@ -333,9 +327,6 @@
         <div class="max-w-7xl mx-auto px-6 relative z-10">
             <div class="grid lg:grid-cols-2 gap-16 items-center">
                 <div>
-                    <div class="inline-flex items-center gap-1.5 px-4 py-1.5 rounded-full text-xs font-bold tracking-widest border mb-6 bg-orange-50 border-orange-200 text-orange-600 dark:bg-[#FF7A0018] dark:border-[#FF7A0045] dark:text-[#FF7A00]">
-                        HOW IT WORKS
-                    </div>
                     <h2 class="font-black text-4xl md:text-5xl leading-tight mb-6 font-montserrat text-slate-900 dark:text-white">
                         Mulai dalam <span class="text-gradient-orange">3 Langkah</span>
                     </h2>
